@@ -48,6 +48,10 @@ public class PlayerInputSet : MonoBehaviour {
         }
     }
 
+    private void Shoot() {
+        Debug.Log("Pew Pew");
+        animator.SetTrigger("Fire");
+    }
     private void AnimatorControllers() {
         float xVelocity = Vector3.Dot(moveDirection, transform.right);
         float zVelocity = Vector3.Dot(moveDirection, transform.forward);
@@ -109,6 +113,9 @@ public class PlayerInputSet : MonoBehaviour {
             isRunning = false;
             moveSpeed = walkSpeed;
         };
+
+        controls.Character.Fire.performed += context => Shoot();
+
     }
 
     private void OnEnable() => controls.Enable();
