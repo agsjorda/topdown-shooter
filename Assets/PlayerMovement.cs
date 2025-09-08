@@ -1,6 +1,8 @@
 using UnityEngine;
 
-public class PlayerInputSet : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour {
+
+    private Player player;
 
     private PlayerControls controls;
     private CharacterController characterController;
@@ -24,15 +26,16 @@ public class PlayerInputSet : MonoBehaviour {
     private Vector2 moveInput;
     private Vector2 aimInput;
 
-    private void Awake() {
-        AssignInputEvents();
-    }
 
     private void Start() {
+        player = GetComponent<Player>();
+
         characterController = GetComponent<CharacterController>();
         animator = GetComponentInChildren<Animator>();
         meshTransform = animator.transform; // grab the mesh/animator child
         moveSpeed = walkSpeed;
+
+        AssignInputEvents();
     }
 
     private void Update() {
@@ -48,10 +51,6 @@ public class PlayerInputSet : MonoBehaviour {
         }
     }
 
-    private void Shoot() {
-        Debug.Log("Pew Pew");
-        animator.SetTrigger("Fire");
-    }
     private void AnimatorControllers() {
         float xVelocity = Vector3.Dot(moveDirection, transform.right);
         float zVelocity = Vector3.Dot(moveDirection, transform.forward);
@@ -97,7 +96,7 @@ public class PlayerInputSet : MonoBehaviour {
     }
 
     private void AssignInputEvents() {
-        controls = new PlayerControls();
+        controls = player.controls;
 
         controls.Character.Movement.performed += context => moveInput = context.ReadValue<Vector2>();
         controls.Character.Movement.canceled += context => moveInput = Vector2.zero;
@@ -114,10 +113,7 @@ public class PlayerInputSet : MonoBehaviour {
             moveSpeed = walkSpeed;
         };
 
-        controls.Character.Fire.performed += context => Shoot();
-
     }
 
-    private void OnEnable() => controls.Enable();
-    private void OnDisable() => controls.Disable();
+
 }
