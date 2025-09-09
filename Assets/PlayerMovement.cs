@@ -73,7 +73,7 @@ public class PlayerMovement : MonoBehaviour {
 
             transform.forward = lookingDirection; // Rotate player to face the aim direction
 
-            aim.position = new Vector3(hitInfo.point.x, hitInfo.point.y, hitInfo.point.z); // Set aim position
+            aim.position = new Vector3(hitInfo.point.x, transform.position.y + 1, hitInfo.point.z); // Set aim position
         }
     }
 
