@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Animations.Rigging;
 
 public class WeaponVisualController : MonoBehaviour {
 
@@ -14,38 +15,42 @@ public class WeaponVisualController : MonoBehaviour {
 
     private Transform currentGun;
 
+    [Header("Rig")]
+    [SerializeField] private float rigIncreaseStep;
+    private bool rigShouldBeIncreased;
+
+
     [Header("Left and IK")]
     [SerializeField] private Transform leftHand;
+
+    private Rig rig;
 
     private void Start() {
         SwitchOn(pistol);
 
-        anim = GetComponentInParent<Animator>();
+        anim = GetComponentInChildren<Animator>();
+        rig = GetComponentInChildren<Rig>();
     }
 
     private void Update() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            SwitchOn(pistol);
-            SwitchAnimationLayer(1);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            SwitchOn(revolver);
-            SwitchAnimationLayer(1);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            SwitchOn(autoRifle);
-            SwitchAnimationLayer(1);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4)) {
-            SwitchOn(shotgun);
-            SwitchAnimationLayer(2);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5)) {
-            SwitchOn(rifle);
-            SwitchAnimationLayer(3);
+        CheckWeaponSwitch();
+
+        if (Input.GetKeyDown(KeyCode.R)) {
+            anim.SetTrigger("Reload");
+            rig.weight = 0;
         }
 
+        if (rigShouldBeIncreased) {
+            rig.weight += rigIncreaseStep * Time.deltaTime;
+            if (rig.weight >= 1) {
+                rigShouldBeIncreased = false;
+            }
+        }
     }
+
+    public void ReturnRigWeightToOne() => rigShouldBeIncreased = true;
+
+
 
     private void SwitchOn(Transform gunTransform) {
         SwitchOffGuns();
@@ -72,6 +77,29 @@ public class WeaponVisualController : MonoBehaviour {
     private void SwitchAnimationLayer(int layerIndex) {
         for (int i = 1; i < anim.layerCount; i++) {
             anim.SetLayerWeight(i, i == layerIndex ? 1 : 0);
+        }
+    }
+
+    private void CheckWeaponSwitch() {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            SwitchOn(pistol);
+            SwitchAnimationLayer(1);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            SwitchOn(revolver);
+            SwitchAnimationLayer(1);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            SwitchOn(autoRifle);
+            SwitchAnimationLayer(1);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4)) {
+            SwitchOn(shotgun);
+            SwitchAnimationLayer(2);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5)) {
+            SwitchOn(rifle);
+            SwitchAnimationLayer(3);
         }
     }
 }
