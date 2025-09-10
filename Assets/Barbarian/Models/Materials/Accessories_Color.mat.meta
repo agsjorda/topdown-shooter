@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 0445816b09919c74ead2df9a0fc65e17
+timeCreated: 1478431311
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 75519
+  packageName: Barbarian warrior
+  packageVersion: 1.3
+  assetPath: Assets/Barbarian/Models/Materials/Accessories_Color.mat
+  uploadId: 151442

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: c2a37abe15acef24fb2692d575d7410b
+timeCreated: 1479526703
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 75519
+  packageName: Barbarian warrior
+  packageVersion: 1.3
+  assetPath: Assets/Barbarian/Models/Materials/eyebase.mat
+  uploadId: 151442
