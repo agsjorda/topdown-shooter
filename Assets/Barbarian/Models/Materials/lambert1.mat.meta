@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: b05c6f0444b771e4c94ea60e1d9c7c3f
+timeCreated: 1479570111
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 75519
+  packageName: Barbarian warrior
+  packageVersion: 1.3
+  assetPath: Assets/Barbarian/Models/Materials/lambert1.mat
+  uploadId: 151442
