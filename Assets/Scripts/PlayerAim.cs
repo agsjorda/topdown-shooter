@@ -8,6 +8,8 @@ public class PlayerAim : MonoBehaviour {
     [Header("Aim Control")]
     [SerializeField] private Transform aim;
 
+    [SerializeField] private bool isAimingPrecisely;
+
     [Header("Camera Control")]
     [SerializeField] private Transform cameraTarget;
     [Range(0.5f, 1f)]
@@ -31,12 +33,31 @@ public class PlayerAim : MonoBehaviour {
     }
 
     private void Update() {
-        aim.position = GetMouseHitInfo().point;
-        aim.position = new Vector3(aim.position.x, transform.position.y + 1, aim.position.z); // Keep the aim at the player's height
 
+        if (Input.GetKeyDown(KeyCode.P))
+            isAimingPrecisely = !isAimingPrecisely;
+
+        UpdateAimPosition();
+        UpdateCameraPosition();
+    }
+
+    private void UpdateCameraPosition() {
         cameraTarget.position = Vector3.Lerp(cameraTarget.position, DesiredCameraPosition(), cameraSensitivity * Time.deltaTime);
     }
 
+    private void UpdateAimPosition() {
+        aim.position = GetMouseHitInfo().point;
+
+        if (!isAimingPrecisely)
+            aim.position = new Vector3(aim.position.x, transform.position.y + 1, aim.position.z); // Keep the aim at the player's height
+    }
+
+    public bool CanAimPrecisely() {
+        if (isAimingPrecisely)
+            return true;
+
+        return false;
+    }
     private Vector3 DesiredCameraPosition() {
 
         float actualMaxCameraDistance = player.movement.moveInput.y < -.5f ? minCameraDistance : maxCameraDistance;
