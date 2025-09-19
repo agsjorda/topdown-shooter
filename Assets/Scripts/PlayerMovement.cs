@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour {
     [SerializeField] private float runSpeed = 3f;
     [SerializeField] private float turnSpeed;
     private float verticalVelocity;
+    public float jumpHeight = 2.0f; // How high the character can jump
 
     public Vector2 moveInput { get; private set; }
     private Vector3 moveDirection;
@@ -35,6 +36,11 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void Update() {
+        if (Input.GetKeyDown(KeyCode.Space) && characterController.isGrounded) {
+            Jump();
+        }
+
+        CalculateGravity(); // Now ONLY updates verticalVelocity, doesn't apply it.
         ApplyMovement();
         ApplyRotation();
         AnimatorControllers();
@@ -46,7 +52,27 @@ public class PlayerMovement : MonoBehaviour {
             meshTransform.localRotation = Quaternion.identity;
         }
     }
-
+    private void CalculateGravity() {
+        if (characterController.isGrounded) {
+            // If grounded, reset vertical velocity to a small negative value to stay planted.
+            // Only do this if we aren't moving upwards (i.e., not jumping this frame)
+            if (verticalVelocity < 0) {
+                verticalVelocity = -2f; // A stronger force to ensure grounding
+            }
+        } else {
+            // If NOT grounded, apply gravity to accelerate downward
+            verticalVelocity -= gravity * Time.deltaTime;
+        }
+    }
+    private void Jump() {
+        // Physics formula: v = sqrt(2 * gravity * jumpHeight)
+        Debug.Log("Jump!");
+        verticalVelocity = Mathf.Sqrt(2f * jumpHeight * gravity);
+        // Optional: Set a flag for animations
+        //isJumping = true;
+        // Optional: Trigger a jump animation if you have one
+        // animator.SetTrigger("Jump");
+    }
     private void AnimatorControllers() {
         float xVelocity = Vector3.Dot(moveDirection, transform.right);
         float zVelocity = Vector3.Dot(moveDirection, transform.forward);
@@ -59,33 +85,38 @@ public class PlayerMovement : MonoBehaviour {
     }
 
     private void ApplyRotation() {
-
-        //Debug.DrawLine(ray.origin, hit.point, Color.red);
         Vector3 lookingDirection = player.aim.GetMouseHitInfo().point - transform.position;
         lookingDirection.y = 0; // Ignore vertical aiming
-        lookingDirection.Normalize();
 
-        Quaternion desiredRotation = Quaternion.LookRotation(lookingDirection);
-        transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, turnSpeed * Time.deltaTime);
+        if (lookingDirection.sqrMagnitude > 0.0001f) {
+            lookingDirection.Normalize();
+            Quaternion desiredRotation = Quaternion.LookRotation(lookingDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, turnSpeed * Time.deltaTime);
+        }
+        // else: Do nothing, keep current rotation
     }
 
     private void ApplyMovement() {
-        moveDirection = new Vector3(moveInput.x, 0, moveInput.y);
-        ApplyGravity();
+        // 1. Create HORIZONTAL movement direction from input AND STORE IT IN moveDirection
+        moveDirection = new Vector3(moveInput.x, 0, moveInput.y); // <-- This line is crucial for animations
+                                                                  // Apply speed to horizontal movement
+        Vector3 horizontalVelocity = moveDirection * moveSpeed; // Use a temporary variable for speed
 
-        if (moveDirection.magnitude > 0) {
-            characterController.Move(moveDirection * Time.deltaTime * moveSpeed);
-        }
+        // 2. Create the FINAL movement vector by COMBINING horizontal and vertical
+        Vector3 finalMovement = new Vector3(horizontalVelocity.x, verticalVelocity, horizontalVelocity.z);
+
+        // 3. Move the character using the combined vector
+        characterController.Move(finalMovement * Time.deltaTime);
     }
 
-    private void ApplyGravity() {
-        if (!characterController.isGrounded) {
-            verticalVelocity -= gravity * Time.deltaTime;
-            moveDirection.y = verticalVelocity;
-        } else {
-            moveDirection.y = -.5f; // small downward force to keep grounded
-        }
-    }
+    //private void ApplyGravity() {
+    //    if (!characterController.isGrounded) {
+    //        verticalVelocity -= gravity * Time.deltaTime;
+    //        moveDirection.y = verticalVelocity;
+    //    } else {
+    //        moveDirection.y = -.5f; // small downward force to keep grounded
+    //    }
+    //}
 
     private void AssignInputEvents() {
         controls = player.controls;
