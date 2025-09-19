@@ -3,25 +3,35 @@ using UnityEngine;
 public class PlayerWeaponController : MonoBehaviour {
     private Player player;
 
+    private const float REFERENCE_BULLET_SPEED = 20f;
+    //Default speed from which our mass fromula is derived
+
+    [SerializeField] private Weapon currentWeapon;
+
+    [Header("Bullet Details")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
     [SerializeField] private Transform gunPoint;
 
 
     [SerializeField] private Transform weaponHolder;
-    [SerializeField] private Transform aim;
 
     private void Start() {
         player = GetComponent<Player>();
-
         player.controls.Character.Fire.performed += ctx => Shoot();
+
+        currentWeapon.ammo = currentWeapon.maxAmmo;
     }
     private void Shoot() {
 
+        currentWeapon.ammo--;
 
         GameObject newBullet = Instantiate(bulletPrefab, gunPoint.position, Quaternion.LookRotation(gunPoint.forward));
 
-        newBullet.GetComponent<Rigidbody>().linearVelocity = BulletDirection() * bulletSpeed;
+        Rigidbody rbNewBullet = newBullet.GetComponent<Rigidbody>();
+
+        rbNewBullet.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // Adjust mass based on speed to keep momentum consistent
+        rbNewBullet.linearVelocity = BulletDirection() * bulletSpeed;
 
         Destroy(newBullet, 5);
 
@@ -29,22 +39,20 @@ public class PlayerWeaponController : MonoBehaviour {
         Debug.Log("Pew Pew");
     }
 
-    private Vector3 BulletDirection() {
+    public Vector3 BulletDirection() {
+        Transform aim = player.aim.Aim();
+
         Vector3 direction = (aim.position - gunPoint.position).normalized;
 
-        if (player.aim.CanAimPrecisely() == false)
+        if (player.aim.CanAimPrecisely() == false && player.aim.Target() == null)
             direction.y = 0; // Keep the bullet level
 
-        weaponHolder.LookAt(aim);
-        gunPoint.LookAt(aim);
+        //weaponHolder.LookAt(aim);
+        //gunPoint.LookAt(aim); TODO: find a better place to put this
 
         return direction;
     }
 
-    private void OnDrawGizmos() {
-        Gizmos.DrawLine(weaponHolder.position, weaponHolder.position + weaponHolder.forward * 25);
+    public Transform GunPoint() => gunPoint;
 
-        Gizmos.color = Color.red;
-        Gizmos.DrawLine(gunPoint.position, gunPoint.position + BulletDirection() * 25);
-    }
 }
