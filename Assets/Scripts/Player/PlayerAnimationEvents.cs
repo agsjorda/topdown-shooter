@@ -19,7 +19,7 @@ public class PlayerAnimationEvents : MonoBehaviour {
         visualController.MaximizeLeftHandWeight();
     }
     public void WeaponGrabIsOver() {
-        visualController.SetBusyGrabbingWeaponTo(false);
+        visualController.SetIsEquipingWeapon(false);
     }
 
     public void SwitchOnWeaponModel() => visualController.SwitchOnCurrentWeaponModel();

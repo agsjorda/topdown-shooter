@@ -5,7 +5,7 @@ public class PlayerWeaponVisuals : MonoBehaviour {
 
     private Player player;
     private Animator anim;
-    private bool isGrabbingWeapon;
+    private bool isEquippingWeapon;
 
     [SerializeField] private WeaponModel[] weaponModels;
     [SerializeField] private BackupWeaponModel[] backupWeaponModels;
@@ -30,7 +30,6 @@ public class PlayerWeaponVisuals : MonoBehaviour {
         rig = GetComponentInChildren<Rig>();
         weaponModels = GetComponentsInChildren<WeaponModel>(true);
         backupWeaponModels = GetComponentsInChildren<BackupWeaponModel>(true);
-
     }
 
     private void Update() {
@@ -39,11 +38,12 @@ public class PlayerWeaponVisuals : MonoBehaviour {
         UpdateLeftHandIKWeight();
     }
 
-
     public void PlayReloadAnimation() {
-        if (isGrabbingWeapon)
+        if (isEquippingWeapon)
             return;
 
+        float reloadSpeed = player.weapon.CurrentWeapon().reloadSpeed;
+        anim.SetFloat("ReloadSpeed", reloadSpeed);
         anim.SetTrigger("Reload");
         ReduceRigWeight();
     }
@@ -51,18 +51,21 @@ public class PlayerWeaponVisuals : MonoBehaviour {
 
     public void PlayWeaponEquipAnimation() {
 
-        GrabType grabType = CurrentWeaponModel().grabType;
+        EquipType equipType = CurrentWeaponModel().equipAnimationType;
+
+        float equipSpeed = player.weapon.CurrentWeapon().equipSpeed;
 
         leftHandIK.weight = 0;
         ReduceRigWeight();
-        anim.SetFloat("WeaponGrabType", ((float)grabType));
-        anim.SetTrigger("WeaponGrab");
-        SetBusyGrabbingWeaponTo(true);
+        anim.SetFloat("EquipType", ((float)equipType));
+        anim.SetFloat("EquipSpeed", equipSpeed);
+        anim.SetTrigger("EquipWeapon");
+        SetIsEquipingWeapon(true);
     }
 
-    public void SetBusyGrabbingWeaponTo(bool busy) {
-        isGrabbingWeapon = busy;
-        anim.SetBool("BusyGrabbingWeapon", isGrabbingWeapon);
+    public void SetIsEquipingWeapon(bool busy) {
+        isEquippingWeapon = busy;
+        anim.SetBool("BusyEquippingWeapon", isEquippingWeapon);
     }
 
 

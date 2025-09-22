@@ -1215,7 +1215,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &559086272
 Transform:
   m_ObjectHideFlags: 0
@@ -1745,9 +1745,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weapon:
     weaponType: 2
-    bulletsInMagazine: 0
-    magazineCapacity: 0
+    bulletsInMagazine: 25
+    magazineCapacity: 25
     totalReserveAmmo: 50
+    reloadSpeed: 1
+    equipSpeed: 1
 --- !u!1 &787118468
 GameObject:
   m_ObjectHideFlags: 0
@@ -1919,7 +1921,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 2
-  grabType: 1
+  equipAnimationType: 0
   holdType: 1
   gunPoint: {fileID: 1029884244}
   holdPoint: {fileID: 132694403}
@@ -1973,7 +1975,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 4
-  grabType: 1
+  equipAnimationType: 0
   holdType: 3
   gunPoint: {fileID: 1904652294}
   holdPoint: {fileID: 677974948}
@@ -2951,7 +2953,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 3
-  grabType: 1
+  equipAnimationType: 0
   holdType: 2
   gunPoint: {fileID: 994979037}
   holdPoint: {fileID: 765437519}
@@ -3406,6 +3408,8 @@ MonoBehaviour:
     bulletsInMagazine: 0
     magazineCapacity: 0
     totalReserveAmmo: 0
+    reloadSpeed: 1
+    equipSpeed: 1.341
   bulletPrefab: {fileID: 4119617429578941580, guid: d94a5fbf9ce935044a9b80d2d2301b51, type: 3}
   bulletSpeed: 30
   gunPoint: {fileID: 1603023813}
@@ -3416,10 +3420,14 @@ MonoBehaviour:
     bulletsInMagazine: 0
     magazineCapacity: 15
     totalReserveAmmo: 33
+    reloadSpeed: 1
+    equipSpeed: 1.735
   - weaponType: 4
     bulletsInMagazine: 30
     magazineCapacity: 30
     totalReserveAmmo: 100
+    reloadSpeed: 1
+    equipSpeed: 1.133
 --- !u!114 &1553978692
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3444,18 +3452,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f312af2627634954fa515f43bf448621, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gunTransforms:
-  - {fileID: 1593809317}
-  - {fileID: 1883878497}
-  - {fileID: 820911298}
-  - {fileID: 1154913890}
-  - {fileID: 843291495}
-  pistol: {fileID: 1593809317}
-  revolver: {fileID: 1883878497}
-  autoRifle: {fileID: 820911298}
-  shotgun: {fileID: 1154913890}
-  rifle: {fileID: 843291495}
   weaponModels: []
+  backupWeaponModels: []
   rigIncreaseStep: 2.75
   leftHandIKWeightIncreaseRate: 2.5
   leftHandIK: {fileID: 884225064}
@@ -3576,7 +3574,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 0
-  grabType: 0
+  equipAnimationType: 0
   holdType: 1
   gunPoint: {fileID: 1603023813}
   holdPoint: {fileID: 1690262503}
@@ -4065,7 +4063,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 1
-  grabType: 0
+  equipAnimationType: 0
   holdType: 1
   gunPoint: {fileID: 997080305}
   holdPoint: {fileID: 69969100}
