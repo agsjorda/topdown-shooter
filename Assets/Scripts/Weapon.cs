@@ -22,27 +22,34 @@ public class Weapon {
     [Range(1, 3)]
     public float equipSpeed = 1;
 
+    [Space]
+    public float fireRate = 1f; // bullets per second
+    private float lastShotTime;
 
     public bool CanShoot() {
-        return HaveEnoughBulltes();
-    }
-
-    private bool HaveEnoughBulltes() {
-        if (bulletsInMagazine > 0) {
+        if (HaveEnoughBulltes() && ReadyToFire()) {
             bulletsInMagazine--;
             return true;
         }
-
         return false;
     }
 
+    private bool ReadyToFire() {
+        if (Time.time > lastShotTime + (1f / fireRate)) {
+            lastShotTime = Time.time;
+            return true;
+        }
+        return false;
+    }
+
+
+    #region Reload Methods
     public bool CanReload() {
         if (bulletsInMagazine == magazineCapacity)
             return false; // Magazine is already full
 
         return totalReserveAmmo > 0 ? true : false;
     }
-
     public void ReloadBullets() {
         // Reload drops any remaining bullets in the magazine to simulate real-life reloading
         // totalReserveAmmo += bulletsInMagazine; // Add remaining bullets back to reserve
@@ -60,4 +67,7 @@ public class Weapon {
             totalReserveAmmo = 0;
         }
     }
+    private bool HaveEnoughBulltes() => bulletsInMagazine > 0;
+    #endregion
+
 }
