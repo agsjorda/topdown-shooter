@@ -29,7 +29,12 @@ public class PlayerWeaponController : MonoBehaviour {
 
 
     #region Slots Management - Equip, Drop, Pickup
-    private void EquipWeapon(int i) => currentWeapon = weaponSlots[i];
+    private void EquipWeapon(int i) {
+        currentWeapon = weaponSlots[i];
+
+
+        player.weaponVisuals.PlayWeaponEquipAnimation();
+    }
 
     public void PickupWeapon(Weapon newWeapon) {
 
@@ -37,21 +42,24 @@ public class PlayerWeaponController : MonoBehaviour {
             Debug.Log("Can't carry more than 2 weapons!");
             return;
         }
+
         weaponSlots.Add(newWeapon);
-        currentWeapon = newWeapon;
+        player.weaponVisuals.SwitchOnBackupWeaponModel();
+
     }
 
     private void DropWeapon() {
-        if (weaponSlots.Count <= 1) {
+        if (hasHasOnlyOneWeapon()) {
             Debug.Log("Can't drop last weapon!");
             return;
         }
 
         weaponSlots.Remove(currentWeapon);
 
-        currentWeapon = weaponSlots[0];
+        EquipWeapon(0);
     }
     #endregion
+
     private void Shoot() {
 
         if (currentWeapon.CanShoot() == false)
@@ -84,7 +92,16 @@ public class PlayerWeaponController : MonoBehaviour {
         return direction;
     }
 
+    public bool hasHasOnlyOneWeapon() => weaponSlots.Count <= 1;
+
     public Weapon CurrentWeapon() => currentWeapon;
+    public Weapon BackupWeapon() {
+        foreach (Weapon weapon in weaponSlots) {
+            if (weapon != currentWeapon)
+                return weapon;
+        }
+        return null;
+    }
 
     public Transform GunPoint() => gunPoint;
 
