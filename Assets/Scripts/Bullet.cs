@@ -7,7 +7,8 @@ public class Bullet : MonoBehaviour {
         //rb.constraints = RigidbodyConstraints.FreezeAll;
         CreateImpactFX(collision);
 
-        Destroy(gameObject);
+        // Instead of destroying the bullet, we can return it to an object pool
+        ObjectPool.instance.ReturnBulletToPool(gameObject);
     }
 
     private void CreateImpactFX(Collision collision) {
