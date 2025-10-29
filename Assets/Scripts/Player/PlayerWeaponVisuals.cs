@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityEngine.Animations.Rigging;
 
-public class PlayerWeaponVisuals : MonoBehaviour {
+public class PlayerWeaponVisuals : MonoBehaviour
+{
 
     private Player player;
     private Animator anim;
-    private bool isEquippingWeapon;
 
     [SerializeField] private WeaponModel[] weaponModels;
     [SerializeField] private BackupWeaponModel[] backupWeaponModels;
@@ -24,7 +24,8 @@ public class PlayerWeaponVisuals : MonoBehaviour {
 
 
 
-    private void Start() {
+    private void Start()
+    {
         player = GetComponent<Player>();
         anim = GetComponentInChildren<Animator>();
         rig = GetComponentInChildren<Rig>();
@@ -32,15 +33,17 @@ public class PlayerWeaponVisuals : MonoBehaviour {
         backupWeaponModels = GetComponentsInChildren<BackupWeaponModel>(true);
     }
 
-    private void Update() {
+    private void Update()
+    {
 
         UpdateRigWeight();
         UpdateLeftHandIKWeight();
     }
 
-    public void PlayReloadAnimation() {
-        if (isEquippingWeapon)
-            return;
+    public void PlayFireAnimation() => anim.SetTrigger("Fire");
+
+    public void PlayReloadAnimation()
+    {
 
         float reloadSpeed = player.weapon.CurrentWeapon().reloadSpeed;
         anim.SetFloat("ReloadSpeed", reloadSpeed);
@@ -49,7 +52,8 @@ public class PlayerWeaponVisuals : MonoBehaviour {
     }
 
 
-    public void PlayWeaponEquipAnimation() {
+    public void PlayWeaponEquipAnimation()
+    {
 
         EquipType equipType = CurrentWeaponModel().equipAnimationType;
 
@@ -60,16 +64,11 @@ public class PlayerWeaponVisuals : MonoBehaviour {
         anim.SetFloat("EquipType", ((float)equipType));
         anim.SetFloat("EquipSpeed", equipSpeed);
         anim.SetTrigger("EquipWeapon");
-        SetIsEquipingWeapon(true);
-    }
-
-    public void SetIsEquipingWeapon(bool busy) {
-        isEquippingWeapon = busy;
-        anim.SetBool("BusyEquippingWeapon", isEquippingWeapon);
     }
 
 
-    public void SwitchOnCurrentWeaponModel() {
+    public void SwitchOnCurrentWeaponModel()
+    {
 
         int animationIndex = (int)CurrentWeaponModel().holdType;
 
@@ -86,35 +85,60 @@ public class PlayerWeaponVisuals : MonoBehaviour {
         AttachLeftHand();
     }
 
-    public void SwitchOffWeaponModels() {
+    public void SwitchOffWeaponModels()
+    {
 
         for (int i = 0; i < weaponModels.Length; i++) {
             weaponModels[i].gameObject.SetActive(false);
         }
     }
 
-    private void SwitchOffBackupWeaponModels() {
+    private void SwitchOffBackupWeaponModels()
+    {
         foreach (BackupWeaponModel backupWeapon in backupWeaponModels) {
-            backupWeapon.gameObject.SetActive(false);
+            backupWeapon.Activate(false);
         }
     }
 
-    public void SwitchOnBackupWeaponModel() {
-        WeaponType weaponType = player.weapon.BackupWeapon().weaponType;
+    public void SwitchOnBackupWeaponModel()
+    {
+        SwitchOffBackupWeaponModels();
+
+        BackupWeaponModel lowHangWeapon = null;
+        BackupWeaponModel backHangWeapon = null;
+        BackupWeaponModel sideHangWeapon = null;
 
         foreach (BackupWeaponModel backupModel in backupWeaponModels) {
-            if (backupModel.weaponType == weaponType) {
-                backupModel.gameObject.SetActive(true);
+
+            if (backupModel.weaponType == player.weapon.CurrentWeapon().weaponType)
+                continue;
+
+            if (player.weapon.WeaponInSlots(backupModel.weaponType) != null) {
+
+                if (backupModel.HangTypeIs(HangType.LowBackHang))
+                    lowHangWeapon = backupModel;
+
+                if (backupModel.HangTypeIs(HangType.BackHang))
+                    backHangWeapon = backupModel;
+
+                if (backupModel.HangTypeIs(HangType.SideHang))
+                    sideHangWeapon = backupModel;
             }
         }
+
+        lowHangWeapon?.Activate(true);
+        backHangWeapon?.Activate(true);
+        sideHangWeapon?.Activate(true);
     }
 
-    private void SwitchAnimationLayer(int layerIndex) {
+    private void SwitchAnimationLayer(int layerIndex)
+    {
         for (int i = 1; i < anim.layerCount; i++) {
             anim.SetLayerWeight(i, i == layerIndex ? 1 : 0);
         }
     }
-    public WeaponModel CurrentWeaponModel() {
+    public WeaponModel CurrentWeaponModel()
+    {
 
         WeaponModel weaponModel = null;
 
@@ -131,7 +155,8 @@ public class PlayerWeaponVisuals : MonoBehaviour {
     }
 
     #region Animation Rigging Methods
-    private void UpdateLeftHandIKWeight() {
+    private void UpdateLeftHandIKWeight()
+    {
         if (shouldIncrease_LeftHandIKWeight) {
             leftHandIK.weight += leftHandIKWeightIncreaseRate * Time.deltaTime;
             if (leftHandIK.weight >= 1) {
@@ -140,7 +165,8 @@ public class PlayerWeaponVisuals : MonoBehaviour {
         }
     }
 
-    private void UpdateRigWeight() {
+    private void UpdateRigWeight()
+    {
         if (shouldIncrease_RigWeight) {
             rig.weight += rigIncreaseStep * Time.deltaTime;
             if (rig.weight >= 1) {
@@ -149,12 +175,14 @@ public class PlayerWeaponVisuals : MonoBehaviour {
         }
     }
 
-    private void ReduceRigWeight() {
+    private void ReduceRigWeight()
+    {
         rig.weight = .15f;
     }
     public void MaximizeRigWeight() => shouldIncrease_RigWeight = true;
     public void MaximizeLeftHandWeight() => shouldIncrease_LeftHandIKWeight = true;
-    private void AttachLeftHand() {
+    private void AttachLeftHand()
+    {
         Transform targetTransform = CurrentWeaponModel().holdPoint;
 
         leftHandIK_Target.localPosition = targetTransform.localPosition;

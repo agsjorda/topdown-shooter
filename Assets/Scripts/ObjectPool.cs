@@ -10,7 +10,8 @@ public class ObjectPool : MonoBehaviour {
 
     private Queue<GameObject> bulletPool;
 
-    private void Awake() {
+    private void Awake()
+    {
         if (instance == null) {
             instance = this;
         } else {
@@ -19,12 +20,14 @@ public class ObjectPool : MonoBehaviour {
 
     }
 
-    private void Start() {
+    private void Start()
+    {
         bulletPool = new Queue<GameObject>();
         CreateInitialPool();
     }
 
-    public GameObject GetBulletFromPool() {
+    public GameObject GetBulletFromPool()
+    {
 
         if (bulletPool.Count == 0)
             CreateNewBullet();
@@ -36,24 +39,28 @@ public class ObjectPool : MonoBehaviour {
         return bulletToGet;
     }
 
-    public void ReturnBulletToPool(GameObject bullet) {
+    public void ReturnBulletToPool(GameObject bullet)
+    {
         bullet.SetActive(false);
         bulletPool.Enqueue(bullet);
         bullet.transform.parent = transform; // Reattach to pool parent
     }
 
-    private void CreateInitialPool() {
+    private void CreateInitialPool()
+    {
         for (int i = 0; i < poolSize; i++) {
             CreateNewBullet();
 
         }
     }
 
-    private void CreateNewBullet() {
+    private void CreateNewBullet()
+    {
         GameObject newBullet = CreateGameObject(bulletPrefab, transform, false, bulletPool);
     }
 
-    private GameObject CreateGameObject(GameObject prefab, Transform parent = null, bool setActive = false, Queue<GameObject> targetPool = null) {
+    private GameObject CreateGameObject(GameObject prefab, Transform parent = null, bool setActive = false, Queue<GameObject> targetPool = null)
+    {
         GameObject newObj = Instantiate(prefab, parent != null ? parent : transform);
         newObj.SetActive(setActive);
         targetPool?.Enqueue(newObj);
