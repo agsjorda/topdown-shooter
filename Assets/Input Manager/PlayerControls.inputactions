@@ -1,4 +1,5 @@
 {
+    "version": 1,
     "name": "PlayerControls",
     "maps": [
         {
@@ -36,6 +37,78 @@
                     "name": "Run",
                     "type": "Button",
                     "id": "f5fd17fd-c1d9-450a-8a76-5f3e08d364e4",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip Slot - 1",
+                    "type": "Button",
+                    "id": "c93b7a56-9080-42b1-bcd7-550ae5cc774b",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip Slot -2",
+                    "type": "Button",
+                    "id": "b14a3a2e-dadd-49ec-8330-d828ea9697f0",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip Slot -3",
+                    "type": "Button",
+                    "id": "01a80d4c-cfe7-4281-bb8e-89d5911c7ff1",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip Slot -4",
+                    "type": "Button",
+                    "id": "16d74248-4e12-4935-96c0-f3eb73ada824",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Equip Slot -5",
+                    "type": "Button",
+                    "id": "96f54b5a-0d7f-431f-a98a-be8007d9d60c",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Drop Current Weapon",
+                    "type": "Button",
+                    "id": "b3511419-9218-4282-817d-c32b2cb08337",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Reload",
+                    "type": "Button",
+                    "id": "e10fa9d1-7f95-4086-83fe-69974289976d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Toggle Weapon Mode",
+                    "type": "Button",
+                    "id": "073935f1-f27b-4795-a7ff-ba296b4e1940",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
@@ -128,6 +201,94 @@
                     "processors": "",
                     "groups": "",
                     "action": "Run",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "be5564d6-948c-462f-9869-7cd41e4ea14e",
+                    "path": "<Keyboard>/1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip Slot - 1",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "53c1847f-7d8f-45d5-bfed-8d02964a4d15",
+                    "path": "<Keyboard>/2",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip Slot -2",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b1069512-6567-43be-8671-814b76340e7c",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drop Current Weapon",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b891d0ce-7053-402b-a0f4-e09ffa3cf72c",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Reload",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ab0b8d97-d88b-4f1c-a460-ea826552b890",
+                    "path": "<Keyboard>/3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip Slot -3",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e476fed9-b222-4636-b2a5-f953b97d4735",
+                    "path": "<Keyboard>/4",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip Slot -4",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "48a3db2d-086a-48e7-beb2-e222e24115f7",
+                    "path": "<Keyboard>/5",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Equip Slot -5",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e0716127-86b5-4d61-adc4-47b2878645c7",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Toggle Weapon Mode",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
