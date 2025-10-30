@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6679e192d5720344bb4ba0a73f7bfde0, type: 3}
   m_Name: Weapon_Rifle_D
   m_EditorClassIdentifier: Assembly-CSharp::Weapon_Data
-  weaponName: 
-  bulletsInMagazine: 0
-  magazineCapacity: 0
-  totalReserveAmmo: 0
+  weaponName: Benelli M12
+  bulletsInMagazine: 30
+  magazineCapacity: 30
+  totalReserveAmmo: 2147483647
   shootType: 0
-  bulletsPerShot: 1
-  fireRate: 0
+  bulletsPerShot: 5
+  fireRate: 1.5
   isBurstAvailable: 0
   isBurstModeActive: 0
   burstBulletsPerShot: 0
@@ -27,8 +27,8 @@ MonoBehaviour:
   baseSpread: 1
   maxSpread: 3
   spreadIncreaseRate: 0.15
-  weaponType: 0
+  weaponType: 3
   reloadSpeed: 1
   equipSpeed: 1
-  gunDistance: 4
+  gunDistance: 5
   cameraDistance: 6
