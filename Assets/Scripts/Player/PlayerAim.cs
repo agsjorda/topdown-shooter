@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
 
-public class PlayerAim : MonoBehaviour {
+public class PlayerAim : MonoBehaviour
+{
     private Player player;
     private PlayerControls controls;
 
@@ -17,12 +18,15 @@ public class PlayerAim : MonoBehaviour {
 
     [Header("Camera Control")]
     [SerializeField] private Transform cameraTarget;
-    [Range(0.5f, 1f)]
-    [SerializeField] private float minCameraDistance = 1.5f;
-    [Range(1f, 3f)]
-    [SerializeField] private float maxCameraDistance = 2.5f;
-    [Range(3f, 5f)]
+    [Range(0.2f, 1f)]
+    [SerializeField] private float minCameraDistance = .9f;
+    [Range(0.5f, 3f)]
+    [SerializeField] private float maxCameraDistance = 1.6f;
+    [Range(1f, 10f)]
     [SerializeField] private float cameraSensitivity = 3f;
+
+    [Tooltip("Smooth time used by SmoothDamp. Lower = snappier following.")] //remove if change update camera position to Lerp
+    [SerializeField] private float cameraFollowSmoothTime = 0.12f; //remove if change update camera position to Lerp
 
     [Space]
 
@@ -30,14 +34,17 @@ public class PlayerAim : MonoBehaviour {
 
     private Vector2 mouseInput;
     private RaycastHit lastKnownMouseHit;
+    private Vector3 cameraVelocity;  //remove if change update camera position to Lerp
 
-    private void Start() {
+    private void Start()
+    {
         player = GetComponent<Player>();
         controls = player.controls;
         InitializeAimInput();
     }
 
-    private void Update() {
+    private void Update()
+    {
 
         if (Input.GetKeyDown(KeyCode.P))
             isAimingPrecisely = !isAimingPrecisely;
@@ -50,13 +57,24 @@ public class PlayerAim : MonoBehaviour {
         UpdateCameraPosition();
     }
 
-    private void UpdateAimVisuals() {
+    private void UpdateAimVisuals()
+    {
+
+        aimLaser.enabled = player.weapon.IsWeaponReady();
+
+        if (aimLaser.enabled == false)
+            return;
+
+        WeaponModel weaponModel = player.weaponVisuals.CurrentWeaponModel();
+
+        weaponModel.transform.LookAt(aim);
+        weaponModel.gunPoint.LookAt(aim);
 
         Transform gunPoint = player.weapon.GunPoint();
         Vector3 laserDirection = player.weapon.BulletDirection();
 
         float laserTipLength = 0.5f;
-        float gunDistance = 4;
+        float gunDistance = player.weapon.CurrentWeapon().gunDistance;
 
         Vector3 endPoint = gunPoint.position + laserDirection * gunDistance;
 
@@ -70,7 +88,8 @@ public class PlayerAim : MonoBehaviour {
         aimLaser.SetPosition(1, endPoint);
         aimLaser.SetPosition(2, endPoint + laserDirection * laserTipLength);
     }
-    private void UpdateAimPosition() {
+    private void UpdateAimPosition()
+    {
         Transform target = Target();
 
         if (target != null && isLockingToTarget) {
@@ -85,7 +104,8 @@ public class PlayerAim : MonoBehaviour {
     }
 
 
-    public Transform Target() {
+    public Transform Target()
+    {
         Transform target = null;
         var hitTransform = GetMouseHitInfo().transform;
         if (hitTransform != null && hitTransform.GetComponent<Target>() != null)
@@ -94,7 +114,8 @@ public class PlayerAim : MonoBehaviour {
     }
     public Transform Aim() => aim;
     public bool CanAimPrecisely() => isAimingPrecisely;
-    public RaycastHit GetMouseHitInfo() {
+    public RaycastHit GetMouseHitInfo()
+    {
         Ray ray = Camera.main.ScreenPointToRay(mouseInput);
 
         if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, aimLayerMask)) {
@@ -106,11 +127,14 @@ public class PlayerAim : MonoBehaviour {
     }
 
     #region Camera Region
-    private void UpdateCameraPosition() {
-        cameraTarget.position = Vector3.Lerp(cameraTarget.position, DesiredCameraPosition(), cameraSensitivity * Time.deltaTime);
+    private void UpdateCameraPosition()
+    {
+        //cameraTarget.position = Vector3.Lerp(cameraTarget.position, DesiredCameraPosition(), cameraSensitivity * Time.deltaTime);
+        cameraTarget.position = Vector3.SmoothDamp(cameraTarget.position, DesiredCameraPosition(), ref cameraVelocity, cameraFollowSmoothTime);
     }
 
-    private Vector3 DesiredCameraPosition() {
+    private Vector3 DesiredCameraPosition()
+    {
 
         float actualMaxCameraDistance = player.movement.moveInput.y < -.5f ? minCameraDistance : maxCameraDistance;
 
@@ -127,7 +151,8 @@ public class PlayerAim : MonoBehaviour {
     }
 
     #endregion
-    private void InitializeAimInput() {
+    private void InitializeAimInput()
+    {
         controls.Character.Aim.performed += context => mouseInput = context.ReadValue<Vector2>();
         controls.Character.Aim.canceled += context => mouseInput = Vector2.zero;
     }
