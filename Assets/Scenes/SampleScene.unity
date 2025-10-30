@@ -1905,17 +1905,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b207f0be58fa5ec40ba0bd52e0e73ccd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon:
-    weaponType: 2
-    shootType: 0
-    bulletsPerShot: 0
-    defaultFireRate: 0
-    fireRate: 1
-    isBurstModeActive: 0
-    bulletsInMagazine: 25
-    magazineCapacity: 25
-    totalReserveAmmo: 50
-    spreadResetTime: 1
+  weaponData: {fileID: 11400000, guid: 1ea6c6e01927fcc459db9c0fd2a3370d, type: 2}
 --- !u!1 &777356948
 GameObject:
   m_ObjectHideFlags: 0
@@ -3902,8 +3892,6 @@ MonoBehaviour:
   currentWeapon:
     weaponType: 0
     shootType: 0
-    bulletsPerShot: 0
-    defaultFireRate: 0
     fireRate: 5
     isBurstModeActive: 0
     bulletsInMagazine: 0
@@ -3915,35 +3903,13 @@ MonoBehaviour:
   weaponHolder: {fileID: 787118469}
   maxSlots: 3
   weaponSlots:
-  - weaponType: 1
+  - weaponType: 0
     shootType: 0
-    bulletsPerShot: 1
-    defaultFireRate: 10
     fireRate: 10
     isBurstModeActive: 0
     bulletsInMagazine: 50
     magazineCapacity: 50
     totalReserveAmmo: 88888
-    spreadResetTime: 1
-  - weaponType: 3
-    shootType: 0
-    bulletsPerShot: 6
-    defaultFireRate: 10
-    fireRate: 10
-    isBurstModeActive: 0
-    bulletsInMagazine: 100
-    magazineCapacity: 50
-    totalReserveAmmo: 8888888
-    spreadResetTime: 1
-  - weaponType: 4
-    shootType: 0
-    bulletsPerShot: 1
-    defaultFireRate: 1
-    fireRate: 1
-    isBurstModeActive: 0
-    bulletsInMagazine: 100
-    magazineCapacity: 50
-    totalReserveAmmo: 8888888
     spreadResetTime: 1
 --- !u!114 &1553978692
 MonoBehaviour:
