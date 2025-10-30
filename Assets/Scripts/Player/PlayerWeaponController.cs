@@ -63,13 +63,24 @@ public class PlayerWeaponController : MonoBehaviour
 
     public void PickupWeapon(Weapon_Data newWeaponData)
     {
+        Weapon newWeapon = new Weapon(newWeaponData);
 
-        if (weaponSlots.Count >= maxSlots) {
-            Debug.Log("Can't carry more than 2 weapons!");
+        if (WeaponInSlots(newWeapon.weaponType) != null) {
+            Debug.Log("Already have this weapon!");
+            WeaponInSlots(newWeapon.weaponType).totalReserveAmmo += newWeapon.bulletsInMagazine;
             return;
         }
 
-        Weapon newWeapon = new Weapon(newWeaponData);
+        if (weaponSlots.Count >= maxSlots && newWeapon.weaponType != currentWeapon.weaponType) {
+
+            int weaponIndex = weaponSlots.IndexOf(currentWeapon);
+
+            player.weaponVisuals.SwitchOffWeaponModels();
+            weaponSlots[weaponIndex] = newWeapon;
+            EquipWeapon(weaponIndex);
+            Debug.Log("Can't carry more than 2 weapons!");
+            return;
+        }
 
         weaponSlots.Add(newWeapon);
         player.weaponVisuals.SwitchOnBackupWeaponModel();

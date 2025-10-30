@@ -2,16 +2,27 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    [SerializeField] private MeshRenderer mesh;
+    protected MeshRenderer mesh;
     [SerializeField] private Material highlightMaterial;
-    private Material defaultMaterial;
+    protected Material defaultMaterial;
 
     private void Start()
     {
         if (mesh == null)
             mesh = GetComponentInChildren<MeshRenderer>();
 
-        defaultMaterial = mesh.material;
+        defaultMaterial = mesh.sharedMaterial;
+    }
+
+    protected void UpdateMeshAndMaterial(MeshRenderer newMesh)
+    {
+        mesh = newMesh;
+        defaultMaterial = newMesh.sharedMaterial;
+    }
+
+    public virtual void Interaction()
+    {
+        Debug.Log("Interacted with " + gameObject.name);
     }
 
     public void HighlightActive(bool active)
@@ -22,7 +33,7 @@ public class Interactable : MonoBehaviour
             mesh.material = defaultMaterial;
     }
 
-    private void OnTriggerEnter(Collider other)
+    protected virtual void OnTriggerEnter(Collider other)
     {
         PlayerInteraction playerInteraction = other.GetComponent<PlayerInteraction>();
 
@@ -33,7 +44,7 @@ public class Interactable : MonoBehaviour
         playerInteraction.UpdateClosestInteractable();
     }
 
-    private void OnTriggerExit(Collider other)
+    protected virtual void OnTriggerExit(Collider other)
     {
         PlayerInteraction playerInteraction = other.GetComponent<PlayerInteraction>();
 
