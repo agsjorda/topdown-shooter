@@ -23,6 +23,8 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] private int maxSlots = 2;
     [SerializeField] private List<Weapon> weaponSlots;
 
+    [SerializeField] private GameObject weaponPickupPrefab;
+
     private void Start()
     {
         player = GetComponent<Player>();
@@ -61,9 +63,8 @@ public class PlayerWeaponController : MonoBehaviour
         CameraManager.instance.ChangeCameraDistance(currentWeapon.cameraDistance);
     }
 
-    public void PickupWeapon(Weapon_Data newWeaponData)
+    public void PickupWeapon(Weapon newWeapon)
     {
-        Weapon newWeapon = new Weapon(newWeaponData);
 
         if (WeaponInSlots(newWeapon.weaponType) != null) {
             Debug.Log("Already have this weapon!");
@@ -77,6 +78,9 @@ public class PlayerWeaponController : MonoBehaviour
 
             player.weaponVisuals.SwitchOffWeaponModels();
             weaponSlots[weaponIndex] = newWeapon;
+
+            DropWeaponOnTheGround();
+
             EquipWeapon(weaponIndex);
             Debug.Log("Can't carry more than 2 weapons!");
             return;
@@ -89,14 +93,21 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void DropWeapon()
     {
-        if (hasHasOnlyOneWeapon()) {
-            Debug.Log("Can't drop last weapon!");
+        if (hasHasOnlyOneWeapon())  // Can't drop last weapon
             return;
-        }
+
+
+        DropWeaponOnTheGround();
 
         weaponSlots.Remove(currentWeapon);
 
         EquipWeapon(0);
+    }
+
+    private void DropWeaponOnTheGround()
+    {
+        GameObject droppedWeapon = ObjectPool.instance.GetObjectFromPool(weaponPickupPrefab);
+        droppedWeapon.GetComponent<Pickup_Weapon>()?.SetupPickupWeapon(currentWeapon, transform);
     }
 
     public void SetWeaponReady(bool ready) => weaponReady = ready;

@@ -64,6 +64,8 @@ public class Weapon
     public float spreadResetTime = 1f; // Time in seconds after which the spread resets to base value
     #endregion
 
+
+    public Weapon_Data weaponData { get; private set; } // serves as default weapon data reference
     public Weapon(Weapon_Data weaponData)
     {
         bulletsInMagazine = weaponData.bulletsInMagazine;
@@ -94,6 +96,7 @@ public class Weapon
 
 
         defaultFireRate = fireRate;
+        this.weaponData = weaponData;
     }
 
     #region Spread Methods

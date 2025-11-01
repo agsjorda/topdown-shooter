@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
+    protected PlayerWeaponController weaponController;
+
     protected MeshRenderer mesh;
     [SerializeField] private Material highlightMaterial;
     protected Material defaultMaterial;
@@ -35,12 +37,15 @@ public class Interactable : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
+        if (weaponController == null)
+            weaponController = other.GetComponent<PlayerWeaponController>();
+
         PlayerInteraction playerInteraction = other.GetComponent<PlayerInteraction>();
 
         if (playerInteraction == null)
             return;
 
-        playerInteraction.interactables.Add(this);
+        playerInteraction.GetInteractables().Add(this);
         playerInteraction.UpdateClosestInteractable();
     }
 
@@ -51,7 +56,7 @@ public class Interactable : MonoBehaviour
         if (playerInteraction == null)
             return;
 
-        playerInteraction.interactables.Remove(this);
+        playerInteraction.GetInteractables().Remove(this);
         playerInteraction.UpdateClosestInteractable();
     }
 }
