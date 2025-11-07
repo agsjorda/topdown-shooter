@@ -13,21 +13,21 @@ MonoBehaviour:
   m_Name: Weapon_ShotGun_D
   m_EditorClassIdentifier: Assembly-CSharp::Weapon_Data
   weaponName: Beretta k6
-  bulletsInMagazine: 10
-  magazineCapacity: 10
-  totalReserveAmmo: 2147483647
+  bulletsInMagazine: 30
+  magazineCapacity: 30
+  totalReserveAmmo: 9999999
   shootType: 0
-  bulletsPerShot: 1
+  bulletsPerShot: 5
   fireRate: 1.5
   isBurstAvailable: 0
   isBurstModeActive: 0
   burstBulletsPerShot: 0
   burstFireRate: 0
   burstFireDelay: 0.1
-  baseSpread: 0
-  maxSpread: 0
+  baseSpread: 10
+  maxSpread: 10
   spreadIncreaseRate: 0.15
-  weaponType: 4
+  weaponType: 3
   reloadSpeed: 1
   equipSpeed: 1
   gunDistance: 8
