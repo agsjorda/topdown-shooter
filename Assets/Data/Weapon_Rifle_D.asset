@@ -15,7 +15,7 @@ MonoBehaviour:
   weaponName: Benelli M12
   bulletsInMagazine: 30
   magazineCapacity: 30
-  totalReserveAmmo: 2147483647
+  totalReserveAmmo: 9999999
   shootType: 0
   bulletsPerShot: 5
   fireRate: 1.5
@@ -27,7 +27,7 @@ MonoBehaviour:
   baseSpread: 1
   maxSpread: 3
   spreadIncreaseRate: 0.15
-  weaponType: 3
+  weaponType: 4
   reloadSpeed: 1
   equipSpeed: 1
   gunDistance: 5
