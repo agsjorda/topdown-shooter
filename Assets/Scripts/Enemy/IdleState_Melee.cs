@@ -23,7 +23,7 @@ public class IdleState_Melee : EnemyState
     {
         base.Update();
 
-        if (enemy.IsPlayerInRange()) {
+        if (enemy.IsPlayerInDetectionRange()) {
             stateMachine.ChangeState(enemy.recoveryState);
             return;
         }

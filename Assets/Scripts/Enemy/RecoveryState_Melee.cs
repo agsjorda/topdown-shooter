@@ -1,4 +1,3 @@
-using UnityEngine;
 public class RecoveryState_Melee : EnemyState
 {
     private Enemy_Melee enemy;
@@ -27,8 +26,11 @@ public class RecoveryState_Melee : EnemyState
         enemy.transform.rotation = enemy.FaceTarget(enemy.player.position);
 
         if (triggerCalled) {
-            //stateMachine.ChangeState(enemy.moveState);
-            Debug.Log("Recovery complete, switching to Move State");
+            if (enemy.IsPlayerInAttackRange()) {
+                stateMachine.ChangeState(enemy.attackState);
+            } else {
+                stateMachine.ChangeState(enemy.chaseState);
+            }
         }
     }
 }

@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 75b6981ab54345a48b375728c34259c4
+guid: 1c152543e16930249a98d376a0afd49f
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,11 +31,11 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: taunt
+      name: WeaponSpin_Attack
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 32
-      lastFrame: 99
+      firstFrame: 0
+      lastFrame: 39
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

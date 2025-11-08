@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 75b6981ab54345a48b375728c34259c4
+guid: 19754e9d322353b47ba34d681daa2fab
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -31,18 +31,18 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: taunt
+      name: Fast Run
       takeName: mixamo.com
       internalID: -203655887218126122
-      firstFrame: 32
-      lastFrame: 99
+      firstFrame: 0
+      lastFrame: 16
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
       cycleOffset: 0
       loop: 0
       hasAdditiveReferencePose: 0
-      loopTime: 0
+      loopTime: 1
       loopBlend: 0
       loopBlendOrientation: 1
       loopBlendPositionY: 1

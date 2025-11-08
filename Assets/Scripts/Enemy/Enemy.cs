@@ -3,14 +3,16 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    public float turnSpeed;
-    public float detectionRange;
-
     [Header("Idle data")]
     public float idleTime;
+    public float detectionRange;
 
     [Header("Move data")]
     public float moveSpeed;
+    public float chaseSpeed;
+    public float turnSpeed;
+    private bool manualMovement;
+    private bool manualRotation;
 
     [SerializeField] private Transform[] patrolPoints;
     private int currentPatrolIndex;
@@ -40,20 +42,23 @@ public class Enemy : MonoBehaviour
     protected virtual void Update()
     {
     }
-    private void OnDrawGizmos()
+    protected virtual void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-
         Gizmos.DrawWireSphere(transform.position, detectionRange);
     }
 
+    public void ActivateManualMovement(bool activate) => this.manualMovement = activate;
+    public bool ManualMovementActive() => manualMovement;
+    public void ActivateManualRotation(bool activate) => this.manualRotation = activate;
+    public bool ManualRotationActive() => manualRotation;
+
     public void AnimationTrigger() => stateMachine.currentState.AnimationTrigger();
 
-    public bool IsPlayerInRange()
+    public bool IsPlayerInDetectionRange()
     {
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        return distanceToPlayer <= detectionRange;
+        return distanceToPlayer < detectionRange;
     }
 
     public Vector3 GetPatrolDestination()

@@ -14,6 +14,8 @@ public class MoveState_Melee : EnemyState
     {
         base.Enter();
 
+        enemy.agent.speed = enemy.moveSpeed;
+
         destination = enemy.GetPatrolDestination();
 
         enemy.agent.SetDestination(destination);
@@ -28,7 +30,7 @@ public class MoveState_Melee : EnemyState
     {
         base.Update();
 
-        if (enemy.IsPlayerInRange()) {
+        if (enemy.IsPlayerInDetectionRange()) {
             stateMachine.ChangeState(enemy.recoveryState);
             return;
         }
@@ -43,13 +45,17 @@ public class MoveState_Melee : EnemyState
     //private Vector3 GetNextPathPoint()
     //{
     //    NavMeshAgent agent = enemy.agent;
-    //    NavMeshAgent path = agent.path;
+    //    NavMeshPath path = agent.path;
 
-    //    if(path.corners.Length < 2)
+    //    if (path.corners.Length < 2)
     //        return destination;
 
-    //    for (int i = 0; i < path.corners.length; i++) {
-
+    //    for (int i = 0; i < path.corners.Length; i++) {
+    //        if (Vector3.Distance(agent.transform.position, path.corners[i]) < 1) {
+    //            return path.corners[i + 1];
+    //        }
     //    }
+
+    //    return agent.destination;
     //}
 }
