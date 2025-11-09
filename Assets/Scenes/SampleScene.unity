@@ -4015,10 +4015,25 @@ MonoBehaviour:
   hiddenWeapon: {fileID: 1796376253}
   pulledWeapon: {fileID: 5965413808470661210}
   attackData:
+    attackName: 
     attackRange: 1
     moveSpeed: 0.5
     attackIndex: 1
     annimationSpeed: 2
+    attackType: 0
+  attackList:
+  - attackName: Sword Slash
+    attackRange: 1
+    moveSpeed: 0
+    attackIndex: 1
+    annimationSpeed: 1.626
+    attackType: 0
+  - attackName: Sword Spin Attack
+    attackRange: 1.5
+    moveSpeed: 2.5
+    attackIndex: 0
+    annimationSpeed: 1
+    attackType: 1
 --- !u!4 &868441882
 Transform:
   m_ObjectHideFlags: 0
@@ -4070,8 +4085,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06c78af948052824d93c22c84c08dd65, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarHider
-  SamplePoints:
-  - {fileID: 4132260138052341618}
+  SamplePoints: []
   PermanentlyReveal: 0
   MaxDistBetweenSamplePoints: 0
   NumObservers: 0
@@ -5953,10 +5967,13 @@ MonoBehaviour:
   hiddenWeapon: {fileID: 0}
   pulledWeapon: {fileID: 0}
   attackData:
+    attackName: 
     attackRange: 0
     moveSpeed: 0
     attackIndex: 0
     annimationSpeed: 1
+    attackType: 0
+  attackList: []
 --- !u!4 &1226052020
 Transform:
   m_ObjectHideFlags: 0
