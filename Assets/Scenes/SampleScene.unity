@@ -3982,8 +3982,8 @@ GameObject:
   - component: {fileID: 868441882}
   - component: {fileID: 868441881}
   - component: {fileID: 868441883}
-  - component: {fileID: 868441886}
   - component: {fileID: 868441885}
+  - component: {fileID: 868441886}
   m_Layer: 12
   m_Name: Enemy_melee
   m_TagString: Untagged
@@ -4012,9 +4012,11 @@ MonoBehaviour:
   - {fileID: 1179232060}
   - {fileID: 1277622875}
   - {fileID: 1285779744}
+  hiddenWeapon: {fileID: 1796376253}
+  pulledWeapon: {fileID: 5965413808470661210}
   attackData:
     attackRange: 1
-    moveSpeed: 2.5
+    moveSpeed: 0.5
     attackIndex: 1
     annimationSpeed: 2
 --- !u!4 &868441882
@@ -4069,7 +4071,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarHider
   SamplePoints:
-  - {fileID: 2762468663786995556}
+  - {fileID: 4132260138052341618}
   PermanentlyReveal: 0
   MaxDistBetweenSamplePoints: 0
   NumObservers: 0
@@ -4084,13 +4086,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 868441879}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 63f673945e9a2804d9384a061eced3c7, type: 3}
+  m_Script: {fileID: 11500000, guid: 4bd2966c16df4fa4cba52ea99b2698d1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FOW.HiderToggleObjects
-  RevealedObjects:
-  - {fileID: 2897623789602085180}
-  - {fileID: 4981419285896702355}
-  HiddenObjects: []
+  m_EditorClassIdentifier: Assembly-CSharp::FOW.HiderDisableRenderers
+  ObjectsToHide:
+  - {fileID: 4251372427096085067}
+  - {fileID: 4296383718715977115}
+  - {fileID: 2883212177814438170}
+  - {fileID: 1349992490876324038}
+  - {fileID: 4588507132191786312}
+  - {fileID: 9141653915128429430}
+  - {fileID: 384432883178834650}
+  - {fileID: 6155852695928288358}
+  - {fileID: 1796376254}
+  - {fileID: 8231652792969427164}
 --- !u!1 &884225062
 GameObject:
   m_ObjectHideFlags: 0
@@ -5847,7 +5856,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1226052014}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63f673945e9a2804d9384a061eced3c7, type: 3}
   m_Name: 
@@ -5941,11 +5950,13 @@ MonoBehaviour:
   - {fileID: 586966182}
   - {fileID: 506789230}
   - {fileID: 1539207758}
+  hiddenWeapon: {fileID: 0}
+  pulledWeapon: {fileID: 0}
   attackData:
     attackRange: 0
     moveSpeed: 0
     attackIndex: 0
-    annimationSpeed: 0
+    annimationSpeed: 1
 --- !u!4 &1226052020
 Transform:
   m_ObjectHideFlags: 0
@@ -8729,7 +8740,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1796376253
 Transform:
   m_ObjectHideFlags: 0
@@ -16643,7 +16654,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &5053405244039330052
 GameObject:
   m_ObjectHideFlags: 0

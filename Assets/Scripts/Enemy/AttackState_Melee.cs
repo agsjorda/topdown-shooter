@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 public class AttackState_Melee : EnemyState
 {
@@ -23,7 +24,8 @@ public class AttackState_Melee : EnemyState
 
         enemy.anim.SetFloat("AttackAnimationSpeed", enemy.attackData.annimationSpeed);
         enemy.anim.SetFloat("AttackIndex", enemy.attackData.attackIndex);
-        //enemy.PullWeapon();
+        enemy.anim.SetFloat("SlashAttackIndex", Random.Range(0, 5));
+        enemy.PullWeapon();
     }
 
     public override void Update()
@@ -49,10 +51,29 @@ public class AttackState_Melee : EnemyState
     public override void Exit()
     {
         base.Exit();
+        SetupNextAttack();
+    }
 
-        enemy.anim.SetFloat("RecoveryIndex", 0);
+    private void SetupNextAttack()
+    {
+        int recoveryIndex = PlayerClose() ? 1 : 0;
 
-        if (enemy.IsPlayerInAttackRange())
-            enemy.anim.SetFloat("RecoveryIndex", 1);
+        enemy.anim.SetFloat("RecoveryIndex", recoveryIndex);
+        enemy.attackData = UpdatedAttackData();
+    }
+
+    private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.position) <= 1;
+
+    //Create Random AttackData from enemy.attackList excluding Charge attack if player is close
+    private AttackData UpdatedAttackData()
+    {
+        List<AttackData> validAttacks = new List<AttackData>(enemy.attackList);
+
+        if (PlayerClose()) {
+            validAttacks.RemoveAll(attack => attack.attackType == AttackType_Melee.Charge);
+        }
+
+        int random = Random.Range(0, validAttacks.Count);
+        return validAttacks[random];
     }
 }

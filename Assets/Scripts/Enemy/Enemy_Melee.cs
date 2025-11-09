@@ -1,16 +1,23 @@
 
 
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
 public struct AttackData
 {
+    public string attackName;
     public float attackRange;
     public float moveSpeed;
     public float attackIndex;
     [Range(1f, 2f)]
     public float annimationSpeed;
+    public AttackType_Melee attackType;
 }
+
+public enum AttackType_Melee { Close, Charge }
+
+
 public class Enemy_Melee : Enemy
 {
 
@@ -20,11 +27,12 @@ public class Enemy_Melee : Enemy
     public ChaseState_Melee chaseState { get; private set; }
     public AttackState_Melee attackState { get; private set; }
 
-    //[SerializeField] private Transform hiddenWeapon;
-    //[SerializeField] private Transform pulledWeapon;
+    [SerializeField] private Transform hiddenWeapon;
+    [SerializeField] private Transform pulledWeapon;
 
     [Header("Attack Data")]
     public AttackData attackData;
+    public List<AttackData> attackList;
 
     protected override void Awake()
     {
@@ -65,10 +73,10 @@ public class Enemy_Melee : Enemy
         return distanceToPlayer < attackData.attackRange;
     }
 
-    //public void PullWeapon()
-    //{
-    //    // Logic to pull the weapon
-    //    pulledWeapon.gameObject.SetActive(true);
-    //    hiddenWeapon.gameObject.SetActive(false);
-    //}
+    public void PullWeapon()
+    {
+        // Logic to pull the weapon
+        pulledWeapon.gameObject.SetActive(true);
+        hiddenWeapon.gameObject.SetActive(false);
+    }
 }
