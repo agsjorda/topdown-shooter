@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace FOW
@@ -11,13 +9,15 @@ namespace FOW
         protected override void OnHide()
         {
             foreach (Renderer renderer in ObjectsToHide)
-                renderer.enabled = false;
+                if (renderer != null)
+                    renderer.enabled = false;
         }
 
         protected override void OnReveal()
         {
             foreach (Renderer renderer in ObjectsToHide)
-                renderer.enabled = true;
+                if (renderer != null)
+                    renderer.enabled = true;
         }
 
         public void ModifyHiddenRenderers(Renderer[] newObjectsToHide)

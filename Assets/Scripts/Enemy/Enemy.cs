@@ -1,8 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
+    [SerializeField] protected int healthPoints = 25;
+
     [Header("Idle data")]
     public float idleTime;
     public float detectionRange;
@@ -41,6 +44,23 @@ public class Enemy : MonoBehaviour
 
     protected virtual void Update()
     {
+    }
+
+    public virtual void GetHit()
+    {
+        healthPoints--;
+    }
+
+    public virtual void HitImpact(Vector3 force, Vector3 impactPoint, Rigidbody rb)
+    {
+        StartCoroutine(HitImpactCouroutine(force, impactPoint, rb));
+    }
+
+    private IEnumerator HitImpactCouroutine(Vector3 force, Vector3 impactPoint, Rigidbody rb)
+    {
+        yield return new WaitForSeconds(.1f);
+
+        rb.AddForceAtPosition(force, impactPoint, ForceMode.Impulse);
     }
     protected virtual void OnDrawGizmos()
     {

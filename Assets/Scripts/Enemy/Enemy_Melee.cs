@@ -16,6 +16,7 @@ public struct AttackData
 }
 
 public enum AttackType_Melee { Close, Charge }
+public enum EnemyMeleeType { Regular, Shield, Dodge }
 
 
 public class Enemy_Melee : Enemy
@@ -26,9 +27,16 @@ public class Enemy_Melee : Enemy
     public RecoveryState_Melee recoveryState { get; private set; }
     public ChaseState_Melee chaseState { get; private set; }
     public AttackState_Melee attackState { get; private set; }
+    public DeadState_Melee deadState { get; private set; }
 
     [SerializeField] private Transform hiddenWeapon;
     [SerializeField] private Transform pulledWeapon;
+
+    [Header("Enemy Settings")]
+    public EnemyMeleeType meleeType;
+    public Transform shieldTransform;
+    public float dodgeCooldown;
+    public float lastDodgeTime;
 
     [Header("Attack Data")]
     public AttackData attackData;
@@ -43,6 +51,7 @@ public class Enemy_Melee : Enemy
         recoveryState = new RecoveryState_Melee(this, stateMachine, "Recovery");
         chaseState = new ChaseState_Melee(this, stateMachine, "Chase");
         attackState = new AttackState_Melee(this, stateMachine, "Attack");
+        deadState = new DeadState_Melee(this, stateMachine, "Idle");// Idle is placeholder
 
     }
 
@@ -51,6 +60,7 @@ public class Enemy_Melee : Enemy
         base.Start();
 
         stateMachine.Initialize(idleState);
+        InitializeSpeciality();
     }
 
     protected override void Update()
@@ -58,6 +68,23 @@ public class Enemy_Melee : Enemy
         base.Update();
 
         stateMachine.currentState.Update();
+    }
+
+    private void InitializeSpeciality()
+    {
+        if (meleeType == EnemyMeleeType.Shield) {
+            anim.SetFloat("ChaseIndex", 1);
+            shieldTransform.gameObject.SetActive(true);
+        }
+    }
+
+    public override void GetHit()
+    {
+        base.GetHit();
+
+        if (healthPoints <= 0)
+            stateMachine.ChangeState(deadState);
+        //make the impact reaction here if needed
     }
 
     protected override void OnDrawGizmos()
@@ -73,6 +100,20 @@ public class Enemy_Melee : Enemy
         return distanceToPlayer < attackData.attackRange;
     }
 
+
+    public void ActivateDodgeRoll()
+    {
+        if (meleeType != EnemyMeleeType.Dodge) return;
+
+        if (stateMachine.currentState != chaseState) return;
+
+        if (Vector3.Distance(transform.position, player.position) < 2f) return;
+
+        if (Time.time > lastDodgeTime + dodgeCooldown) {
+            anim.SetTrigger("Dodge");
+            lastDodgeTime = Time.time;
+        }
+    }
     public void PullWeapon()
     {
         // Logic to pull the weapon
