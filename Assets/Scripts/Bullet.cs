@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
+    public float impactForce;
 
     private BoxCollider cd;
     private Rigidbody rb;
@@ -22,8 +23,10 @@ public class Bullet : MonoBehaviour
         trailRenderer = GetComponent<TrailRenderer>();
         meshRenderer = GetComponent<MeshRenderer>();
     }
-    public void BulletSetup(float flyDistance)
+    public void BulletSetup(float flyDistance, float impactForce)
     {
+        this.impactForce = impactForce;
+
         bulletDisabled = false;
         cd.enabled = true;
         meshRenderer.enabled = true;
@@ -66,11 +69,25 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        //rb.constraints = RigidbodyConstraints.FreezeAll;
         CreateImpactFX(collision);
-
         // Instead of destroying the bullet, we can return it to an object pool
         ReturnBulletToPool();
+
+        Enemy enemy = collision.gameObject.GetComponentInParent<Enemy>();
+        Enemy_Shield enemyShield = collision.gameObject.GetComponent<Enemy_Shield>();
+
+        if (enemyShield != null) {
+            enemyShield.ReduceDurability();
+            return;
+        }
+
+        if (enemy != null) {
+            Vector3 forceDirection = rb.linearVelocity.normalized * impactForce;
+            Rigidbody hitRigidbody = collision.collider.attachedRigidbody;
+            enemy.GetHit();
+            enemy.DeathImpact(forceDirection, collision.contacts[0].point, hitRigidbody);
+        }
+
     }
 
     private void CreateImpactFX(Collision collision)
@@ -78,7 +95,7 @@ public class Bullet : MonoBehaviour
         if (collision.contacts.Length > 0) {
             ContactPoint contact = collision.contacts[0];
 
-            GameObject newImpactFX = ObjectPool.instance.GetObjectFromPool(bulletImpactFX);
+            GameObject newImpactFX = ObjectPool.instance.GetObject(bulletImpactFX);
             newImpactFX.transform.position = contact.point;
 
             ObjectPool.instance.ReturnObject(newImpactFX, 1f);

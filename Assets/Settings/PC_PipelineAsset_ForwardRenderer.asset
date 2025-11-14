@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarRenderFeature
   m_Active: 1
   renderPassEvent: 350
+  EnableNormals: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -14,6 +14,7 @@ public class PlayerWeaponController : MonoBehaviour
     private bool isShooting;
 
     [Header("Bullet Details")]
+    [SerializeField] private float bulletImpactForce = 100f;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
 
@@ -30,7 +31,7 @@ public class PlayerWeaponController : MonoBehaviour
         player = GetComponent<Player>();
         AssignInputEvents();
 
-        Invoke("EquipStartingWeapon", 0.1f);
+        Invoke(nameof(EquipStartingWeapon), 0.1f);
     }
 
     private void Update()
@@ -106,7 +107,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void DropWeaponOnTheGround()
     {
-        GameObject droppedWeapon = ObjectPool.instance.GetObjectFromPool(weaponPickupPrefab);
+        GameObject droppedWeapon = ObjectPool.instance.GetObject(weaponPickupPrefab);
         droppedWeapon.GetComponent<Pickup_Weapon>()?.SetupPickupWeapon(currentWeapon, transform);
     }
 
@@ -149,13 +150,14 @@ public class PlayerWeaponController : MonoBehaviour
 
 
         FireSingleBullet();
+        TriggerEnemyDodge();
     }
 
     private void FireSingleBullet()
     {
         currentWeapon.bulletsInMagazine--;
 
-        GameObject newBullet = ObjectPool.instance.GetObjectFromPool(bulletPrefab);
+        GameObject newBullet = ObjectPool.instance.GetObject(bulletPrefab);
 
         newBullet.transform.position = GunPoint().position;
         newBullet.transform.rotation = Quaternion.LookRotation(GunPoint().forward);
@@ -163,7 +165,7 @@ public class PlayerWeaponController : MonoBehaviour
         Rigidbody rbNewBullet = newBullet.GetComponent<Rigidbody>();
 
         Bullet bulletScript = newBullet.GetComponent<Bullet>();
-        bulletScript.BulletSetup(currentWeapon.gunDistance);
+        bulletScript.BulletSetup(currentWeapon.gunDistance, bulletImpactForce);
 
         Vector3 bulletsDirection = currentWeapon.ApplySpread(BulletDirection());
 
@@ -206,7 +208,19 @@ public class PlayerWeaponController : MonoBehaviour
 
     public Transform GunPoint() => player.weaponVisuals.CurrentWeaponModel().gunPoint;
 
+    private void TriggerEnemyDodge()
+    {
+        Vector3 rayOrigin = GunPoint().position;
+        Vector3 rayDirection = BulletDirection();
 
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, Mathf.Infinity)) {
+            Enemy_Melee enemy_melee = hitInfo.collider.GetComponentInParent<Enemy_Melee>();
+
+            if (enemy_melee != null) {
+                enemy_melee.ActivateDodgeRoll();
+            }
+        }
+    }
     #region Input Events
     private void AssignInputEvents()
     {
@@ -232,7 +246,5 @@ public class PlayerWeaponController : MonoBehaviour
         controls.Character.ToggleWeaponMode.performed += ctx => currentWeapon.ToggleBurstMode();
 
     }
-
-
     #endregion
 }
