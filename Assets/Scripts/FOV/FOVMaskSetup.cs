@@ -92,7 +92,7 @@ public class FOVMaskSetup : MonoBehaviour
         if (!autoCreateUI || darknessMaterial == null) return;
 
         // try find existing RawImage using this material
-        var existing = FindObjectsOfType<RawImage>(true);
+        var existing = Object.FindObjectsByType<RawImage>(FindObjectsSortMode.None);
         foreach (var ri in existing) {
             if (ri.material == darknessMaterial) {
                 uiRawImage = ri;

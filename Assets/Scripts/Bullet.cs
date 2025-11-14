@@ -74,7 +74,7 @@ public class Bullet : MonoBehaviour
         ReturnBulletToPool();
 
         Enemy enemy = collision.gameObject.GetComponentInParent<Enemy>();
-        EnemyShield enemyShield = collision.gameObject.GetComponent<EnemyShield>();
+        Enemy_Shield enemyShield = collision.gameObject.GetComponent<Enemy_Shield>();
 
         if (enemyShield != null) {
             enemyShield.ReduceDurability();
@@ -85,7 +85,7 @@ public class Bullet : MonoBehaviour
             Vector3 forceDirection = rb.linearVelocity.normalized * impactForce;
             Rigidbody hitRigidbody = collision.collider.attachedRigidbody;
             enemy.GetHit();
-            enemy.HitImpact(forceDirection, collision.contacts[0].point, hitRigidbody);
+            enemy.DeathImpact(forceDirection, collision.contacts[0].point, hitRigidbody);
         }
 
     }
@@ -95,7 +95,7 @@ public class Bullet : MonoBehaviour
         if (collision.contacts.Length > 0) {
             ContactPoint contact = collision.contacts[0];
 
-            GameObject newImpactFX = ObjectPool.instance.GetObjectFromPool(bulletImpactFX);
+            GameObject newImpactFX = ObjectPool.instance.GetObject(bulletImpactFX);
             newImpactFX.transform.position = contact.point;
 
             ObjectPool.instance.ReturnObject(newImpactFX, 1f);

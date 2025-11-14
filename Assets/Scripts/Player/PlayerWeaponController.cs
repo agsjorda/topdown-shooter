@@ -31,7 +31,7 @@ public class PlayerWeaponController : MonoBehaviour
         player = GetComponent<Player>();
         AssignInputEvents();
 
-        Invoke("EquipStartingWeapon", 0.1f);
+        Invoke(nameof(EquipStartingWeapon), 0.1f);
     }
 
     private void Update()
@@ -107,7 +107,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void DropWeaponOnTheGround()
     {
-        GameObject droppedWeapon = ObjectPool.instance.GetObjectFromPool(weaponPickupPrefab);
+        GameObject droppedWeapon = ObjectPool.instance.GetObject(weaponPickupPrefab);
         droppedWeapon.GetComponent<Pickup_Weapon>()?.SetupPickupWeapon(currentWeapon, transform);
     }
 
@@ -157,7 +157,7 @@ public class PlayerWeaponController : MonoBehaviour
     {
         currentWeapon.bulletsInMagazine--;
 
-        GameObject newBullet = ObjectPool.instance.GetObjectFromPool(bulletPrefab);
+        GameObject newBullet = ObjectPool.instance.GetObject(bulletPrefab);
 
         newBullet.transform.position = GunPoint().position;
         newBullet.transform.rotation = Quaternion.LookRotation(GunPoint().forward);

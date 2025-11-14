@@ -9,8 +9,8 @@ public class Enemy_Ragdoll : MonoBehaviour
 
     private void Awake()
     {
-        ragdollColliders = ragdollParent.GetComponentsInChildren<Collider>();
-        ragdollRigidbodies = ragdollParent.GetComponentsInChildren<Rigidbody>();
+        ragdollColliders = GetComponentsInChildren<Collider>();
+        ragdollRigidbodies = GetComponentsInChildren<Rigidbody>();
 
         RagdollActive(false);
     }
@@ -18,14 +18,16 @@ public class Enemy_Ragdoll : MonoBehaviour
     public void RagdollActive(bool active)
     {
         foreach (Rigidbody rb in ragdollRigidbodies) {
-            rb.isKinematic = !active;
+            if (rb != null)
+                rb.isKinematic = !active;
         }
     }
 
     public void CollidersActive(bool active)
     {
-        foreach (Collider col in ragdollColliders) {
-            col.enabled = active;
+        foreach (Collider cd in ragdollColliders) {
+            if (cd != null)
+                cd.enabled = active;
         }
     }
 }
