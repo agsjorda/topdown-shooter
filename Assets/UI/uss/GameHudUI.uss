@@ -1,0 +1,120 @@
+.healthBar_fill {
+    flex-grow: 0;
+    background-position-x: left 0;
+    width: 99%;
+    background-color: rgb(248, 163, 46);
+    height: 80%;
+    background-image: none;
+    flex-shrink: 0;
+    overflow: visible;
+    margin-right: 5px;
+    -unity-background-scale-mode: scale-to-fit;
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    align-self: auto;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.quickSlot {
+    flex-grow: 0;
+    width: 5%;
+    height: 100%;
+    background-color: rgba(34, 34, 34, 0.8);
+    flex-shrink: 0;
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    margin-left: 15px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    background-image: none;
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    border-left-color: rgba(250, 247, 247, 0.57);
+    border-right-color: rgba(250, 247, 247, 0.57);
+    border-top-color: rgba(250, 247, 247, 0.57);
+    border-bottom-color: rgba(250, 247, 247, 0.57);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    cursor: initial;
+    opacity: 1;
+    overflow: visible;
+    
+    /* Shadow */
+    box-shadow: 0px 4px 100px rgba(0, 0, 0, 0.6);
+}
+
+.healthBar_fill:hover {
+    background-color: rgb(255, 169, 45);
+}
+
+.quickSlot:hover {
+    scale: 1.05 1.05;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+    cursor: initial;
+    rotate: 5deg;
+}
+
+.minimap {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 15%;
+    height: 30%;
+    margin-top: 100px;
+    margin-right: 100px;
+    margin-bottom: 100px;
+    margin-left: 100px;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    border-bottom-left-radius: 50px;
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    border-left-color: rgba(255, 255, 255, 0.69);
+    border-right-color: rgba(255, 255, 255, 0.69);
+    border-top-color: rgba(255, 255, 255, 0.69);
+    border-bottom-color: rgba(255, 255, 255, 0.69);
+}
+
+.minimap:hover {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 15%;
+    height: 30%;
+    margin-top: 100px;
+    margin-right: 100px;
+    margin-bottom: 100px;
+    margin-left: 100px;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    border-bottom-left-radius: 50px;
+    border-top-width: 10px;
+    border-right-width: 10px;
+    border-bottom-width: 10px;
+    border-left-width: 10px;
+    border-left-color: rgba(241, 174, 8, 0.91);
+    border-right-color: rgba(241, 174, 8, 0.91);
+    border-top-color: rgba(241, 174, 8, 0.91);
+    border-bottom-color: rgba(241, 174, 8, 0.91);
+    transition-duration: 0.3s;
+}
