@@ -49,7 +49,11 @@ public class Bullet : MonoBehaviour
             ReturnBulletToPool();
     }
 
-    private void ReturnBulletToPool() => ObjectPool.instance.ReturnObject(gameObject);
+    private void ReturnBulletToPool()
+    {
+        if (ObjectPool.instance != null)
+            ObjectPool.instance.ReturnObject(gameObject);
+    }
 
     private void DisableBulletIfNeeded()
     {

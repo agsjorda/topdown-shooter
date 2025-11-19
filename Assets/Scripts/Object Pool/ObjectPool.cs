@@ -50,7 +50,8 @@ public class ObjectPool : MonoBehaviour
 
         GameObject objectToGet = poolDictionary[prefab].Dequeue();
 
-        objectToGet.transform.parent = null;
+        // FIX: Use SetParent instead of .parent
+        objectToGet.transform.SetParent(null, true); // worldPositionStays = true when unparenting
         ResetPooledObjectState(objectToGet);
 
         if (autoActivate)
@@ -69,7 +70,8 @@ public class ObjectPool : MonoBehaviour
         GameObject obj = GetObject(prefab, false); // get inactive
 
         if (parent != null) {
-            obj.transform.SetParent(parent);
+            // FIX: Use SetParent with worldPositionStays = false for UI elements
+            obj.transform.SetParent(parent, false);
             obj.transform.localPosition = localPosition;
             obj.transform.localRotation = localRotation;
         } else {
@@ -80,7 +82,8 @@ public class ObjectPool : MonoBehaviour
         obj.SetActive(true);
 
         if (!keepParented && parent != null)
-            obj.transform.SetParent(null);
+            // FIX: Use SetParent with worldPositionStays = true when unparenting
+            obj.transform.SetParent(null, true);
 
         return obj;
     }
@@ -119,7 +122,8 @@ public class ObjectPool : MonoBehaviour
         }
 
         objectToReturn.SetActive(false);
-        objectToReturn.transform.parent = transform;
+        // FIX: Use SetParent with worldPositionStays = false for UI elements
+        objectToReturn.transform.SetParent(transform, false);
 
         if (!poolDictionary.ContainsKey(originalPrefab))
             poolDictionary[originalPrefab] = new Queue<GameObject>();
@@ -132,7 +136,6 @@ public class ObjectPool : MonoBehaviour
     // ───────────────────────────────
     // INITIALIZATION HELPERS
     // ───────────────────────────────
-    // InitializeNewPool - add a log after creating the queue
     private void InitializeNewPool(GameObject prefab)
     {
         if (prefab == null) {
@@ -150,7 +153,6 @@ public class ObjectPool : MonoBehaviour
         Debug.Log($"ObjectPool: Initialized pool for '{prefab.name}' with {poolDictionary[prefab].Count} instances.");
     }
 
-    // CreateNewObject - log the instance creation
     private void CreateNewObject(GameObject prefab)
     {
         if (prefab == null) return;
@@ -165,10 +167,9 @@ public class ObjectPool : MonoBehaviour
 
         poolDictionary[prefab].Enqueue(newObject);
 
-        Debug.Log($"ObjectPool: Created pooled instance '{newObject.name}' for prefab '{prefab.name}'. Queue size = {poolDictionary[prefab].Count}");
+        //Debug.Log($"ObjectPool: Created pooled instance '{newObject.name}' for prefab '{prefab.name}'. Queue size = {poolDictionary[prefab].Count}");
     }
 
-    // add this helper inside the ObjectPool class
     public int GetPoolCount(GameObject prefab)
     {
         if (prefab == null) return 0;

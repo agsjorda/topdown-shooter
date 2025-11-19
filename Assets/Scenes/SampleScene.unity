@@ -1913,7 +1913,7 @@ GameObject:
   - component: {fileID: 474115368}
   - component: {fileID: 474115370}
   m_Layer: 5
-  m_Name: IngameUI
+  m_Name: GameUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1966,10 +1966,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 474115367}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7872eb5a57fff7d489b98aa81684ef2a, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f05e113c89321c42a828c30c3cd389f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IngameUI
-  fillPercent: 1
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  mainDocument: {fileID: 474115368}
+  healthFill: 1
 --- !u!1 &481987812
 GameObject:
   m_ObjectHideFlags: 0
@@ -3802,7 +3803,7 @@ MonoBehaviour:
   - {fileID: 1277622875}
   - {fileID: 1285779744}
   inBattleMode: 0
-  meleeType: 0
+  meleeType: 3
   shieldTransform: {fileID: 2151470595947397223}
   dodgeCooldown: 3
   lastDodgeTime: 0

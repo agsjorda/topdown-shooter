@@ -1,9 +1,9 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class InventoryUI : MonoBehaviour
+public class Inventory_UI : MonoBehaviour
 {
-    public InventoryUI(VisualElement visualElement)
+    public Inventory_UI(VisualElement visualElement)
     {
         this.visualElement = visualElement;
     }
