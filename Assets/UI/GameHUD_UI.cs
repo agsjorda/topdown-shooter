@@ -2,87 +2,49 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class GameHUD_UI : UIInterfaceSubComponent
+public class GameHUD_UI : UIBaseComponent
 {
-    private VisualElement rootElement;
     private HealthBar_UI healthBar;
-    private bool isValid = false;
-    private bool isVisible = true;
-    private List<UIInterfaceSubComponent> uiComponents = new List<UIInterfaceSubComponent>();
+    private List<UIBaseComponent> childComponents = new List<UIBaseComponent>();
 
-    public bool IsVisible => isVisible;
-
-    public GameHUD_UI(VisualElement root,
-                   string healthBarFillName = "healthBar_fill",
-                   string miniMapElementName = "mini-map")
+    public GameHUD_UI(VisualElement root) : base(root)
     {
-        this.rootElement = root;
+        if (!IsValid) return;
 
-        if (root == null) {
-            Debug.LogError("GameHUD: Root element is null!");
-            isValid = false;
-            return;
-        }
+        // Initialize child components
+        healthBar = new HealthBar_UI(root);
 
-        // Initialize health bar
-        healthBar = new HealthBar_UI(root, healthBarFillName);
-        if (healthBar != null && healthBar.IsValid) {
-            uiComponents.Add(healthBar);
-            isValid = true;
+        if (healthBar.IsValid) {
+            childComponents.Add(healthBar);
         } else {
-            isValid = false;
-            Debug.LogWarning("GameHUD: healthBar not found — HUD not marked valid");
+            Debug.LogError("GameHUD: Failed to initialize health bar");
             return;
         }
-
-        // Initialize other components as needed
-        // var miniMap = new MiniMap_UI(root, miniMapElementName);
-        // if (miniMap != null && miniMap.IsValid) uiComponents.Add(miniMap);
-
-        Debug.Log("GameHUD: Initialized successfully");
     }
 
     public void SetHealthPercent(float percent)
     {
-        if (!isValid) return;
         healthBar?.SetHealthPercent(percent);
     }
 
     public void SetHealth(float current, float max)
     {
-        if (!isValid) return;
-        healthBar?.SetHealthPercent(current / max);
+        healthBar?.SetHealth(current, max);
     }
 
-    public void Show()
+    public override void Show()
     {
-        if (!isValid || rootElement == null) return;
-
-        isVisible = true;
-        rootElement.style.display = DisplayStyle.Flex;
-
-        // Show all child components
-        foreach (var component in uiComponents) {
-            component.Show();
-        }
+        base.Show();
+        childComponents.ForEach(component => component.Show());
     }
 
-    public void Hide()
+    public override void Hide()
     {
-        if (!isValid || rootElement == null) return;
-
-        isVisible = false;
-        rootElement.style.display = DisplayStyle.None;
-
-        // Hide all child components
-        foreach (var component in uiComponents) {
-            component.Hide();
-        }
+        base.Hide();
+        childComponents.ForEach(component => component.Hide());
     }
 
-    // Individual component visibility
+    // Individual component control
     public void ShowHealthBar() => healthBar?.Show();
     public void HideHealthBar() => healthBar?.Hide();
-
-    public bool IsValid => isValid;
 }

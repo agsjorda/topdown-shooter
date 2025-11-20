@@ -1,51 +1,31 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class Inventory_UI : UIInterfaceSubComponent
+public class Inventory_UI : UIBaseComponent
 {
-    private VisualElement inventoryPanel;
-    private bool isValid = false;
-    private bool isOpen = false;
+    public bool IsOpen => IsVisible;
 
-    public bool IsOpen => isOpen;
-    public bool IsVisible => isOpen; // Map IsOpen to IsVisible for interface
-    public bool IsValid => isValid;
-
-    public Inventory_UI(VisualElement inventoryPanel)
+    public Inventory_UI(VisualElement root) : base(root)
     {
-        this.inventoryPanel = inventoryPanel;
-
-        if (inventoryPanel == null) {
-            Debug.LogError("InventoryUI: Inventory panel is null!");
-            isValid = false;
-            return;
-        }
-
-        isValid = true;
-        Hide(); // Start hidden by default
+        if (!IsValid) return;
         SetupSlots();
     }
 
-    public void Show()
+    public override void Show()
     {
-        if (!isValid) return;
-        isOpen = true;
-        inventoryPanel.style.display = DisplayStyle.Flex;
-        Debug.Log("InventoryUI: Show");
+        base.Show();
+        Debug.Log("Inventory opened");
     }
 
-    public void Hide()
+    public override void Hide()
     {
-        if (!isValid) return;
-        isOpen = false;
-        inventoryPanel.style.display = DisplayStyle.None;
-        Debug.Log("InventoryUI: Hide");
+        base.Hide();
+        Debug.Log("Inventory closed");
     }
 
     private void SetupSlots()
     {
-        // Inventory slot setup logic
-        Debug.Log("InventoryUI: Slots setup complete");
+        // Inventory setup logic
+        Debug.Log("Inventory slots initialized");
     }
-
 }
