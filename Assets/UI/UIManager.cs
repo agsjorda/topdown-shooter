@@ -4,6 +4,10 @@ using UnityEngine.UIElements;
 
 public class UIManager : MonoBehaviour
 {
+    private Player player;
+
+    private PlayerControls controls;
+
     [Header("UI Document")]
     [SerializeField] private UIDocument mainDocument;
 
@@ -18,6 +22,14 @@ public class UIManager : MonoBehaviour
     private GameHUD_UI gameHUD;
     private Inventory_UI inventoryUI;
     private bool isInitialized = false;
+
+    private void Start()
+    {
+        player = Object.FindFirstObjectByType<Player>();
+        if (player == null) {
+            Debug.LogError("UIManager: Player not found in scene");
+        }
+    }
 
     private void OnEnable()
     {
@@ -65,13 +77,14 @@ public class UIManager : MonoBehaviour
     {
         if (!isInitialized) return;
 
-        HandleInput();
+        HandleInputEvents();
     }
 
-    private void HandleInput()
+    private void HandleInputEvents()
     {
-        if (Input.GetKeyDown(KeyCode.I)) ToggleInventory();
-        if (Input.GetKeyDown(KeyCode.H)) ToggleHUD();
+        controls = player.controls;
+        controls.Character.InventoryToggle.performed += context => ToggleInventory();
+        controls.Character.HudToggle.performed += context => ToggleHUD();
         if (Input.GetKeyDown(KeyCode.UpArrow)) ChangeHealth(0.1f);
         if (Input.GetKeyDown(KeyCode.DownArrow)) ChangeHealth(-0.1f);
     }
