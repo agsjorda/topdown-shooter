@@ -1,23 +1,26 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
     <Style src="project://database/Assets/UI/uss/GameHudUI.uss?fileID=7433441132597879392&amp;guid=77d816de8e86af2488326805b2f04e14&amp;type=3#GameHudUI" />
-    <ui:VisualElement name="hud-panel" style="flex-grow: 1;">
-        <ui:VisualElement style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-bottom: 20px; flex-direction: row; align-items: flex-start; justify-content: space-between; margin-top: 20px; margin-right: 20px; margin-left: 20px;">
-            <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; width: 25%; height: 25%;" />
-            <ui:VisualElement name="minimap" class="minimap" style="background-color: rgba(34, 34, 34, 0.75);" />
-        </ui:VisualElement>
-        <ui:VisualElement name="bottomUIContainer" style="flex-grow: 0; height: 20%; flex-direction: column; align-items: flex-start; align-self: auto; padding-top: 50px; padding-right: 10px; padding-bottom: 50px; padding-left: 100px;">
-            <ui:VisualElement style="flex-grow: 1; height: 100%; width: 100%; align-items: flex-start; justify-content: center; margin-left: 10px;">
-                <ui:VisualElement name="healthBar" style="flex-grow: 0; background-color: rgba(46, 46, 46, 0.85); width: 25%; height: 60%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; align-items: center; justify-content: flex-start; overflow: hidden; flex-shrink: 0; flex-direction: row; align-self: auto; background-position-x: left 0; -unity-background-scale-mode: stretch-to-fill; border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-image: none; -unity-background-image-tint-color: rgba(253, 253, 253, 0); border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px; border-left-color: rgb(248, 163, 46); border-right-color: rgb(248, 163, 46); border-top-color: rgb(248, 163, 46); border-bottom-color: rgb(248, 163, 46);">
-                    <ui:VisualElement name="healthBar_fill" class="healthBar_fill" />
-                    <ui:Label text="100 / 100" focusable="true" style="-unity-text-align: middle-center; background-color: rgba(255, 251, 251, 0); color: rgb(255, 255, 255); -unity-font-style: bold; position: absolute; top: -1px; left: 360px; font-size: 45px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Anton.ttf?fileID=12800000&amp;guid=997a43b767814dd0a7642ec9b78cba41&amp;type=3#Anton&quot;);" />
+    <ui:VisualElement name="ui-container" style="flex-grow: 1; flex-shrink: 1;">
+        <ui:VisualElement name="hud-panel" style="flex-grow: 1;">
+            <ui:VisualElement style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-bottom: 20px; flex-direction: row; align-items: flex-start; justify-content: space-between; margin-top: 20px; margin-right: 20px; margin-left: 20px;">
+                <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; width: 25%; height: 25%;" />
+                <ui:VisualElement name="minimap" class="minimap" style="background-color: rgba(34, 34, 34, 0.75); background-image: url(&quot;project://database/Assets/Textures/minimap_renderTexture.renderTexture?fileID=8400000&amp;guid=920eedbff18111a4b82465479e7c2263&amp;type=2#minimap_renderTexture&quot;);" />
+            </ui:VisualElement>
+            <ui:VisualElement name="bottomUIContainer" style="flex-grow: 0; height: 20%; flex-direction: column; align-items: flex-start; align-self: auto; padding-top: 50px; padding-right: 10px; padding-bottom: 50px; padding-left: 100px;">
+                <ui:VisualElement style="flex-grow: 1; height: 100%; width: 100%; align-items: flex-start; justify-content: center; margin-left: 10px;">
+                    <ui:VisualElement name="healthBar" style="flex-grow: 0; background-color: rgba(46, 46, 46, 0.85); width: 25%; height: 60%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; align-items: center; justify-content: flex-start; overflow: hidden; flex-shrink: 0; flex-direction: row; align-self: auto; background-position-x: left 0; -unity-background-scale-mode: stretch-to-fill; border-top-right-radius: 20px; border-bottom-right-radius: 20px; background-image: none; -unity-background-image-tint-color: rgba(253, 253, 253, 0); border-top-width: 10px; border-right-width: 10px; border-bottom-width: 10px; border-left-width: 10px; border-left-color: rgb(248, 163, 46); border-right-color: rgb(248, 163, 46); border-top-color: rgb(248, 163, 46); border-bottom-color: rgb(248, 163, 46);">
+                        <ui:VisualElement name="healthBar_fill" class="healthBar_fill" />
+                        <ui:Label text="100 / 100" focusable="true" style="-unity-text-align: middle-center; background-color: rgba(255, 251, 251, 0); color: rgb(255, 255, 255); -unity-font-style: bold; position: absolute; top: -1px; left: 360px; font-size: 45px; -unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Examples%20&amp;%20Extras/Fonts/Anton.ttf?fileID=12800000&amp;guid=997a43b767814dd0a7642ec9b78cba41&amp;type=3#Anton&quot;);" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement style="flex-grow: 1; width: 100%; height: 100%; flex-direction: row; align-items: center; align-self: center;">
+                    <ui:VisualElement class="quickSlot" />
+                    <ui:VisualElement class="quickSlot" />
+                    <ui:VisualElement class="quickSlot" />
+                    <ui:VisualElement class="quickSlot" style="-unity-background-scale-mode: scale-and-crop;" />
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 1; width: 100%; height: 100%; flex-direction: row; align-items: center; align-self: center;">
-                <ui:VisualElement class="quickSlot" />
-                <ui:VisualElement class="quickSlot" />
-                <ui:VisualElement class="quickSlot" />
-                <ui:VisualElement class="quickSlot" style="-unity-background-scale-mode: scale-and-crop;" />
-            </ui:VisualElement>
         </ui:VisualElement>
+        <ui:VisualElement name="inventory-panel" style="flex-grow: 1; position: absolute; width: 80%; height: 80%; align-self: center; align-content: center; justify-content: flex-start; background-color: rgba(48, 96, 209, 0.64); margin-top: 5%;" />
     </ui:VisualElement>
 </ui:UXML>

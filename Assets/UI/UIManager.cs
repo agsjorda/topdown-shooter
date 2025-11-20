@@ -8,73 +8,99 @@ public class UIManager : MonoBehaviour
     [SerializeField] private UIDocument mainDocument;
 
     [Header("UI References")]
-    private string hudPanelName = "hud-panel";
-    private string healthBarFillName = "healthBar_fill";
+    [SerializeField] private string hudPanelName = "hud-panel";
+    [SerializeField] private string inventoryPanelName = "inventory-panel";
 
-    [Header("TEST ONLY — Adjust Health Fill")]
-    [Range(0f, 1f)]
-    [SerializeField] private float healthFill = 1f;
-    private float previousHealthFill; // Track changes
-
+    // All UI components
     private GameHUD_UI gameHUD;
+    private Inventory_UI inventoryUI;
+
     private bool isInitialized = false;
 
     private void OnEnable()
     {
         InitializeUI();
-        UpdateUI();
     }
+
+    [Header("TEST ONLY — Adjust Health Fill")]
+    [Range(0f, 1f)]
+    [SerializeField] private float healthFill = 1f;
+    private float previousHealthFill;
 
     private void OnValidate()
     {
-        // Always (re)attempt init in edit mode so inspector changes take effect
         InitializeUI();
 
-        // Only update if value actually changed and we're initialized
         if (isInitialized && !Mathf.Approximately(healthFill, previousHealthFill)) {
-            UpdateUI();
+            UpdateHealthUI();
             previousHealthFill = healthFill;
+        }
+    }
+
+    private void Update()
+    {
+        HandleInput();
+    }
+
+    private void HandleInput()
+    {
+        if (!isInitialized) return;
+
+        // Example input handling
+        if (Input.GetKeyDown(KeyCode.I)) {
+            ToggleInventory();
+        }
+
+        if (Input.GetKeyDown(KeyCode.H)) {
+            ToggleHUD();
         }
     }
 
     private void InitializeUI()
     {
-        if (mainDocument == null) {
+        if (mainDocument == null || mainDocument.rootVisualElement == null) {
             isInitialized = false;
             return;
         }
 
-        VisualElement root = mainDocument.rootVisualElement;
-        if (root == null) {
-            isInitialized = false;
-            return;
-        }
+        var root = mainDocument.rootVisualElement;
 
-        // GameHUD now manages multiple components internally
+        // Initialize all UI components
         gameHUD = new GameHUD_UI(root.Q<VisualElement>(hudPanelName));
+        inventoryUI = new Inventory_UI(root.Q<VisualElement>(inventoryPanelName));
 
-        if (gameHUD != null && gameHUD.IsValid) {
-            // Test the health bar and mark initialized
-            gameHUD.SetHealthPercent(healthFill);
-            isInitialized = true;
-            previousHealthFill = healthFill;
-        } else {
-            isInitialized = false;
+        isInitialized = (gameHUD != null && gameHUD.IsValid);
+
+        if (isInitialized) {
+            // Start with HUD visible, inventory hidden
+            gameHUD.Show();
+            inventoryUI?.Hide();
+            Debug.Log("UIManager: All UI components initialized");
         }
     }
 
-    private void UpdateUI()
+    // Public API for other systems
+    public void SetHealth(float current, float max)
+    {
+        if (!isInitialized) return;
+        healthFill = Mathf.Clamp01(current / max);
+        gameHUD?.SetHealth(current, max);
+        previousHealthFill = healthFill;
+    }
+
+    public void ShowHUD() => gameHUD?.Show();
+    public void HideHUD() => gameHUD?.Hide();
+    public void ToggleHUD() => gameHUD?.Toggle(); // Using extension method!
+
+    public void ShowInventory() => inventoryUI?.Show();
+    public void HideInventory() => inventoryUI?.Hide();
+    public void ToggleInventory() => inventoryUI?.Toggle(); // Using extension method!
+
+    public void UpdateHealthUI()
     {
         if (gameHUD == null || !gameHUD.IsValid) return;
-
         gameHUD.SetHealthPercent(healthFill);
     }
 
-    // Public API for other systems to use
-    public void SetHealth(float current, float max)
-    {
-        healthFill = Mathf.Clamp01(current / max);
-        UpdateUI();
-        previousHealthFill = healthFill;
-    }
+    public bool IsInitialized => isInitialized;
 }

@@ -53,9 +53,7 @@
     cursor: initial;
     opacity: 1;
     overflow: visible;
-    
-    /* Shadow */
-    box-shadow: 0px 4px 100px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 4px 100px rgba(0, 0, 0, 0.6);
 }
 
 .healthBar_fill:hover {
@@ -92,6 +90,7 @@
     border-right-color: rgba(255, 255, 255, 0.69);
     border-top-color: rgba(255, 255, 255, 0.69);
     border-bottom-color: rgba(255, 255, 255, 0.69);
+    background-image: url("project://database/Assets/Textures/minimap_renderTexture.renderTexture?fileID=8400000&guid=920eedbff18111a4b82465479e7c2263&type=2#minimap_renderTexture");
 }
 
 .minimap:hover {
