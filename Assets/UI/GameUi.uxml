@@ -21,6 +21,6 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="inventory-panel" style="flex-grow: 1; position: absolute; width: 80%; height: 80%; align-self: center; align-content: center; justify-content: flex-start; background-color: rgba(48, 96, 209, 0.64); margin-top: 5%;" />
+        <ui:VisualElement name="inventory-panel" style="flex-grow: 1; position: absolute; width: 80%; height: 80%; align-self: center; align-content: center; justify-content: flex-start; background-color: rgba(48, 96, 209, 0.64); margin-top: 5%; display: none;" />
     </ui:VisualElement>
 </ui:UXML>

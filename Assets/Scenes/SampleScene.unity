@@ -2119,7 +2119,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   mainDocument: {fileID: 474115368}
-  healthFill: 1
+  hudPanelName: hud-panel
+  inventoryPanelName: inventory-panel
+  testHealth: 1
 --- !u!1 &481987812
 GameObject:
   m_ObjectHideFlags: 0
