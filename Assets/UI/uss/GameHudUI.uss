@@ -1,0 +1,210 @@
+.healthBar_fill {
+    flex-grow: 0;
+    background-position-x: left 0;
+    width: 99%;
+    background-color: rgb(248, 163, 46);
+    height: 80%;
+    background-image: none;
+    flex-shrink: 0;
+    overflow: visible;
+    margin-right: 5px;
+    -unity-background-scale-mode: scale-to-fit;
+    border-bottom-right-radius: 20px;
+    border-top-right-radius: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+    align-self: auto;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+.healthBar_fill:hover {
+    background-color: rgb(255, 169, 45);
+}
+
+.quickSlot {
+    flex-grow: 0;
+    width: 5%;
+    height: 100%;
+    background-color: rgba(34, 34, 34, 0.8);
+    flex-shrink: 0;
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+    margin-left: 15px;
+    padding-top: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    background-image: none;
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    border-left-color: rgba(250, 247, 247, 0.57);
+    border-right-color: rgba(250, 247, 247, 0.57);
+    border-top-color: rgba(250, 247, 247, 0.57);
+    border-bottom-color: rgba(250, 247, 247, 0.57);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    cursor: initial;
+    opacity: 1;
+    overflow: visible;
+    box-shadow: 0 4px 100px rgba(0, 0, 0, 0.6);
+}
+
+.quickSlot:hover {
+    scale: 1.05 1.05;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-in-out;
+    cursor: initial;
+    rotate: 5deg;
+}
+
+.minimap {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 15%;
+    height: 30%;
+    margin-top: 100px;
+    margin-right: 100px;
+    margin-bottom: 100px;
+    margin-left: 100px;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    border-bottom-left-radius: 50px;
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    border-left-color: rgba(255, 255, 255, 0.69);
+    border-right-color: rgba(255, 255, 255, 0.69);
+    border-top-color: rgba(255, 255, 255, 0.69);
+    border-bottom-color: rgba(255, 255, 255, 0.69);
+    background-image: url("project://database/Assets/Textures/minimap_renderTexture.renderTexture?fileID=8400000&guid=920eedbff18111a4b82465479e7c2263&type=2#minimap_renderTexture");
+}
+
+.minimap:hover {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 15%;
+    height: 30%;
+    margin-top: 100px;
+    margin-right: 100px;
+    margin-bottom: 100px;
+    margin-left: 100px;
+    background-color: rgba(0, 0, 0, 0.75);
+    border-top-left-radius: 50px;
+    border-top-right-radius: 50px;
+    border-bottom-right-radius: 50px;
+    border-bottom-left-radius: 50px;
+    border-top-width: 10px;
+    border-right-width: 10px;
+    border-bottom-width: 10px;
+    border-left-width: 10px;
+    border-left-color: rgba(241, 174, 8, 0.91);
+    border-right-color: rgba(241, 174, 8, 0.91);
+    border-top-color: rgba(241, 174, 8, 0.91);
+    border-bottom-color: rgba(241, 174, 8, 0.91);
+    transition-duration: 0.3s;
+}
+
+.inventorySlots {
+    flex-shrink: 0;
+    width: 19%;
+    height: 20%;
+    background-color: rgba(34, 34, 34, 0.7);
+    border-left-color: rgb(102, 102, 102);
+    border-right-color: rgb(102, 102, 102);
+    border-top-color: rgb(102, 102, 102);
+    border-bottom-color: rgb(102, 102, 102);
+    border-top-width: 5px;
+    border-right-width: 5px;
+    border-bottom-width: 5px;
+    border-left-width: 5px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    margin-top: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.inventorySlots:hover {
+    border-left-color: rgb(248, 163, 46);
+    border-right-color: rgb(248, 163, 46);
+    border-top-color: rgb(248, 163, 46);
+    border-bottom-color: rgb(248, 163, 46);
+    scale: 1.02 1.02 1.02;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+.inventoryBox {
+    flex-grow: 1;
+    width: 90%;
+    background-color: rgba(0, 0, 0, 0);
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-shrink: 1;
+    justify-content: start;
+    align-items: flex-start;
+}
+
+.inventoryTab {
+    background-color: rgba(0, 0, 0, 0);
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(102, 102, 102);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+.inventoryTab-icon {
+    width: 70%;
+    height: 70%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    -unity-background-image-tint-color: rgb(150, 150, 150);
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+.inventoryTab--active {
+    border-bottom-width: 4px;
+    border-bottom-color: rgb(248, 163, 46);
+}
+
+.inventoryTab--active .inventoryTab-icon {
+    -unity-background-image-tint-color: rgb(248, 163, 46);
+}
+
+.inventoryTab:hover {
+    background-color: rgba(34, 34, 34, 0.1);
+}
+
+.inventoryTab:hover .inventoryTab-icon {
+    scale: 1.05 1.05;
+}

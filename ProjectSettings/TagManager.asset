@@ -18,9 +18,9 @@ TagManager:
   - Aim
   - FOVMask
   - Enemy
-  - Visible
-  - Hidden
-  - BlackEffect
+  - minimapRender
+  - 
+  - PlayerPreview
   - 
   - 
   - 
