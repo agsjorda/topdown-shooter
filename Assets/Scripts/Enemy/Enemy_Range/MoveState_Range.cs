@@ -1,13 +1,13 @@
 using UnityEngine;
 
-public class MoveState_Melee : EnemyState
+public class MoveState_Range : EnemyState
 {
-    private Enemy_Melee enemy;
+    private Enemy_Range enemy;
     private Vector3 destination;
 
-    public MoveState_Melee(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
+    public MoveState_Range(Enemy enemyBase, EnemyStateMachine stateMachine, string animBoolName) : base(enemyBase, stateMachine, animBoolName)
     {
-        enemy = enemyBase as Enemy_Melee;
+        enemy = enemyBase as Enemy_Range;
     }
 
     public override void Enter()
@@ -30,9 +30,6 @@ public class MoveState_Melee : EnemyState
     {
         base.Update();
 
-
-        //steeringTarget is a built in NavmeshAgent method that gives the next point to move towards
-        //enemy.transform.rotation = enemy.FaceTarget(enemy.agent.steeringTarget);
         enemy.FaceTarget(GetNextPathPoint());
 
         if (enemy.agent.remainingDistance <= enemy.agent.stoppingDistance + .05f)

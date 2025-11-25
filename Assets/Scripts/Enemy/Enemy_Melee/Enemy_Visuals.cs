@@ -33,6 +33,14 @@ public class Enemy_Visuals : MonoBehaviour
         corruptionAmount = Random.Range(2, 8);
     }
 
+    public void EnableWeaponTrail(bool enable)
+    {
+        if (currentWeaponModel != null) {
+            Enemy_WeaponModel weaponModelComponent = currentWeaponModel.GetComponent<Enemy_WeaponModel>();
+            weaponModelComponent.EnableTrailEffects(enable);
+        }
+    }
+
 
     public void SetupWeaponType(Enemy_MeleeWeaponType weaponType) => currentWeaponType = weaponType;
     public void SetupLook()
