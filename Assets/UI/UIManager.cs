@@ -23,12 +23,17 @@ public class UIManager : MonoBehaviour
     private Inventory_UI inventoryUI;
     private bool isInitialized = false;
 
+    [Header("cameras")]
+    [SerializeField] private Camera characterPreviewCamera;
+    [SerializeField] private Camera minimapCamera;
+
     private void Start()
     {
         player = Object.FindFirstObjectByType<Player>();
         if (player == null) {
             Debug.LogError("UIManager: Player not found in scene");
         }
+
     }
 
     private void OnEnable()
@@ -67,6 +72,7 @@ public class UIManager : MonoBehaviour
 
         if (inventoryUI.IsValid) {
             inventoryUI.Hide();
+            characterPreviewCamera.enabled = false;
         }
 
         isInitialized = true;
@@ -79,12 +85,32 @@ public class UIManager : MonoBehaviour
 
         HandleInputEvents();
     }
+    public void ToggleMinimap(bool show)
+    {
+        minimapCamera.enabled = show;
+    }
+
+    public void ToggleCharacterPreview(bool show)
+    {
+        characterPreviewCamera.enabled = show;
+    }
 
     private void HandleInputEvents()
     {
         controls = player.controls;
-        controls.Character.InventoryToggle.performed += context => ToggleInventory();
-        controls.Character.HudToggle.performed += context => ToggleHUD();
+        controls.Character.InventoryToggle.performed += context =>
+        {
+            Debug.Log("Inventory toggle pressed");
+            ToggleInventory();
+            ToggleHUD();
+            ToggleCharacterPreview(inventoryUI.IsVisible);
+        };
+        controls.Character.HudToggle.performed += context =>
+        {
+            ToggleHUD();
+            if (inventoryUI.IsVisible)
+                ToggleInventory();
+        };
         if (Input.GetKeyDown(KeyCode.UpArrow)) ChangeHealth(0.1f);
         if (Input.GetKeyDown(KeyCode.DownArrow)) ChangeHealth(-0.1f);
     }
@@ -103,7 +129,12 @@ public class UIManager : MonoBehaviour
         gameHUD?.SetHealthPercent(testHealth);
     }
 
-    public void ToggleHUD() => gameHUD?.Toggle();
+    public void ToggleHUD()
+    {
+        gameHUD?.Toggle();
+
+        ToggleMinimap(gameHUD.IsVisible);
+    }
     public void ToggleInventory() => inventoryUI?.Toggle();
     public void ShowHUD() => gameHUD?.Show();
     public void HideHUD() => gameHUD?.Hide();
