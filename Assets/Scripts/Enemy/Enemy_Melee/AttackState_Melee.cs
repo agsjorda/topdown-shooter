@@ -56,7 +56,7 @@ public class AttackState_Melee : EnemyState
 
     private void SetupNextAttack()
     {
-        int recoveryIndex = PlayerClose() ? 1 : 0;
+        int recoveryIndex = PlayerClose() ? 1 : Random.Range(0, 2);
 
         enemy.anim.SetFloat("RecoveryIndex", recoveryIndex);
         enemy.attackData = UpdatedAttackData();
