@@ -21,17 +21,17 @@
                 </ui:VisualElement>
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="inventory-panel" style="flex-grow: 1; position: absolute; width: 95%; height: 95%; align-self: center; align-content: center; justify-content: flex-start; background-color: rgba(34, 34, 34, 0.64); margin-top: 0%; display: flex; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px;">
+        <ui:VisualElement name="inventory-panel" style="flex-grow: 1; position: absolute; width: 100%; height: 100%; align-self: center; align-content: center; justify-content: flex-start; background-color: rgba(34, 34, 34, 0.64); margin-top: 0%; display: flex; border-top-left-radius: 20px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-bottom-left-radius: 20px;">
             <ui:VisualElement style="flex-grow: 0; height: 15%; background-color: rgba(34, 34, 34, 0.7); align-items: center; justify-content: center;">
                 <ui:Label text="Inventory" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Bangers.ttf?fileID=12800000&amp;guid=137330a480fa8604184ebd4d28ff5ade&amp;type=3#Bangers&quot;); color: rgb(255, 255, 255); font-size: 100%;" />
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 1; flex-direction: row;">
-                <ui:VisualElement name="characterPreview-container" style="flex-grow: 1; align-items: center; display: flex; align-self: auto; justify-content: center; flex-direction: column; width: 50%;">
-                    <ui:VisualElement name="playerPreview" style="flex-grow: 0; width: 80%; background-color: rgba(34, 34, 34, 0); background-image: url(&quot;project://database/Assets/Textures/playerPreview_renderTexture.renderTexture?fileID=8400000&amp;guid=d2ac92518687b3f4a907aeba90d08cd3&amp;type=2#playerPreview_renderTexture&quot;); -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); height: 90%; flex-shrink: 0;" />
+                <ui:VisualElement name="characterPreview-container" style="flex-grow: 1; align-items: center; display: flex; align-self: auto; justify-content: center; flex-direction: column; width: 45%;">
+                    <ui:VisualElement name="playerPreview" style="flex-grow: 0; width: 90%; background-color: rgba(34, 34, 34, 0); background-image: url(&quot;project://database/Assets/Textures/playerPreview_renderTexture.renderTexture?fileID=8400000&amp;guid=d2ac92518687b3f4a907aeba90d08cd3&amp;type=2#playerPreview_renderTexture&quot;); -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); height: 90%; flex-shrink: 0;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="inventory-container" style="flex-grow: 0; align-items: center; flex-shrink: 0; width: 50%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-wrap: wrap;">
-                    <ui:VisualElement name="tabAndContentContainer" style="width: 80%; height: 100%; align-items: center;">
-                        <ui:VisualElement name="tabButtonsContainer" style="width: 80%; height: 20%; flex-direction: row; align-items: center; justify-content: center;">
+                <ui:VisualElement name="inventory-container" style="flex-grow: 0; align-items: center; flex-shrink: 0; width: 55%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-wrap: wrap;">
+                    <ui:VisualElement name="tabAndContentContainer" style="width: 90%; height: 100%; align-items: flex-start; justify-content: center;">
+                        <ui:VisualElement name="tabButtonsContainer" style="width: 80%; height: 20%; flex-direction: row; align-items: center; justify-content: center; margin-left: 40px;">
                             <ui:VisualElement name="allTabButton" class="inventoryTab" style="flex-grow: 1; background-image: none;">
                                 <ui:VisualElement class="inventoryTab-icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/icons/All_icon.png?fileID=2800000&amp;guid=3a5042b43d5788d4892ff4ae84bcc0a3&amp;type=3#All_icon&quot;);" />
                             </ui:VisualElement>
@@ -48,11 +48,11 @@
                                 <ui:VisualElement class="inventoryTab-icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/icons/swap-bag.png?fileID=2800000&amp;guid=3fc619f11d9b63342859641b1af9df96&amp;type=3#swap-bag&quot;);" />
                             </ui:VisualElement>
                         </ui:VisualElement>
-                        <ui:VisualElement name="tabContentContainer" style="flex-grow: 1; flex-direction: column; width: 100%; height: 100%; align-items: center; flex-shrink: 1;" />
+                        <ui:VisualElement name="tabContentContainer" style="flex-grow: 1; flex-direction: row; width: 90%; height: 100%; flex-shrink: 1; align-items: flex-start; justify-content: center;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>
-            <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; height: 10%;" />
+            <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; height: 10%; background-color: rgba(34, 34, 34, 0.7);" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
