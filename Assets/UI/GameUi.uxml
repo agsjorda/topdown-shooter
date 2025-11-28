@@ -30,8 +30,25 @@
                     <ui:VisualElement name="playerPreview" style="flex-grow: 0; width: 80%; background-color: rgba(34, 34, 34, 0); background-image: url(&quot;project://database/Assets/Textures/playerPreview_renderTexture.renderTexture?fileID=8400000&amp;guid=d2ac92518687b3f4a907aeba90d08cd3&amp;type=2#playerPreview_renderTexture&quot;); -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); height: 90%; flex-shrink: 0;" />
                 </ui:VisualElement>
                 <ui:VisualElement name="inventory-container" style="flex-grow: 0; align-items: center; flex-shrink: 0; width: 50%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-wrap: wrap;">
-                    <ui:VisualElement name="tabAndContentContainer" class="tabAndContentContainer">
-                        <ui:VisualElement name="tabButtonsContainer" class="tabButtonsContainer" />
+                    <ui:VisualElement name="tabAndContentContainer" style="width: 80%; height: 100%; align-items: center;">
+                        <ui:VisualElement name="tabButtonsContainer" style="width: 80%; height: 20%; flex-direction: row; align-items: center; justify-content: center;">
+                            <ui:VisualElement name="allTabButton" class="inventoryTab" style="flex-grow: 1; background-image: none;">
+                                <ui:VisualElement class="inventoryTab-icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/icons/All_icon.png?fileID=2800000&amp;guid=3a5042b43d5788d4892ff4ae84bcc0a3&amp;type=3#All_icon&quot;);" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="weaponsTabButton" class="inventoryTab" style="flex-grow: 1;">
+                                <ui:VisualElement class="inventoryTab-icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/icons/crossed-swords.png?fileID=2800000&amp;guid=3fed58a9305314544922e12c854af2d0&amp;type=3#crossed-swords&quot;);" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="armorTabButton" class="inventoryTab" style="flex-grow: 1;">
+                                <ui:VisualElement class="inventoryTab-icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/icons/spartan-helmet.png?fileID=2800000&amp;guid=b529bf87e379f584b8e09ca0590441e1&amp;type=3#spartan-helmet&quot;);" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="consumableTabButton" class="inventoryTab" style="flex-grow: 1;">
+                                <ui:VisualElement class="inventoryTab-icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/icons/round-potion.png?fileID=2800000&amp;guid=3c638adb5dfbbe64aa680b528ae4e2df&amp;type=3#round-potion&quot;);" />
+                            </ui:VisualElement>
+                            <ui:VisualElement name="miscTabButton" class="inventoryTab" style="flex-grow: 1;">
+                                <ui:VisualElement class="inventoryTab-icon" style="flex-grow: 1; background-image: url(&quot;project://database/Assets/UI/icons/swap-bag.png?fileID=2800000&amp;guid=3fc619f11d9b63342859641b1af9df96&amp;type=3#swap-bag&quot;);" />
+                            </ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement name="tabContentContainer" style="flex-grow: 1; flex-direction: column; width: 100%; height: 100%; align-items: center; flex-shrink: 1;" />
                     </ui:VisualElement>
                 </ui:VisualElement>
             </ui:VisualElement>

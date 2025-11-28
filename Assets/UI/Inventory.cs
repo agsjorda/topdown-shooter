@@ -5,11 +5,11 @@ public class Inventory : MonoBehaviour
 {
     [SerializeField] private UIDocument uiDocument;
     [SerializeField] private int slotSize = 100;
+    [SerializeField] private int numberOfslots = 12;
     [SerializeField] private Sprite weaponIcon, armorIcon, miscIcon;
 
-    private VisualElement weaponsTabButton, armorTabButton, miscTabButton;
+    private VisualElement allTabButton, weaponsTabButton, armorTabButton, consumableTabButton, miscTabButton;
     private VisualElement currentActiveTab;
-    private VisualElement tabButtonsContainer;
 
     private void Start()
     {
@@ -18,77 +18,51 @@ public class Inventory : MonoBehaviour
 
     private void InitializeInventory()
     {
+        //Initialize Visual Elements
         var root = uiDocument?.rootVisualElement;
         if (root == null) return;
 
         var inventoryContainer = root.Q<VisualElement>("inventory-container");
         if (inventoryContainer == null) return;
 
-
-        // Create main layout
         var tabAndContentContainer = root.Q<VisualElement>("tabAndContentContainer");
-        tabButtonsContainer = root.Q<VisualElement>("tabButtonsContainer");
-        // Create tab buttons row
-        CreateTabButtons();
-        tabAndContentContainer.Add(tabButtonsContainer);
+        var tabContentContainer = root.Q<VisualElement>("tabContentContainer");
+        allTabButton = root.Q<VisualElement>("allTabButton");
+        weaponsTabButton = root.Q<VisualElement>("weaponsTabButton");
+        armorTabButton = root.Q<VisualElement>("armorTabButton");
+        consumableTabButton = root.Q<VisualElement>("consumableTabButton");
+        miscTabButton = root.Q<VisualElement>("miscTabButton");
+
+        //setup tab button callbacks
+        SetActiveWhenPressed();
 
         // Create tab content
         var tabContent = CreateTabContent();
-        tabAndContentContainer.Add(tabContent);
+        tabContentContainer.Add(tabContent);
+        tabAndContentContainer.Add(tabContentContainer);
 
         inventoryContainer.Add(tabAndContentContainer);
 
         // Set first tab as active by default
-        SetActiveTab(weaponsTabButton);
+        SetActiveTab(allTabButton);
     }
 
-    private void CreateTabButtons()
+    private void SetActiveWhenPressed()
     {
-        // Create three tab buttons
-        weaponsTabButton = CreateIconTabButton("weapons", weaponIcon);
-        armorTabButton = CreateIconTabButton("armor", armorIcon);
-        miscTabButton = CreateIconTabButton("misc", miscIcon);
-
-        tabButtonsContainer.Add(weaponsTabButton);
-        tabButtonsContainer.Add(armorTabButton);
-        tabButtonsContainer.Add(miscTabButton);
-
-    }
-
-    private VisualElement CreateIconTabButton(string name, Sprite icon)
-    {
-        var button = new VisualElement();
-        button.name = $"{name}-tab";
-        button.AddToClassList("inventoryTab"); // Use the new USS class
-
-        // Set fixed size
-        button.style.width = slotSize;
-        button.style.height = slotSize;
-        button.style.marginLeft = 15;
-        button.style.marginRight = 15;
-
-        // Add icon container
-        var iconContainer = new VisualElement();
-        iconContainer.name = $"{name}-icon";
-        iconContainer.AddToClassList("inventoryTab-icon");
-
-        if (icon != null) {
-            iconContainer.style.backgroundImage = new StyleBackground(icon);
-        }
-
-        button.Add(iconContainer);
-
-        // Add click event
-        button.RegisterCallback<ClickEvent>(evt => SetActiveTab(button));
-
-        return button;
+        allTabButton.RegisterCallback<ClickEvent>(ev => SetActiveTab(allTabButton));
+        weaponsTabButton.RegisterCallback<ClickEvent>(ev => SetActiveTab(weaponsTabButton));
+        armorTabButton.RegisterCallback<ClickEvent>(ev => SetActiveTab(armorTabButton));
+        consumableTabButton.RegisterCallback<ClickEvent>(ev => SetActiveTab(consumableTabButton));
+        miscTabButton.RegisterCallback<ClickEvent>(ev => SetActiveTab(miscTabButton));
     }
 
     private void SetActiveTab(VisualElement tabButton)
     {
         // Remove active state from all tabs
+        allTabButton?.RemoveFromClassList("inventoryTab--active");
         weaponsTabButton?.RemoveFromClassList("inventoryTab--active");
         armorTabButton?.RemoveFromClassList("inventoryTab--active");
+        consumableTabButton?.RemoveFromClassList("inventoryTab--active");
         miscTabButton?.RemoveFromClassList("inventoryTab--active");
 
         // Add active state to clicked tab
@@ -105,7 +79,7 @@ public class Inventory : MonoBehaviour
         content.AddToClassList("tabContentContainer");
 
         // Create 10 inventory slots
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < numberOfslots; i++) {
             content.Add(CreateInventorySlot(i + 1));
         }
 
@@ -116,8 +90,8 @@ public class Inventory : MonoBehaviour
     {
         var slot = new VisualElement();
         slot.AddToClassList("inventorySlots");
-        slot.style.width = slotSize;
-        slot.style.height = slotSize;
+        //slot.style.width = slotSize;
+        //slot.style.height = slotSize;
 
         var label = new Label(number.ToString());
         label.style.unityTextAlign = TextAnchor.MiddleCenter;
