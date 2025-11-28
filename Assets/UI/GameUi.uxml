@@ -1,5 +1,5 @@
 <ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <Style src="project://database/Assets/UI/uss/GameHudUI.uss?fileID=7433441132597879392&amp;guid=77d816de8e86af2488326805b2f04e14&amp;type=3#GameHudUI" />
+    <Style src="project://database/Assets/UI/uss/GameUI.uss?fileID=7433441132597879392&amp;guid=b81c4000d6977534ab8ca148299785c8&amp;type=3#GameUI" />
     <ui:VisualElement name="ui-container" style="flex-grow: 1; flex-shrink: 1; justify-content: center;">
         <ui:VisualElement name="hud-panel" style="flex-grow: 1;">
             <ui:VisualElement style="flex-grow: 1; padding-top: 0; padding-right: 0; padding-bottom: 0; padding-left: 0; margin-bottom: 20px; flex-direction: row; align-items: flex-start; justify-content: space-between; margin-top: 20px; margin-right: 20px; margin-left: 20px;">
@@ -29,7 +29,11 @@
                 <ui:VisualElement name="characterPreview-container" style="flex-grow: 1; align-items: center; display: flex; align-self: auto; justify-content: center; flex-direction: column; width: 50%;">
                     <ui:VisualElement name="playerPreview" style="flex-grow: 0; width: 80%; background-color: rgba(34, 34, 34, 0); background-image: url(&quot;project://database/Assets/Textures/playerPreview_renderTexture.renderTexture?fileID=8400000&amp;guid=d2ac92518687b3f4a907aeba90d08cd3&amp;type=2#playerPreview_renderTexture&quot;); -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); height: 90%; flex-shrink: 0;" />
                 </ui:VisualElement>
-                <ui:VisualElement name="inventory-container" style="flex-grow: 0; align-items: center; flex-shrink: 0; width: 50%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-wrap: wrap;" />
+                <ui:VisualElement name="inventory-container" style="flex-grow: 0; align-items: center; flex-shrink: 0; width: 50%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-wrap: wrap;">
+                    <ui:VisualElement name="tabAndContentContainer" class="tabAndContentContainer">
+                        <ui:VisualElement name="tabButtonsContainer" class="tabButtonsContainer" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement style="flex-grow: 0; flex-shrink: 0; height: 10%;" />
         </ui:VisualElement>

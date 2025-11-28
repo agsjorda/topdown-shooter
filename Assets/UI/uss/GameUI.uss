@@ -118,6 +118,34 @@
     transition-duration: 0.3s;
 }
 
+.tabAndContentContainer {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    flex-grow: 1;
+    flex-wrap: wrap;
+}
+
+.tabButtonsContainer {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-end;
+    margin-bottom: 10px;
+    height: 200px;
+}
+
+.tabContentContainer {
+    flex-grow: 1;
+    width: 90%;
+    background-color: rgba(0, 0, 0, 0.72);
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-shrink: 1;
+    justify-content: space-
+    align-items: flex-start;
+}
+
 .inventorySlots {
     flex-shrink: 0;
     width: 19%;
@@ -153,17 +181,6 @@
     scale: 1.02 1.02 1.02;
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
-}
-
-.inventoryBox {
-    flex-grow: 1;
-    width: 90%;
-    background-color: rgba(0, 0, 0, 0);
-    flex-direction: row;
-    flex-wrap: wrap;
-    flex-shrink: 1;
-    justify-content: start;
-    align-items: flex-start;
 }
 
 .inventoryTab {

@@ -5,14 +5,12 @@ public abstract class UIBaseComponent
 {
     protected VisualElement rootElement;
     protected bool isVisible = true;
-
     public bool IsValid => rootElement != null;
     public bool IsVisible => isVisible;
 
     protected UIBaseComponent(VisualElement root)
     {
         this.rootElement = root;
-
         if (!IsValid) {
             Debug.LogWarning($"{GetType().Name}: Root element is null");
             return;
@@ -31,6 +29,18 @@ public abstract class UIBaseComponent
         if (!IsValid) return;
         isVisible = false;
         rootElement.style.display = DisplayStyle.None;
+    }
+
+    public void Toggle()
+    {
+        if (!IsValid) {
+            Debug.LogWarning("Attempted to toggle null or invalid component");
+            return;
+        }
+        if (IsVisible)
+            Hide();
+        else
+            Show();
     }
 
     // Common helper methods

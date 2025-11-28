@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public float impactForce;
+    private float impactForce;
 
     private BoxCollider cd;
     private Rigidbody rb;
@@ -16,14 +16,14 @@ public class Bullet : MonoBehaviour
     private bool bulletDisabled;
 
 
-    private void Awake()
+    protected virtual void Awake()
     {
         cd = GetComponent<BoxCollider>();
         rb = GetComponent<Rigidbody>();
         trailRenderer = GetComponent<TrailRenderer>();
         meshRenderer = GetComponent<MeshRenderer>();
     }
-    public void BulletSetup(float flyDistance, float impactForce)
+    public void BulletSetup(float flyDistance = 100, float impactForce = 100)
     {
         this.impactForce = impactForce;
 
@@ -35,7 +35,7 @@ public class Bullet : MonoBehaviour
         this.flyDistance = flyDistance + .5f; //.5f is a length of the tip of the aim laser (check method UpdateAimVisuals in PlayerAim.cs)
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         FadeTrailIfNeeded();
         DisableBulletIfNeeded();
@@ -43,19 +43,19 @@ public class Bullet : MonoBehaviour
 
     }
 
-    private void ReturnToPoolIfNeeded()
+    protected virtual void ReturnToPoolIfNeeded()
     {
         if (trailRenderer.time < 0)
             ReturnBulletToPool();
     }
 
-    private void ReturnBulletToPool()
+    protected void ReturnBulletToPool()
     {
         if (ObjectPool.instance != null)
             ObjectPool.instance.ReturnObject(gameObject);
     }
 
-    private void DisableBulletIfNeeded()
+    protected void DisableBulletIfNeeded()
     {
         if (Vector3.Distance(startPosition, transform.position) >= flyDistance && !bulletDisabled) {
 
@@ -65,13 +65,13 @@ public class Bullet : MonoBehaviour
         }
     }
 
-    private void FadeTrailIfNeeded()
+    protected void FadeTrailIfNeeded()
     {
         if (Vector3.Distance(startPosition, transform.position) >= flyDistance - 1.5f)
             trailRenderer.time -= 2 * Time.deltaTime; //2 is chosen to make the trail disappear faster
     }
 
-    private void OnCollisionEnter(Collision collision)
+    protected virtual void OnCollisionEnter(Collision collision)
     {
         CreateImpactFX(collision);
         // Instead of destroying the bullet, we can return it to an object pool
@@ -94,7 +94,7 @@ public class Bullet : MonoBehaviour
 
     }
 
-    private void CreateImpactFX(Collision collision)
+    protected void CreateImpactFX(Collision collision)
     {
         if (collision.contacts.Length > 0) {
             ContactPoint contact = collision.contacts[0];

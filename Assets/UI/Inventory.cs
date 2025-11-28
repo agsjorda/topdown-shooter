@@ -9,13 +9,14 @@ public class Inventory : MonoBehaviour
 
     private VisualElement weaponsTabButton, armorTabButton, miscTabButton;
     private VisualElement currentActiveTab;
+    private VisualElement tabButtonsContainer;
 
     private void Start()
     {
-        CreateInventoryInContainer();
+        InitializeInventory();
     }
 
-    private void CreateInventoryInContainer()
+    private void InitializeInventory()
     {
         var root = uiDocument?.rootVisualElement;
         if (root == null) return;
@@ -23,49 +24,35 @@ public class Inventory : MonoBehaviour
         var inventoryContainer = root.Q<VisualElement>("inventory-container");
         if (inventoryContainer == null) return;
 
-        inventoryContainer.Clear();
 
         // Create main layout
-        var mainContainer = new VisualElement();
-        mainContainer.style.flexDirection = FlexDirection.Column;
-        mainContainer.style.justifyContent = Justify.Center;
-        mainContainer.style.alignItems = Align.Center;
-        mainContainer.style.flexGrow = 1;
-
+        var tabAndContentContainer = root.Q<VisualElement>("tabAndContentContainer");
+        tabButtonsContainer = root.Q<VisualElement>("tabButtonsContainer");
         // Create tab buttons row
-        var tabButtons = CreateTabButtons();
-        mainContainer.Add(tabButtons);
+        CreateTabButtons();
+        tabAndContentContainer.Add(tabButtonsContainer);
 
         // Create tab content
         var tabContent = CreateTabContent();
-        mainContainer.Add(tabContent);
+        tabAndContentContainer.Add(tabContent);
 
-        inventoryContainer.Add(mainContainer);
+        inventoryContainer.Add(tabAndContentContainer);
 
         // Set first tab as active by default
         SetActiveTab(weaponsTabButton);
     }
 
-    private VisualElement CreateTabButtons()
+    private void CreateTabButtons()
     {
-        var container = new VisualElement();
-        container.name = "tab-buttons-container";
-        container.style.flexDirection = FlexDirection.Row;
-        container.style.justifyContent = Justify.Center;
-        container.style.alignItems = Align.FlexEnd; // Align to bottom for border
-        container.style.marginBottom = 10; // Reduced margin
-        container.style.height = slotSize + 10; // Extra space for border
-
         // Create three tab buttons
         weaponsTabButton = CreateIconTabButton("weapons", weaponIcon);
         armorTabButton = CreateIconTabButton("armor", armorIcon);
         miscTabButton = CreateIconTabButton("misc", miscIcon);
 
-        container.Add(weaponsTabButton);
-        container.Add(armorTabButton);
-        container.Add(miscTabButton);
+        tabButtonsContainer.Add(weaponsTabButton);
+        tabButtonsContainer.Add(armorTabButton);
+        tabButtonsContainer.Add(miscTabButton);
 
-        return container;
     }
 
     private VisualElement CreateIconTabButton(string name, Sprite icon)
@@ -115,7 +102,7 @@ public class Inventory : MonoBehaviour
     private VisualElement CreateTabContent()
     {
         var content = new VisualElement();
-        content.AddToClassList("inventoryBox");
+        content.AddToClassList("tabContentContainer");
 
         // Create 10 inventory slots
         for (int i = 0; i < 10; i++) {
