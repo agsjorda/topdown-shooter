@@ -5,7 +5,7 @@ using UnityEngine;
 public class Item_DataSO : ScriptableObject
 {
     public string itemId;
-    public string displayName;
+    public string itemName;
     public Sprite icon;
     [TextArea] public string description;
     public bool stackable = true;
