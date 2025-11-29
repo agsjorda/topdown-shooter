@@ -118,65 +118,50 @@
     transition-duration: 0.3s;
 }
 
-.tabContentContainer {
-    flex-grow: 1;
+.inventory-scroll-view {
     width: 100%;
     height: 100%;
-    background-color: rgba(0,0,0,0);
-    flex-direction: row;
-    flex-wrap: nowrap; /* scrollView handles the layout now */
+    overflow: hidden;
+    align-items: center;
 }
 
-.inventoryScrollView {
-    overflow-x: scroll;
-    overflow-y: hidden;
+.inventory-scroll-view > .unity-scroll-view__content-container {
+    overflow: hidden;
 }
 
-.inventoryScrollView::-unity-scroll-view__vertical-scroller { display: none; }
-.inventoryScrollView::-unity-scroll-view__horizontal-scroller { display: none; }
-
-.inventoryGridContainer {
+.inventory-slots-container {
     flex-direction: row;
     flex-wrap: wrap;
-    height: 840px;        /* 4 rows (4 × slotHeight) */
     align-content: flex-start;
+    padding: 10px;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    justify-content: flex-start;
 }
 
 .inventorySlots {
     flex-shrink: 0;
-    width: 250px;
-    height: 250px;
-    background-color: rgba(34, 34, 34, 0.7);
-    border-left-color: rgb(102, 102, 102);
-    border-right-color: rgb(102, 102, 102);
-    border-top-color: rgb(102, 102, 102);
-    border-bottom-color: rgb(102, 102, 102);
-    border-top-width: 5px;
-    border-right-width: 5px;
-    border-bottom-width: 5px;
-    border-left-width: 5px;
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-    margin-top: 5px;
-    margin-right: 5px;
-    margin-bottom: 5px;
-    margin-left: 5px;
-    padding-top: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    padding-left: 0;
+    width: 100px;
+    height: 100px;
+    background-color: rgba(34, 34, 34, 0.4);
+    border: 5px solid rgb(102, 102, 102);
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
 }
 
 .inventorySlots:hover {
-    border-left-color: rgb(248, 163, 46);
-    border-right-color: rgb(248, 163, 46);
-    border-top-color: rgb(248, 163, 46);
-    border-bottom-color: rgb(248, 163, 46);
-    scale: 1.02 1.02 1.02;
+    border-color: rgb(248, 163, 46);
+    scale: 1.02;
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
+    background-color: rgba(34, 34, 34, 0.7);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
 }
 
 .inventoryTab {
@@ -202,7 +187,7 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    -unity-background-image-tint-color: rgb(150, 150, 150);
+    -unity-background-image-tint-color: rgb(178, 178, 178);
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
 }
@@ -217,9 +202,66 @@
 }
 
 .inventoryTab:hover {
-    background-color: rgba(34, 34, 34, 0.1);
+    background-color: rgba(34, 34, 34, 0.4);
 }
 
 .inventoryTab:hover .inventoryTab-icon {
     scale: 1.05 1.05;
+}
+
+.equipSlots {
+    flex-grow: 1;
+    position: absolute;
+    top: 224px;
+    left: 265px;
+    height: 200px;
+    width: 200px;
+    rotate: 45deg;
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.equipSlots:hover {
+    scale: 1.05 1.05 1.05;
+    border-left-color: rgb(248, 163, 46);
+    border-right-color: rgb(248, 163, 46);
+    border-top-color: rgb(248, 163, 46);
+    border-bottom-color: rgb(248, 163, 46);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    background-color: rgba(34, 34, 34, 0.7);
+}
+
+.equipSlot-icon {
+    flex-grow: 1;
+    width: 100%;
+    height: auto;
+    background-image: url("project://database/Assets/UI/icons/crossed-swords.png?fileID=2800000&guid=3fed58a9305314544922e12c854af2d0&type=3#crossed-swords");
+    rotate: -45deg;
+    position: relative;
+    -unity-background-image-tint-color: rgb(178, 178, 178);
+    background-size: 100% 100%;
+    scale: 0.8 0.8;
+}
+
+.equipSlot-icon:hover {
+    scale: 0.9 0.9;
+}
+
+.inventoryPreviewSection {
+    filter: blur(5px);
 }

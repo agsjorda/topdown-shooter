@@ -9,8 +9,6 @@ public struct AmmoData
     [Range(10, 100)] public int maxAmount;
 }
 
-public enum AmmoBoxType { smallBox, bigBox }
-
 public class Pickup_Ammo : Interactable
 {
     [SerializeField] private AmmoBoxType ammoBoxType;
@@ -28,6 +26,10 @@ public class Pickup_Ammo : Interactable
 
     public override void Interaction()
     {
+        PlayerWeaponController weaponController = Object.FindFirstObjectByType<PlayerWeaponController>();
+        if (weaponController == null)
+            return;
+
         List<AmmoData> currentAmmoList = smallBoxAmmo;
 
         if (ammoBoxType == AmmoBoxType.bigBox) {

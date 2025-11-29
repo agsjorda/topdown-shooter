@@ -3,7 +3,6 @@ using UnityEngine.UIElements;
 
 public class Inventory_UI : UIBaseComponent
 {
-    public bool IsOpen => IsVisible;
 
     public Inventory_UI(VisualElement root) : base(root)
     {
