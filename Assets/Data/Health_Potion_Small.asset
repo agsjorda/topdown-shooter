@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df2aeb1601490334aa4128fe10707e93, type: 3}
-  m_Name: epol
+  m_Name: Health_Potion_Small
   m_EditorClassIdentifier: Assembly-CSharp::Item_DataSO
   itemName: health potion
   itemDescription: for health

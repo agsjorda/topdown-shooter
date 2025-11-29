@@ -1,11 +1,13 @@
 using UnityEngine;
 
 
-[CreateAssetMenu(fileName = "Item Data", menuName = "Item data/Item")]
+[CreateAssetMenu(fileName = "NewItem", menuName = "Inventory/Item Data")]
 public class Item_DataSO : ScriptableObject
 {
-    public string itemName;
-    public string itemDescription;
-    public Sprite itemIcon;
-    public ItemType itemType;
+    public string itemId;
+    public string displayName;
+    public Sprite icon;
+    [TextArea] public string description;
+    public bool stackable = true;
+    public int maxStack = 99;
 }
