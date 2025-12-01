@@ -84,7 +84,9 @@ public class Inventory_UI : UIBaseComponent
         if (config != null) {
             // Ensure config has a UIDocument reference that points to the same root if possible
             if (config.targetDocument == null) {
-                var docs = Object.FindObjectsOfType<UIDocument>();
+                // OLD: var docs = Object.FindObjectsOfType<UIDocument>();
+                // NEW: Use FindObjectsByType with FindObjectsSortMode.None
+                var docs = Object.FindObjectsByType<UIDocument>(FindObjectsSortMode.None);
                 foreach (var d in docs) {
                     if (d.rootVisualElement == rootElement) {
                         config.targetDocument = d;

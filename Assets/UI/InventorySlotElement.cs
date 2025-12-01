@@ -6,7 +6,7 @@ using UnityEngine.UIElements;
 /// Keep visuals CSS-driven where possible so USS :hover rules work.
 /// </summary>
 [UxmlElement] // This attribute replaces the need for UxmlFactory/UxmlTraits
-public class InventorySlotElement : VisualElement
+public partial class InventorySlotElement : VisualElement
 {
     private const string HOVER_CLASS = "inventorySlots--hover";
 
