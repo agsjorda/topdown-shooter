@@ -2835,6 +2835,32 @@ MonoBehaviour:
   wrapperBackgroundTexture: {fileID: 0}
   wrapperBackgroundSprite: {fileID: 21300000, guid: 8aac2aac202e56b45919eff84070377e, type: 3}
   wrapperBackgroundTint: {r: 1, g: 1, b: 1, a: 1}
+  tabs:
+  - id: allTab
+    label: 
+    iconTexture: {fileID: 2800000, guid: 3a5042b43d5788d4892ff4ae84bcc0a3, type: 3}
+    iconTint: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 0.77254903}
+  - id: weaponsTab
+    label: 
+    iconTexture: {fileID: 2800000, guid: 3fed58a9305314544922e12c854af2d0, type: 3}
+    iconTint: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 0.77254903}
+  - id: armorTab
+    label: 
+    iconTexture: {fileID: 2800000, guid: b529bf87e379f584b8e09ca0590441e1, type: 3}
+    iconTint: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 0.77254903}
+  - id: consumablesTab
+    label: 
+    iconTexture: {fileID: 2800000, guid: 3c638adb5dfbbe64aa680b528ae4e2df, type: 3}
+    iconTint: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 0.77254903}
+  - id: miscTab
+    label: 
+    iconTexture: {fileID: 2800000, guid: 3fc619f11d9b63342859641b1af9df96, type: 3}
+    iconTint: {r: 0.8207547, g: 0.8207547, b: 0.8207547, a: 0.77254903}
+  activeTabIndex: 0
+  tabWidthPx: 300
+  tabHeightPx: 230
+  tabIconWidthPx: 200
+  tabIconHeightPx: 147
 --- !u!1 &481987812
 GameObject:
   m_ObjectHideFlags: 0

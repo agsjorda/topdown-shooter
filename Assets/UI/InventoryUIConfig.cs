@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 [DisallowMultipleComponent]
@@ -40,14 +41,36 @@ public class InventoryUIConfig : MonoBehaviour
     public Sprite wrapperBackgroundSprite;
     public Color wrapperBackgroundTint = Color.white;
 
-    // cache for change detection
+    [System.Serializable]
+    public class TabDescriptor
+    {
+        public string id = "all";
+        public string label = "";
+        public Texture2D iconTexture; // Sprite removed
+        public Color iconTint = Color.white;
+    }
+
+    [Header("Tabs")]
+    public List<TabDescriptor> tabs = new List<TabDescriptor>();
+    public int activeTabIndex = 0;
+
+    [Header("Tab Size (applies to all tabs)")]
+    [Range(20, 400)] public int tabWidthPx = 0;   // 0 = use USS
+    [Range(20, 400)] public int tabHeightPx = 0;  // 0 = use USS
+
+    [Header("Tab Icon Size (applies to all tabs)")]
+    [Range(16, 512)] public int tabIconWidthPx = 0;   // 0 = use USS
+    [Range(16, 512)] public int tabIconHeightPx = 0;  // 0 = use USS
+
+    // cache for change detection (slots only, tabs rebuilt each time for simplicity)
     int _cSlotSize, _cSlotCount;
     float _cCellMargin, _cBorderRadius;
     bool _cUseBg, _cUseCustomBorder;
     Color _cBgTint, _cBorderColor;
     Texture2D _cBgTex;
     Sprite _cBgSprite;
-    BorderPreset _cBorderPreset; // <- track preset
+    BorderPreset _cBorderPreset;
+    int _cTabW, _cTabH, _cTabIconW, _cTabIconH;
 
     void Awake()
     {
@@ -75,7 +98,11 @@ public class InventoryUIConfig : MonoBehaviour
             || _cBgTint != slotBackgroundTint
             || _cUseCustomBorder != useCustomBorderColor
             || _cBorderColor != slotBorderColor
-            || _cBorderPreset != borderPreset; // <- detect preset change
+            || _cBorderPreset != borderPreset
+            || _cTabW != tabWidthPx
+            || _cTabH != tabHeightPx
+            || _cTabIconW != tabIconWidthPx
+            || _cTabIconH != tabIconHeightPx;
     }
 
     void Cache()
@@ -90,7 +117,11 @@ public class InventoryUIConfig : MonoBehaviour
         _cBgTint = slotBackgroundTint;
         _cUseCustomBorder = useCustomBorderColor;
         _cBorderColor = slotBorderColor;
-        _cBorderPreset = borderPreset; // <- cache preset
+        _cBorderPreset = borderPreset;
+        _cTabW = tabWidthPx;
+        _cTabH = tabHeightPx;
+        _cTabIconW = tabIconWidthPx;
+        _cTabIconH = tabIconHeightPx;
     }
 
     private void BuildOrUpdate()
@@ -98,6 +129,57 @@ public class InventoryUIConfig : MonoBehaviour
         if (targetDocument == null || targetDocument.rootVisualElement == null) return;
 
         var root = targetDocument.rootVisualElement;
+
+        // Build tabs first (reads/writes tabButtonsContainer)
+        BuildOrUpdateTabs(root);
+
+        // Build slots inside scroll wrapper
+        BuildOrUpdateSlots(root);
+    }
+
+    private void BuildOrUpdateTabs(VisualElement root)
+    {
+        var tabButtonsContainer = root.Q<VisualElement>("tabButtonsContainer");
+        if (tabButtonsContainer == null) return;
+
+        // Apply global sizes from inspector sliders
+        InventoryTabElement.SetGlobalSize(tabWidthPx, tabHeightPx);
+        InventoryTabElement.SetGlobalIconSize(tabIconWidthPx, tabIconHeightPx);
+
+        tabButtonsContainer.Clear();
+
+        for (int i = 0; i < tabs.Count; i++) {
+            var def = tabs[i];
+            var tab = new InventoryTabElement();
+            tab.SetId(def.id);
+            tab.SetIcon(def.iconTexture, def.iconTint); // Texture2D only
+            tab.SetLabel(def.label);
+            tab.SetActive(i == Mathf.Clamp(activeTabIndex, 0, Mathf.Max(0, tabs.Count - 1)));
+
+            int capturedIndex = i;
+            tab.Clicked += _ =>
+            {
+                SetActiveTab(tabButtonsContainer, capturedIndex);
+                // TODO: filter content by TabId if needed
+            };
+
+            tabButtonsContainer.Add(tab);
+        }
+    }
+
+    private void SetActiveTab(VisualElement tabButtonsContainer, int index)
+    {
+        activeTabIndex = Mathf.Clamp(index, 0, Mathf.Max(0, tabs.Count - 1));
+        int i = 0;
+        foreach (var child in tabButtonsContainer.Children()) {
+            if (child is InventoryTabElement tab)
+                tab.SetActive(i == activeTabIndex);
+            i++;
+        }
+    }
+
+    private void BuildOrUpdateSlots(VisualElement root)
+    {
         var tabContentContainer = root.Q<VisualElement>("tabContentContainer");
         if (tabContentContainer == null) return;
 
@@ -120,7 +202,6 @@ public class InventoryUIConfig : MonoBehaviour
 
         if (slotsContainer == null) return;
 
-        // layout
         slotsContainer.style.flexDirection = FlexDirection.Row;
         slotsContainer.style.flexWrap = Wrap.Wrap;
         slotsContainer.style.justifyContent = Justify.Center;
@@ -129,25 +210,6 @@ public class InventoryUIConfig : MonoBehaviour
         slotsContainer.style.height = StyleKeyword.Null;
         slotsContainer.style.width = new Length(100, LengthUnit.Percent);
 
-        // reuse existing when only preset changes (faster, avoids flicker)
-        var existingSlots = slotsContainer.Query<InventorySlotElement>().ToList();
-        if (existingSlots.Count == slotCount
-            && _cSlotSize == slotSize
-            && Mathf.Approximately(_cCellMargin, cellMargin)
-            && _cUseBg == slotUseBackground
-            && _cBorderRadius == slotBorderRadius
-            && _cBgTex == slotBackgroundTexture
-            && _cBgSprite == slotBackgroundSprite
-            && _cBgTint == slotBackgroundTint
-            && _cUseCustomBorder == useCustomBorderColor
-            && _cBorderColor == slotBorderColor) {
-            // Only preset changed: update classes, no rebuild
-            ApplyPresetToExistingSlots(existingSlots);
-            root.MarkDirtyRepaint();
-            return;
-        }
-
-        // full rebuild
         slotsContainer.Clear();
 
         for (int i = 0; i < slotCount; i++) {
@@ -164,38 +226,20 @@ public class InventoryUIConfig : MonoBehaviour
                 slotBorderRadius
             );
 
-            // If presets are used, ensure inline border colors are cleared so USS hover can win
-            if (!useCustomBorderColor) {
+            if (useCustomBorderColor) {
+                slot.SetStaticBorderColor(slotBorderColor);
+            } else {
                 slot.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
                 slot.style.borderRightColor = new StyleColor(StyleKeyword.Null);
                 slot.style.borderTopColor = new StyleColor(StyleKeyword.Null);
                 slot.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
-            } else {
-                slot.SetStaticBorderColor(slotBorderColor); // static, hover won't override inline
             }
 
             ApplyPresetClass(slot);
-
             slotsContainer.Add(slot);
         }
 
         root.MarkDirtyRepaint();
-    }
-
-    private void ApplyPresetToExistingSlots(System.Collections.Generic.List<InventorySlotElement> slots)
-    {
-        foreach (var slot in slots) {
-            // Clear any inline border colors when using presets so hover color applies
-            if (!useCustomBorderColor) {
-                slot.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderRightColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderTopColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
-            } else {
-                slot.SetStaticBorderColor(slotBorderColor);
-            }
-            ApplyPresetClass(slot);
-        }
     }
 
     private void ApplyPresetClass(InventorySlotElement slot)
