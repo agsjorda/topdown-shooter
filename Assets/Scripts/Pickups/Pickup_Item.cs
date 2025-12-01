@@ -39,7 +39,7 @@ public class Pickup_Item : Interactable
     private void UpdateVisuals()
     {
         if (spriteRenderer != null && itemData != null) {
-            spriteRenderer.sprite = itemData.itemIcon;
+            spriteRenderer.sprite = itemData.icon;
         }
     }
 
