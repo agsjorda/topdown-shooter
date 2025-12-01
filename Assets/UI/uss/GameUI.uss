@@ -142,8 +142,8 @@
 
 .inventorySlots {
     flex-shrink: 0;
-    width: 100px;
-    height: 100px;
+    width: 250px;
+    height: 250px;
     background-color: rgba(34, 34, 34, 0.4);
     border: 5px solid rgb(102, 102, 102);
     border-radius: 5px;
@@ -153,8 +153,8 @@
 }
 
 .inventorySlots:hover {
-    border-color: rgb(248, 163, 46);
-    scale: 1.02;
+    /* border-color: rgb(248, 163, 46); */
+    transform: scale(1.02);
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
     background-color: rgba(34, 34, 34, 0.7);
@@ -163,6 +163,14 @@
     border-bottom-width: 2px;
     border-left-width: 2px;
 }
+
+/* Predefined border color classes (designer chooses one in inspector) */
+.inventorySlots.border-yellow { border-color: rgb(248,163,46); }
+.inventorySlots.border-red    { border-color: rgb(220,80,80); }
+.inventorySlots.border-green  { border-color: rgb(100,200,120); }
+
+/* Hover for items that have custom border class still inherits :hover rule */
+.inventorySlots.border-yellow:hover { /* optional override */ }
 
 .inventoryTab {
     background-color: rgba(0, 0, 0, 0);
@@ -262,6 +270,3 @@
     scale: 0.9 0.9;
 }
 
-.inventoryPreviewSection {
-    filter: blur(5px);
-}
