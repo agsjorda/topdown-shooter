@@ -118,26 +118,15 @@
     transition-duration: 0.3s;
 }
 
-.inventory-scroll-view {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    align-items: center;
-}
-
-.inventory-scroll-view > .unity-scroll-view__content-container {
-    overflow: hidden;
-}
 
 .inventory-slots-container {
     flex-direction: row;
     flex-wrap: wrap;
-    align-content: flex-start;
+    justify-content: space-around;
+    align-items: flex-start;
     padding: 10px;
     gap: 8px;
-    width: 100%;
-    height: 100%;
-    justify-content: flex-start;
+    border: 10px solid rgb(102, 102, 102);
 }
 
 .inventorySlots {
@@ -152,8 +141,9 @@
     display: flex;
 }
 
-.inventorySlots:hover {
-    /* border-color: rgb(248, 163, 46); */
+/* Ensure hover visuals are applied either by :hover or the code-toggled class */
+.inventorySlots:hover,
+.inventorySlots.inventorySlots--hover {
     transform: scale(1.02);
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
@@ -164,13 +154,15 @@
     border-left-width: 2px;
 }
 
-/* Predefined border color classes (designer chooses one in inspector) */
-.inventorySlots.border-yellow { border-color: rgb(248,163,46); }
-.inventorySlots.border-red    { border-color: rgb(220,80,80); }
-.inventorySlots.border-green  { border-color: rgb(100,200,120); }
+/* Hover border color is driven by the preset class from the inspector */
+.inventorySlots.border-yellow:hover,
+.inventorySlots.inventorySlots--hover.border-yellow { border-color: rgb(248, 163, 46); }
 
-/* Hover for items that have custom border class still inherits :hover rule */
-.inventorySlots.border-yellow:hover { /* optional override */ }
+.inventorySlots.border-red:hover,
+.inventorySlots.inventorySlots--hover.border-red { border-color: rgb(220, 80, 80); }
+
+.inventorySlots.border-green:hover,
+.inventorySlots.inventorySlots--hover.border-green { border-color: rgb(100, 200, 120); }
 
 .inventoryTab {
     background-color: rgba(0, 0, 0, 0);

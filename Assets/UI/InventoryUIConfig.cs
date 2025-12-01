@@ -1,21 +1,11 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UIElements;
 
-/// <summary>
-/// Lightweight runtime configurator for inventory slot visuals.
-/// - Updates in Play mode when inspector values change (via Update change-detection).
-/// - Supports manual refresh via context menu and edit-time preview via OnValidate.
-/// - Keeps implementation small and deterministic (clear + recreate slots).
-/// </summary>
 [DisallowMultipleComponent]
 public class InventoryUIConfig : MonoBehaviour
 {
     [Header("Target")]
-    [Tooltip("UIDocument to target. If empty the first active UIDocument in the scene will be used.")]
     public UIDocument targetDocument;
-
-    [Tooltip("Name or class of the VisualElement container where slots will be placed.")]
-    public string slotsContainerNameOrClass = "inventory-slots-container";
 
     [Header("Slot Layout")]
     [Range(40, 300)] public int slotSize = 100;
@@ -23,74 +13,142 @@ public class InventoryUIConfig : MonoBehaviour
     [Range(0f, 50f)] public float cellMargin = 8f;
 
     [Header("Slot Visuals")]
-    public bool useBackground = false;
-    public Texture2D backgroundTexture;
-    public Sprite backgroundSprite;
-    public Color backgroundTint = Color.white;
+    public bool slotUseBackground = false;
+    public Texture2D slotBackgroundTexture;
+    public Sprite slotBackgroundSprite;
+    public Color slotBackgroundTint = Color.white;
+    [Range(0f, 50f)] public float slotBorderRadius = 5f;
 
-    //[Header("Border Preset (USS classes)")]
+    [Header("Slot Border Color")]
+    public bool useCustomBorderColor = false;
+    public Color slotBorderColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+
     public enum BorderPreset { Default, Yellow, Red, Green }
     public BorderPreset borderPreset = BorderPreset.Yellow;
-    [Range(0f, 50f)] public float borderRadius = 5f;
 
-    // cached values for change detection (Play mode)
-    int _cacheSlotSize;
-    int _cacheSlotCount;
-    float _cacheCellMargin;
-    bool _cacheUseBackground;
-    Object _cacheBackgroundTexture;
-    Object _cacheBackgroundSprite;
-    Color _cacheBackgroundTint;
-    BorderPreset _cacheBorderPreset;
-    float _cacheBorderRadius;
+    [Header("Scroll Wrapper")]
+    public bool autoCreateScrollWrapper = true;
+    public int scrollWidthPx = 0;
+    public int scrollHeightPx = 350;
+    public bool centerWrapper = true;
+    public ScrollerVisibility verticalVisibility = ScrollerVisibility.Auto;
+    public ScrollerVisibility horizontalVisibility = ScrollerVisibility.Hidden;
 
-    void Start()
+    [Header("Wrapper Background")]
+    public bool wrapperUseBackground = false;
+    public Texture2D wrapperBackgroundTexture;
+    public Sprite wrapperBackgroundSprite;
+    public Color wrapperBackgroundTint = Color.white;
+
+    // cache for change detection
+    int _cSlotSize, _cSlotCount;
+    float _cCellMargin, _cBorderRadius;
+    bool _cUseBg, _cUseCustomBorder;
+    Color _cBgTint, _cBorderColor;
+    Texture2D _cBgTex;
+    Sprite _cBgSprite;
+    BorderPreset _cBorderPreset; // <- track preset
+
+    void Awake()
     {
-        // ensure a UIDocument is available at runtime if none assigned
         if (targetDocument == null)
-            targetDocument = FindObjectOfType<UIDocument>();
-        CacheAll();
-        RefreshSlotsInDocument();
+            targetDocument = GetComponent<UIDocument>();
     }
 
+    void OnEnable() { BuildOrUpdate(); Cache(); }
+    void OnValidate() { if (!Application.isPlaying) { BuildOrUpdate(); Cache(); } }
     void Update()
     {
         if (!Application.isPlaying) return;
-
-        if (HasChanged()) {
-            CacheAll();
-            RefreshSlotsInDocument();
-        }
+        if (HasChanged()) { BuildOrUpdate(); Cache(); }
     }
 
-    void OnValidate()
+    bool HasChanged()
     {
-        // quick editor preview when editing values outside Play mode
-        if (!Application.isPlaying)
-            RefreshSlotsInDocument();
+        return _cSlotSize != slotSize
+            || _cSlotCount != slotCount
+            || !Mathf.Approximately(_cCellMargin, cellMargin)
+            || !Mathf.Approximately(_cBorderRadius, slotBorderRadius)
+            || _cUseBg != slotUseBackground
+            || _cBgTex != slotBackgroundTexture
+            || _cBgSprite != slotBackgroundSprite
+            || _cBgTint != slotBackgroundTint
+            || _cUseCustomBorder != useCustomBorderColor
+            || _cBorderColor != slotBorderColor
+            || _cBorderPreset != borderPreset; // <- detect preset change
     }
 
-    [ContextMenu("Refresh Slots")]
-    public void RefreshSlotsInDocument()
+    void Cache()
     {
-        // find a UIDocument if none assigned
-        if (targetDocument == null)
-            targetDocument = FindObjectOfType<UIDocument>();
+        _cSlotSize = slotSize;
+        _cSlotCount = slotCount;
+        _cCellMargin = cellMargin;
+        _cBorderRadius = slotBorderRadius;
+        _cUseBg = slotUseBackground;
+        _cBgTex = slotBackgroundTexture;
+        _cBgSprite = slotBackgroundSprite;
+        _cBgTint = slotBackgroundTint;
+        _cUseCustomBorder = useCustomBorderColor;
+        _cBorderColor = slotBorderColor;
+        _cBorderPreset = borderPreset; // <- cache preset
+    }
 
-        if (targetDocument == null) return;
+    private void BuildOrUpdate()
+    {
+        if (targetDocument == null || targetDocument.rootVisualElement == null) return;
 
         var root = targetDocument.rootVisualElement;
-        if (root == null) return;
+        var tabContentContainer = root.Q<VisualElement>("tabContentContainer");
+        if (tabContentContainer == null) return;
 
-        // locate container by name OR class
-        VisualElement container = root.Q<VisualElement>(slotsContainerNameOrClass);
-        if (container == null)
-            container = root.Query<VisualElement>(className: slotsContainerNameOrClass).First();
+        var scrollWrapper = tabContentContainer.Q<InventoryScrollElement>();
+        if (autoCreateScrollWrapper && scrollWrapper == null) {
+            scrollWrapper = new InventoryScrollElement();
+            tabContentContainer.Add(scrollWrapper);
+        }
 
-        if (container == null) return;
+        VisualElement slotsContainer = scrollWrapper != null
+            ? scrollWrapper.SlotsContainer
+            : tabContentContainer.Q<VisualElement>(className: "inventory-slots-container");
 
-        // simple and robust: clear and recreate
-        container.Clear();
+        if (scrollWrapper != null) {
+            scrollWrapper.SetBackground(wrapperBackgroundTexture, wrapperBackgroundSprite, wrapperBackgroundTint, wrapperUseBackground);
+            scrollWrapper.SetSize(scrollWidthPx, scrollHeightPx);
+            scrollWrapper.SetScrollerVisibility(verticalVisibility, horizontalVisibility);
+            if (centerWrapper) scrollWrapper.CenterInParent();
+        }
+
+        if (slotsContainer == null) return;
+
+        // layout
+        slotsContainer.style.flexDirection = FlexDirection.Row;
+        slotsContainer.style.flexWrap = Wrap.Wrap;
+        slotsContainer.style.justifyContent = Justify.Center;
+        slotsContainer.style.alignContent = Align.FlexStart;
+        slotsContainer.style.alignItems = Align.FlexStart;
+        slotsContainer.style.height = StyleKeyword.Null;
+        slotsContainer.style.width = new Length(100, LengthUnit.Percent);
+
+        // reuse existing when only preset changes (faster, avoids flicker)
+        var existingSlots = slotsContainer.Query<InventorySlotElement>().ToList();
+        if (existingSlots.Count == slotCount
+            && _cSlotSize == slotSize
+            && Mathf.Approximately(_cCellMargin, cellMargin)
+            && _cUseBg == slotUseBackground
+            && _cBorderRadius == slotBorderRadius
+            && _cBgTex == slotBackgroundTexture
+            && _cBgSprite == slotBackgroundSprite
+            && _cBgTint == slotBackgroundTint
+            && _cUseCustomBorder == useCustomBorderColor
+            && _cBorderColor == slotBorderColor) {
+            // Only preset changed: update classes, no rebuild
+            ApplyPresetToExistingSlots(existingSlots);
+            root.MarkDirtyRepaint();
+            return;
+        }
+
+        // full rebuild
+        slotsContainer.Clear();
 
         for (int i = 0; i < slotCount; i++) {
             var slot = new InventorySlotElement();
@@ -98,52 +156,58 @@ public class InventoryUIConfig : MonoBehaviour
             slot.SetSlotSize(slotSize);
             slot.SetCellMargin(cellMargin);
 
-            // apply non-border visuals (border colors handled via USS classes)
-            slot.ApplyVisuals(useBackground, backgroundTexture, backgroundSprite, backgroundTint, borderRadius);
+            slot.ApplyVisuals(
+                slotUseBackground,
+                slotBackgroundTexture,
+                slotBackgroundSprite,
+                slotBackgroundTint,
+                slotBorderRadius
+            );
 
-            // toggle one preset class for border color (USS must define .border-yellow/.border-red/.border-green)
-            slot.RemoveFromClassList("border-yellow");
-            slot.RemoveFromClassList("border-red");
-            slot.RemoveFromClassList("border-green");
-
-            switch (borderPreset) {
-                case BorderPreset.Yellow: slot.AddToClassList("border-yellow"); break;
-                case BorderPreset.Red: slot.AddToClassList("border-red"); break;
-                case BorderPreset.Green: slot.AddToClassList("border-green"); break;
-                default: break;
+            // If presets are used, ensure inline border colors are cleared so USS hover can win
+            if (!useCustomBorderColor) {
+                slot.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
+                slot.style.borderRightColor = new StyleColor(StyleKeyword.Null);
+                slot.style.borderTopColor = new StyleColor(StyleKeyword.Null);
+                slot.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
+            } else {
+                slot.SetStaticBorderColor(slotBorderColor); // static, hover won't override inline
             }
 
-            container.Add(slot);
+            ApplyPresetClass(slot);
+
+            slotsContainer.Add(slot);
         }
 
-        // request repaint so changes appear immediately
         root.MarkDirtyRepaint();
     }
 
-    bool HasChanged()
+    private void ApplyPresetToExistingSlots(System.Collections.Generic.List<InventorySlotElement> slots)
     {
-        if (_cacheSlotSize != slotSize) return true;
-        if (_cacheSlotCount != slotCount) return true;
-        if (!Mathf.Approximately(_cacheCellMargin, cellMargin)) return true;
-        if (_cacheUseBackground != useBackground) return true;
-        if (_cacheBackgroundTexture != backgroundTexture) return true;
-        if (_cacheBackgroundSprite != backgroundSprite) return true;
-        if (_cacheBackgroundTint != backgroundTint) return true;
-        if (_cacheBorderPreset != borderPreset) return true;
-        if (!Mathf.Approximately(_cacheBorderRadius, borderRadius)) return true;
-        return false;
+        foreach (var slot in slots) {
+            // Clear any inline border colors when using presets so hover color applies
+            if (!useCustomBorderColor) {
+                slot.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
+                slot.style.borderRightColor = new StyleColor(StyleKeyword.Null);
+                slot.style.borderTopColor = new StyleColor(StyleKeyword.Null);
+                slot.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
+            } else {
+                slot.SetStaticBorderColor(slotBorderColor);
+            }
+            ApplyPresetClass(slot);
+        }
     }
 
-    void CacheAll()
+    private void ApplyPresetClass(InventorySlotElement slot)
     {
-        _cacheSlotSize = slotSize;
-        _cacheSlotCount = slotCount;
-        _cacheCellMargin = cellMargin;
-        _cacheUseBackground = useBackground;
-        _cacheBackgroundTexture = backgroundTexture;
-        _cacheBackgroundSprite = backgroundSprite;
-        _cacheBackgroundTint = backgroundTint;
-        _cacheBorderPreset = borderPreset;
-        _cacheBorderRadius = borderRadius;
+        slot.RemoveFromClassList("border-yellow");
+        slot.RemoveFromClassList("border-red");
+        slot.RemoveFromClassList("border-green");
+        switch (borderPreset) {
+            case BorderPreset.Yellow: slot.AddToClassList("border-yellow"); break;
+            case BorderPreset.Red: slot.AddToClassList("border-red"); break;
+            case BorderPreset.Green: slot.AddToClassList("border-green"); break;
+            default: break;
+        }
     }
 }

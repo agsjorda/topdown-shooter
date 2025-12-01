@@ -1,11 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 
-/// <summary>
-/// Reusable inventory slot VisualElement. Configurable at runtime.
-/// Keep visuals CSS-driven where possible so USS :hover rules work.
-/// </summary>
-[UxmlElement] // This attribute replaces the need for UxmlFactory/UxmlTraits
+[UxmlElement]
 public partial class InventorySlotElement : VisualElement
 {
     private const string HOVER_CLASS = "inventorySlots--hover";
@@ -31,19 +27,20 @@ public partial class InventorySlotElement : VisualElement
         indexLabel = new Label();
         indexLabel.style.unityTextAlign = TextAnchor.LowerRight;
         indexLabel.style.color = Color.white;
+        indexLabel.pickingMode = PickingMode.Ignore;     // important
         hierarchy.Add(indexLabel);
 
         iconImage = new Image();
-        iconImage.pickingMode = PickingMode.Ignore;
+        iconImage.pickingMode = PickingMode.Ignore;      // important
         iconImage.scaleMode = ScaleMode.ScaleToFit;
         hierarchy.Add(iconImage);
 
         qtyLabel = new Label();
         qtyLabel.style.unityTextAlign = TextAnchor.LowerRight;
         qtyLabel.style.color = Color.white;
+        qtyLabel.pickingMode = PickingMode.Ignore;       // important
         hierarchy.Add(qtyLabel);
 
-        // Only toggle a class on enter/leave — let USS :hover handle visuals
         RegisterCallback<MouseEnterEvent>(_ => AddToClassList(HOVER_CLASS));
         RegisterCallback<MouseLeaveEvent>(_ => RemoveFromClassList(HOVER_CLASS));
 
@@ -66,8 +63,7 @@ public partial class InventorySlotElement : VisualElement
     public void SetIndex(int oneBasedIndex)
     {
         index = oneBasedIndex;
-        if (indexLabel != null)
-            indexLabel.text = oneBasedIndex > 0 ? oneBasedIndex.ToString() : "";
+        indexLabel.text = oneBasedIndex > 0 ? oneBasedIndex.ToString() : "";
     }
 
     public void SetSlotIndex(int index) { SlotIndex = index; SetIndex(index); }
@@ -89,23 +85,18 @@ public partial class InventorySlotElement : VisualElement
     public void SetItem(Item_DataSO item, int qty)
     {
         if (item == null) { ClearItem(); return; }
-        if (iconImage != null) iconImage.image = item.icon ? item.icon.texture : null;
-        if (qtyLabel != null) qtyLabel.text = item.stackable ? qty.ToString() : "";
+        iconImage.image = item.icon ? item.icon.texture : null;
+        qtyLabel.text = item.stackable ? qty.ToString() : "";
     }
 
     public void ClearItem()
     {
-        if (iconImage != null) iconImage.image = null;
-        if (qtyLabel != null) qtyLabel.text = "";
+        iconImage.image = null;
+        qtyLabel.text = "";
     }
 
-    /// <summary>
-    /// Apply visual options but do NOT set inline border color/width so USS :hover can override.
-    /// Signature matches how Inventory_UI calls it.
-    /// </summary>
     public void ApplyVisuals(bool useBackground, Texture2D backgroundTexture, Sprite backgroundSprite, Color backgroundTint, float borderRadius)
     {
-        // only set radius and optional background; avoid inline border color/width
         style.borderTopLeftRadius = borderRadius;
         style.borderTopRightRadius = borderRadius;
         style.borderBottomLeftRadius = borderRadius;
@@ -125,14 +116,15 @@ public partial class InventorySlotElement : VisualElement
             }
         } else {
             style.backgroundImage = null;
-            // do not override backgroundColor so USS :hover/background remains effective
         }
     }
 
-    public void Build()
+    // Inspector-set static border color (does not fight hover)
+    public void SetStaticBorderColor(Color color)
     {
-        SetSlotSize(slotSize);
-        SetCellMargin(cellMargin);
-        SetIndex(index);
+        style.borderLeftColor = color;
+        style.borderRightColor = color;
+        style.borderTopColor = color;
+        style.borderBottomColor = color;
     }
 }
