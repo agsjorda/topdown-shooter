@@ -2941,6 +2941,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3380962fb42b53146994ee87521886de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryController
+  targetDocument: {fileID: 474115368}
   inventory: {fileID: 1553978697}
   ui: {fileID: 474115371}
 --- !u!1 &481987812

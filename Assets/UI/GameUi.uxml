@@ -50,4 +50,5 @@
             <ui:VisualElement name="Footer" style="flex-grow: 0; flex-shrink: 0; height: 10%; background-color: rgba(34, 34, 34, 0.7);" />
         </ui:VisualElement>
     </ui:VisualElement>
+    <ui:VisualElement name="ghostIcon" style="flex-grow: 1; visibility: hidden; position: absolute; width: 200px; height: 200px;" />
 </ui:UXML>

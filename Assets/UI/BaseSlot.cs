@@ -1,68 +1,76 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 [UxmlElement]
 public partial class BaseSlot : VisualElement
 {
-    public Image Icon;
+    private Image _icon;
+    private Label _stackLabel;
+    private Sprite _baseSprite;
+
+    public Image Icon => _icon ??= this.Q<Image>("inventorySlots-icon");
+    public Label StackLabel => _stackLabel ??= this.Q<Label>("stackCount");
+    public Sprite BaseSprite => _baseSprite;
+
+    public int Index => parent?.IndexOf(this) ?? -1;
+    public SerializableGuid ItemId { get; private set; } = SerializableGuid.Empty;
+
     public int SlotIndex { get; private set; }
     public bool HasItem { get; protected set; }
 
     protected int slotSize = 200;
     protected float cellMargin = 4f;
 
-    // Drag & drop event properties (easy to assign from controller)
-    public System.Action<BaseSlot> OnBeginDrag { get; set; }
-    public System.Action<BaseSlot> OnEndDrag { get; set; }
-    public System.Action<BaseSlot> OnDrop { get; set; }
+    public event Action<Vector2, BaseSlot> OnStartDrag = delegate { };
 
     public BaseSlot()
     {
         AddToClassList("inventorySlots");
 
-        Icon = new Image { pickingMode = PickingMode.Ignore };
-        Icon.AddToClassList("inventorySlots-icon");
-        Icon.scaleMode = ScaleMode.ScaleToFit;
-        Icon.style.width = Length.Percent(100);
-        Icon.style.height = Length.Percent(100);
-        Add(Icon);
+        // Create icon if it doesn't exist
+        _icon = new Image {
+            name = "inventorySlots-icon",
+            scaleMode = ScaleMode.ScaleToFit
+        };
+        _icon.AddToClassList("inventorySlots-icon");
+        _icon.style.width = Length.Percent(100);
+        _icon.style.height = Length.Percent(100);
+        Add(_icon);
 
-        SetupInteractionEvents();
+        RegisterCallback<PointerDownEvent>(OnPointerDown);
+        RegisterCallback<MouseEnterEvent>(OnMouseEnter);
+        RegisterCallback<MouseLeaveEvent>(OnMouseLeave);
+
+        // Add hover effect
+        this.AddManipulator(new Clickable(() => { }));
     }
 
-    private void SetupInteractionEvents()
+    private void OnMouseEnter(MouseEnterEvent evt)
     {
-        // Click to start drag
-        RegisterCallback<PointerDownEvent>(evt =>
-        {
-            if (evt.button != 0 || !HasItem) return;
+        if (HasItem) {
+            style.borderTopColor = Color.yellow;
+            style.borderBottomColor = Color.yellow;
+            style.borderLeftColor = Color.yellow;
+            style.borderRightColor = Color.yellow;
+        }
+    }
 
-            AddToClassList("dragging");
-            OnBeginDrag?.Invoke(this);
-            evt.StopPropagation();
-        });
+    private void OnMouseLeave(MouseLeaveEvent evt)
+    {
+        style.borderTopColor = Color.clear;
+        style.borderBottomColor = Color.clear;
+        style.borderLeftColor = Color.clear;
+        style.borderRightColor = Color.clear;
+    }
 
-        // Release to end drag
-        RegisterCallback<PointerUpEvent>(evt =>
-        {
-            if (evt.button != 0) return;
+    public void OnPointerDown(PointerDownEvent evt)
+    {
+        if (evt.button != 0 || !HasItem) return;
 
-            RemoveFromClassList("dragging");
-            OnEndDrag?.Invoke(this);
-            OnDrop?.Invoke(this);
-            evt.StopPropagation();
-        });
-
-        // Hover for drop target
-        RegisterCallback<PointerEnterEvent>(evt =>
-        {
-            AddToClassList("drop-target");
-        });
-
-        RegisterCallback<PointerLeaveEvent>(evt =>
-        {
-            RemoveFromClassList("drop-target");
-        });
+        Debug.Log($"Pointer down on slot {SlotIndex}, HasItem: {HasItem}");
+        OnStartDrag?.Invoke(evt.position, this);
+        evt.StopPropagation();
     }
 
     public virtual void SetItem(Inventory_Item item, int qty = 1)
@@ -73,13 +81,30 @@ public partial class BaseSlot : VisualElement
         }
 
         HasItem = true;
-        Icon.sprite = item.itemData.icon;
-        Icon.style.display = DisplayStyle.Flex;
+        _baseSprite = item.itemData.icon;
+
+        if (item.itemData.icon != null) {
+            Icon.image = item.itemData.icon.texture;
+            Icon.sprite = item.itemData.icon;
+            Icon.style.display = DisplayStyle.Flex;
+            Icon.style.visibility = Visibility.Visible;
+            Icon.style.opacity = 1f;
+
+            Debug.Log($"Set item icon for slot {SlotIndex}: {item.itemData.itemName}");
+        } else {
+            Debug.LogWarning($"Item {item.itemData.itemName} has no icon!");
+            Icon.image = null;
+            Icon.sprite = null;
+        }
     }
 
     public virtual void ClearItem()
     {
         HasItem = false;
+        ItemId = SerializableGuid.Empty;
+        _baseSprite = null;
+
+        Icon.image = null;
         Icon.sprite = null;
         Icon.style.display = DisplayStyle.None;
     }
@@ -92,6 +117,12 @@ public partial class BaseSlot : VisualElement
         slotSize = Mathf.Max(1, size);
         style.width = slotSize;
         style.height = slotSize;
+
+        // Also update icon size
+        if (Icon != null) {
+            Icon.style.width = slotSize - 10;
+            Icon.style.height = slotSize - 10;
+        }
     }
 
     public virtual void SetCellMargin(float margin)
@@ -108,14 +139,19 @@ public partial class BaseSlot : VisualElement
         style.borderBottomLeftRadius = radius;
         style.borderBottomRightRadius = radius;
 
-        // Icon should always appear ABOVE the background
-        Icon.style.position = Position.Absolute;
-        Icon.style.left = 0;
-        Icon.style.top = 0;
-
+        // Set border
+        style.borderTopWidth = 2;
+        style.borderBottomWidth = 2;
+        style.borderLeftWidth = 2;
+        style.borderRightWidth = 2;
+        style.borderTopColor = Color.clear;
+        style.borderBottomColor = Color.clear;
+        style.borderLeftColor = Color.clear;
+        style.borderRightColor = Color.clear;
 
         if (!useBackground) {
             style.backgroundImage = null;
+            style.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.3f); // Default background
             return;
         }
 
@@ -131,7 +167,6 @@ public partial class BaseSlot : VisualElement
             style.backgroundColor = tint;
         }
     }
-
 
     public void SetStaticBorderColor(Color c)
     {
