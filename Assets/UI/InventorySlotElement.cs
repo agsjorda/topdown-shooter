@@ -6,7 +6,7 @@ public partial class InventorySlotElement : VisualElement
 {
     private const string HOVER_CLASS = "inventorySlots--hover";
 
-    private Label indexLabel;
+    // Removed indexLabel
     private int index = 0;
     private int slotSize = 250;
     private float cellMargin = 8f;
@@ -15,7 +15,6 @@ public partial class InventorySlotElement : VisualElement
     private Image iconImage;
     private Label qtyLabel;
 
-    // drag events
     public event System.Action<int> BeginDrag;
     public event System.Action<int> EndDrop;
 
@@ -24,21 +23,16 @@ public partial class InventorySlotElement : VisualElement
         AddToClassList("inventorySlots");
         name = "inventory-slot-element";
 
-        indexLabel = new Label();
-        indexLabel.style.unityTextAlign = TextAnchor.LowerRight;
-        indexLabel.style.color = Color.white;
-        indexLabel.pickingMode = PickingMode.Ignore;     // important
-        hierarchy.Add(indexLabel);
-
         iconImage = new Image();
-        iconImage.pickingMode = PickingMode.Ignore;      // important
+        iconImage.AddToClassList("inventorySlots-icon"); // uses USS sizing
+        iconImage.pickingMode = PickingMode.Ignore;
         iconImage.scaleMode = ScaleMode.ScaleToFit;
         hierarchy.Add(iconImage);
 
         qtyLabel = new Label();
         qtyLabel.style.unityTextAlign = TextAnchor.LowerRight;
         qtyLabel.style.color = Color.white;
-        qtyLabel.pickingMode = PickingMode.Ignore;       // important
+        qtyLabel.pickingMode = PickingMode.Ignore;
         hierarchy.Add(qtyLabel);
 
         RegisterCallback<MouseEnterEvent>(_ => AddToClassList(HOVER_CLASS));
@@ -60,12 +54,8 @@ public partial class InventorySlotElement : VisualElement
         });
     }
 
-    public void SetIndex(int oneBasedIndex)
-    {
-        index = oneBasedIndex;
-        indexLabel.text = oneBasedIndex > 0 ? oneBasedIndex.ToString() : "";
-    }
-
+    // Keep index for internal purposes but do not render it
+    public void SetIndex(int oneBasedIndex) { index = oneBasedIndex; }
     public void SetSlotIndex(int index) { SlotIndex = index; SetIndex(index); }
 
     public void SetSlotSize(int size)
@@ -85,7 +75,7 @@ public partial class InventorySlotElement : VisualElement
     public void SetItem(Item_DataSO item, int qty)
     {
         if (item == null) { ClearItem(); return; }
-        iconImage.image = item.icon ? item.icon.texture : null;
+        iconImage.image = item.icon != null ? item.icon.texture : null;
         qtyLabel.text = item.stackable ? qty.ToString() : "";
     }
 
@@ -119,7 +109,6 @@ public partial class InventorySlotElement : VisualElement
         }
     }
 
-    // Inspector-set static border color (does not fight hover)
     public void SetStaticBorderColor(Color color)
     {
         style.borderLeftColor = color;

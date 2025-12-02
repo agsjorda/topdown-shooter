@@ -1,8 +1,14 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+//This class holds the base inventory functionality
 public class Inventory_Base : MonoBehaviour
 {
+    // Notify UI to refresh when contents change
+    public event Action InventoryChanged;
+
+    //Maximum number of items the inventory can hold
     public int maxInventorySize = 24;
     public List<Inventory_Item> itemList = new List<Inventory_Item>();
 
@@ -18,6 +24,7 @@ public class Inventory_Base : MonoBehaviour
             foreach (var item in itemList) {
                 Debug.Log($" - {item.itemData.itemName}");
             }
+            InventoryChanged?.Invoke(); // tell UI to update
         } else {
             Debug.Log("Inventory is full!");
         }

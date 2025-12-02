@@ -15,7 +15,7 @@ public partial class InventoryScrollElement : VisualElement
             verticalScrollerVisibility = ScrollerVisibility.Auto,
             horizontalScrollerVisibility = ScrollerVisibility.Hidden
         };
-        InnerScroll.AddToClassList("inventory-scroll-view");
+        //InnerScroll.AddToClassList("inventory-scroll-view");
 
         // ensure content wraps so vertical overflow occurs
         InnerScroll.contentContainer.style.flexDirection = FlexDirection.Row;

@@ -141,6 +141,12 @@
     display: flex;
 }
 
+.inventorySlots-icon {
+    padding: 15px;
+    flex-shrink: 0;
+    flex-grow: 1;
+}
+
 /* Ensure hover visuals are applied either by :hover or the code-toggled class */
 .inventorySlots:hover,
 .inventorySlots.inventorySlots--hover {
@@ -148,21 +154,12 @@
     transition-duration: 0.2s;
     transition-timing-function: ease-in-out;
     background-color: rgba(34, 34, 34, 0.7);
+    border-color: rgb(248, 163, 46);
     border-top-width: 2px;
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 2px;
 }
-
-/* Hover border color is driven by the preset class from the inspector */
-.inventorySlots.border-yellow:hover,
-.inventorySlots.inventorySlots--hover.border-yellow { border-color: rgb(248, 163, 46); }
-
-.inventorySlots.border-red:hover,
-.inventorySlots.inventorySlots--hover.border-red { border-color: rgb(220, 80, 80); }
-
-.inventorySlots.border-green:hover,
-.inventorySlots.inventorySlots--hover.border-green { border-color: rgb(100, 200, 120); }
 
 .inventoryTab {
     background-color: rgba(0, 0, 0, 0);

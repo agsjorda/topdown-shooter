@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xmlns:ui="UnityEngine.UIElements" 
+         xmlns:uie="UnityEditor.UIElements"
+         xsi:noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd"
+         editor-extension-mode="False">
+    
+    <!-- This is your reusable inventory container component -->
+    <ui:VisualElement name="inventory-container" >
+        <ui:VisualElement name="tabAndContentContainer" 
+                          style="width: 90%; height: 100%; align-items: center; justify-content: flex-start; flex-grow: 0;">
+            <ui:VisualElement name="tabButtonsContainer" 
+                              style="width: 80%; height: 15%; flex-direction: row; align-items: center; justify-content: center; margin-left: 0; margin-top: 5%;" />
+            <ui:VisualElement name="tabContentContainer" 
+                              style="flex-grow: 0; flex-direction: row; width: 90%; height: 70%; flex-shrink: 1; align-items: center; justify-content: center; flex-wrap: wrap; overflow: hidden;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+    
+</ui:UXML>

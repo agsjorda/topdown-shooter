@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: df2aeb1601490334aa4128fe10707e93, type: 3}
-  m_Name: Health_Potion_Small
+  m_Name: pistol
   m_EditorClassIdentifier: Assembly-CSharp::Item_DataSO
   itemId: 
-  itemName: health potion
-  icon: {fileID: 21300000, guid: 3c638adb5dfbbe64aa680b528ae4e2df, type: 3}
-  description: Smal Health Potion
-  stackable: 1
+  itemName: pistol
+  icon: {fileID: 21300000, guid: 67946d87233370d40a32743df378e812, type: 3}
+  description: mp5 gun
+  stackable: 0
   maxStack: 99

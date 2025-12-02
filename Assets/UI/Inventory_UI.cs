@@ -99,14 +99,10 @@ public class Inventory_UI : UIBaseComponent
         slot.SetCellMargin(margin);
 
         if (config != null) {
-            slot.RemoveFromClassList("border-yellow");
-            slot.RemoveFromClassList("border-red");
-            slot.RemoveFromClassList("border-green");
+            // Removed preset border classes: rely on USS default hover rule
 
-            switch (config.borderPreset) {
-                case InventoryUIConfig.BorderPreset.Yellow: slot.AddToClassList("border-yellow"); break;
-                case InventoryUIConfig.BorderPreset.Red: slot.AddToClassList("border-red"); break;
-                case InventoryUIConfig.BorderPreset.Green: slot.AddToClassList("border-green"); break;
+            if (config.useCustomBorderColor) {
+                slot.SetStaticBorderColor(config.slotBorderColor);
             }
 
             slot.ApplyVisuals(

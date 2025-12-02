@@ -8,6 +8,9 @@ public class InventoryUIConfig : MonoBehaviour
     [Header("Target")]
     public UIDocument targetDocument;
 
+    [Header("Inventory Source")]
+    public Inventory_Base inventorySource;
+
     [Header("Slot Layout")]
     [Range(40, 300)] public int slotSize = 100;
     [Range(1, 200)] public int slotCount = 30;
@@ -24,9 +27,6 @@ public class InventoryUIConfig : MonoBehaviour
     public bool useCustomBorderColor = false;
     public Color slotBorderColor = new Color(0.4f, 0.4f, 0.4f, 1f);
 
-    public enum BorderPreset { Default, Yellow, Red, Green }
-    public BorderPreset borderPreset = BorderPreset.Yellow;
-
     [Header("Scroll Wrapper")]
     public bool autoCreateScrollWrapper = true;
     public int scrollWidthPx = 0;
@@ -41,6 +41,7 @@ public class InventoryUIConfig : MonoBehaviour
     public Sprite wrapperBackgroundSprite;
     public Color wrapperBackgroundTint = Color.white;
 
+    #region Tabs
     [System.Serializable]
     public class TabDescriptor
     {
@@ -60,30 +61,75 @@ public class InventoryUIConfig : MonoBehaviour
 
     [Header("Tab Icon Size (applies to all tabs)")]
     [Range(16, 512)] public int tabIconWidthPx = 0;   // 0 = use USS
-    [Range(16, 512)] public int tabIconHeightPx = 0;  // 0 = use USS
+    [Range(16, 512)] public int tabIconHeightPx = 0;  // 0 = use USS 
+    #endregion
 
-    // cache for change detection (slots only, tabs rebuilt each time for simplicity)
+    // cache for change detection (removed _cBorderPreset)
     int _cSlotSize, _cSlotCount;
     float _cCellMargin, _cBorderRadius;
     bool _cUseBg, _cUseCustomBorder;
     Color _cBgTint, _cBorderColor;
     Texture2D _cBgTex;
     Sprite _cBgSprite;
-    BorderPreset _cBorderPreset;
     int _cTabW, _cTabH, _cTabIconW, _cTabIconH;
 
     void Awake()
     {
         if (targetDocument == null)
             targetDocument = GetComponent<UIDocument>();
+        SyncSlotCountFromInventory();
     }
 
-    void OnEnable() { BuildOrUpdate(); Cache(); }
-    void OnValidate() { if (!Application.isPlaying) { BuildOrUpdate(); Cache(); } }
+    void OnEnable()
+    {
+        if (targetDocument == null) targetDocument = GetComponent<UIDocument>();
+        if (inventorySource != null) inventorySource.InventoryChanged += OnInventoryChanged;
+
+        SyncSlotCountFromInventory();
+        BuildOrUpdate();
+        Cache();
+    }
+
+    void OnDisable()
+    {
+        if (inventorySource != null) inventorySource.InventoryChanged -= OnInventoryChanged;
+    }
+
+    void OnValidate()
+    {
+        if (!Application.isPlaying) {
+            SyncSlotCountFromInventory();
+            BuildOrUpdate();
+            Cache();
+        }
+    }
+
     void Update()
     {
         if (!Application.isPlaying) return;
-        if (HasChanged()) { BuildOrUpdate(); Cache(); }
+
+        // Keep slotCount in sync at runtime too
+        if (inventorySource != null && slotCount != Mathf.Max(1, inventorySource.maxInventorySize)) {
+            slotCount = Mathf.Max(1, inventorySource.maxInventorySize);
+        }
+
+        if (HasChanged()) {
+            BuildOrUpdate();
+            Cache();
+        }
+    }
+
+    private void OnInventoryChanged()
+    {
+        SyncSlotCountFromInventory();
+        BuildOrUpdate();
+        Cache();
+    }
+
+    private void SyncSlotCountFromInventory()
+    {
+        if (inventorySource != null)
+            slotCount = Mathf.Max(1, inventorySource.maxInventorySize);
     }
 
     bool HasChanged()
@@ -98,7 +144,6 @@ public class InventoryUIConfig : MonoBehaviour
             || _cBgTint != slotBackgroundTint
             || _cUseCustomBorder != useCustomBorderColor
             || _cBorderColor != slotBorderColor
-            || _cBorderPreset != borderPreset
             || _cTabW != tabWidthPx
             || _cTabH != tabHeightPx
             || _cTabIconW != tabIconWidthPx
@@ -117,7 +162,6 @@ public class InventoryUIConfig : MonoBehaviour
         _cBgTint = slotBackgroundTint;
         _cUseCustomBorder = useCustomBorderColor;
         _cBorderColor = slotBorderColor;
-        _cBorderPreset = borderPreset;
         _cTabW = tabWidthPx;
         _cTabH = tabHeightPx;
         _cTabIconW = tabIconWidthPx;
@@ -202,15 +246,9 @@ public class InventoryUIConfig : MonoBehaviour
 
         if (slotsContainer == null) return;
 
-        slotsContainer.style.flexDirection = FlexDirection.Row;
-        slotsContainer.style.flexWrap = Wrap.Wrap;
-        slotsContainer.style.justifyContent = Justify.Center;
-        slotsContainer.style.alignContent = Align.FlexStart;
-        slotsContainer.style.alignItems = Align.FlexStart;
-        slotsContainer.style.height = StyleKeyword.Null;
-        slotsContainer.style.width = new Length(100, LengthUnit.Percent);
-
         slotsContainer.Clear();
+
+        int itemCount = inventorySource != null ? inventorySource.itemList.Count : 0;
 
         for (int i = 0; i < slotCount; i++) {
             var slot = new InventorySlotElement();
@@ -226,32 +264,41 @@ public class InventoryUIConfig : MonoBehaviour
                 slotBorderRadius
             );
 
-            if (useCustomBorderColor) {
-                slot.SetStaticBorderColor(slotBorderColor);
-            } else {
+            // Default: let USS control borders (null inline colors)
+            void ClearInlineBorderColors()
+            {
                 slot.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
                 slot.style.borderRightColor = new StyleColor(StyleKeyword.Null);
                 slot.style.borderTopColor = new StyleColor(StyleKeyword.Null);
                 slot.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
             }
+            ClearInlineBorderColors();
 
-            ApplyPresetClass(slot);
+            // If custom color is enabled, override hover color using inline style on hover
+            if (useCustomBorderColor) {
+                var hoverColor = slotBorderColor; // capture
+
+                slot.RegisterCallback<MouseEnterEvent>(_ =>
+                {
+                    slot.SetStaticBorderColor(hoverColor); // inline color beats USS
+                });
+
+                slot.RegisterCallback<MouseLeaveEvent>(_ =>
+                {
+                    ClearInlineBorderColors(); // restore USS default color when not hovering
+                });
+            }
+
+            if (i < itemCount) {
+                var invItem = inventorySource.itemList[i];
+                slot.SetItem(invItem != null ? invItem.itemData : null, 1);
+            } else {
+                slot.ClearItem();
+            }
+
             slotsContainer.Add(slot);
         }
 
         root.MarkDirtyRepaint();
-    }
-
-    private void ApplyPresetClass(InventorySlotElement slot)
-    {
-        slot.RemoveFromClassList("border-yellow");
-        slot.RemoveFromClassList("border-red");
-        slot.RemoveFromClassList("border-green");
-        switch (borderPreset) {
-            case BorderPreset.Yellow: slot.AddToClassList("border-yellow"); break;
-            case BorderPreset.Red: slot.AddToClassList("border-red"); break;
-            case BorderPreset.Green: slot.AddToClassList("border-green"); break;
-            default: break;
-        }
     }
 }
