@@ -11,6 +11,11 @@ public partial class BaseSlot : VisualElement
     protected int slotSize = 200;
     protected float cellMargin = 4f;
 
+    // Drag & drop event properties (easy to assign from controller)
+    public System.Action<BaseSlot> OnBeginDrag { get; set; }
+    public System.Action<BaseSlot> OnEndDrag { get; set; }
+    public System.Action<BaseSlot> OnDrop { get; set; }
+
     public BaseSlot()
     {
         AddToClassList("inventorySlots");
@@ -21,6 +26,43 @@ public partial class BaseSlot : VisualElement
         Icon.style.width = Length.Percent(100);
         Icon.style.height = Length.Percent(100);
         Add(Icon);
+
+        SetupInteractionEvents();
+    }
+
+    private void SetupInteractionEvents()
+    {
+        // Click to start drag
+        RegisterCallback<PointerDownEvent>(evt =>
+        {
+            if (evt.button != 0 || !HasItem) return;
+
+            AddToClassList("dragging");
+            OnBeginDrag?.Invoke(this);
+            evt.StopPropagation();
+        });
+
+        // Release to end drag
+        RegisterCallback<PointerUpEvent>(evt =>
+        {
+            if (evt.button != 0) return;
+
+            RemoveFromClassList("dragging");
+            OnEndDrag?.Invoke(this);
+            OnDrop?.Invoke(this);
+            evt.StopPropagation();
+        });
+
+        // Hover for drop target
+        RegisterCallback<PointerEnterEvent>(evt =>
+        {
+            AddToClassList("drop-target");
+        });
+
+        RegisterCallback<PointerLeaveEvent>(evt =>
+        {
+            RemoveFromClassList("drop-target");
+        });
     }
 
     public virtual void SetItem(Inventory_Item item, int qty = 1)
@@ -32,12 +74,14 @@ public partial class BaseSlot : VisualElement
 
         HasItem = true;
         Icon.sprite = item.itemData.icon;
+        Icon.style.display = DisplayStyle.Flex;
     }
 
     public virtual void ClearItem()
     {
         HasItem = false;
         Icon.sprite = null;
+        Icon.style.display = DisplayStyle.None;
     }
 
     public virtual void SetSlotIndex(int index) => SlotIndex = index;
@@ -64,7 +108,13 @@ public partial class BaseSlot : VisualElement
         style.borderBottomLeftRadius = radius;
         style.borderBottomRightRadius = radius;
 
-        if (!useBackground || HasItem) {
+        // Icon should always appear ABOVE the background
+        Icon.style.position = Position.Absolute;
+        Icon.style.left = 0;
+        Icon.style.top = 0;
+
+
+        if (!useBackground) {
             style.backgroundImage = null;
             return;
         }
@@ -81,6 +131,7 @@ public partial class BaseSlot : VisualElement
             style.backgroundColor = tint;
         }
     }
+
 
     public void SetStaticBorderColor(Color c)
     {

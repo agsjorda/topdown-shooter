@@ -26,7 +26,7 @@ public class InventoryUIConfig : MonoBehaviour
 
     [Header("Slot Border Color")]
     public bool useCustomBorderColor = false;
-    public Color slotBorderColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+    public Color slotBorderColor = new Color(248, 163, 46, 0.7f);
     #endregion
 
     #region Scroll Wrapper
@@ -75,7 +75,19 @@ public class InventoryUIConfig : MonoBehaviour
     VisualElement _tabContentContainer;
     InventoryScrollElement _scrollWrapper;
     VisualElement _slotsContainer;
-    List<BaseSlot> _createdSlots = new List<BaseSlot>();
+
+    // Store the actual created slots (match the type you instantiate below)
+    private readonly List<BaseSlot> _createdSlots = new List<BaseSlot>();
+
+    // Expose read-only access so external controllers can use them
+    public IReadOnlyList<BaseSlot> Slots => _createdSlots;
+    public int CreatedSlotCount => _createdSlots.Count;
+    public BaseSlot GetSlot(int index) => (index >= 0 && index < _createdSlots.Count) ? _createdSlots[index] : null;
+    public bool TryGetSlot(int index, out BaseSlot slot)
+    {
+        if (index >= 0 && index < _createdSlots.Count) { slot = _createdSlots[index]; return true; }
+        slot = null; return false;
+    }
 
     void Awake()
     {
@@ -87,28 +99,10 @@ public class InventoryUIConfig : MonoBehaviour
     {
         if (targetDocument == null) targetDocument = GetComponent<UIDocument>();
 
-        // Subscribe to inventory changes
-        if (inventorySource != null) {
-            inventorySource.InventoryChanged -= OnInventoryChanged;
-            inventorySource.InventoryChanged += OnInventoryChanged;
-            Debug.Log("Subscribed to inventory changes");
-        }
-
+        // No inventory event subscription here; controller owns data sync.
         CacheContainers();
         BuildOrUpdate();
         Cache();
-
-        // Initial inventory sync
-        SyncItemsToSlots();
-    }
-
-    void OnDisable()
-    {
-        // Unsubscribe from inventory changes
-        if (inventorySource != null) {
-            inventorySource.InventoryChanged -= OnInventoryChanged;
-            Debug.Log("Unsubscribed from inventory changes");
-        }
     }
 
     void OnValidate()
@@ -130,11 +124,12 @@ public class InventoryUIConfig : MonoBehaviour
         }
     }
 
-    // This is called when inventory changes
-    void OnInventoryChanged()
+    // Public entry point for external rebuilds (used by controller)
+    public void RebuildUI()
     {
-        Debug.Log("Inventory changed - updating UI");
-        SyncItemsToSlots();
+        CacheContainers();
+        BuildOrUpdate();
+        Cache();
     }
 
     #region Caching
@@ -207,9 +202,6 @@ public class InventoryUIConfig : MonoBehaviour
 
         BuildOrUpdateTabs(root);
         BuildOrUpdateSlots(root);
-
-        // Sync items after creating slots
-        SyncItemsToSlots();
     }
 
     void BuildOrUpdateTabs(VisualElement root)
@@ -255,8 +247,10 @@ public class InventoryUIConfig : MonoBehaviour
 
         _slotsContainer.Clear();
         _createdSlots.Clear();
+        _createdSlots.Capacity = slotCount; // optional pre-alloc
 
         for (int i = 0; i < slotCount; i++) {
+            // If you have a specialized slot, instantiate it instead of BaseSlot
             var slot = new BaseSlot();
             slot.SetSlotIndex(i);
             slot.SetSlotSize(slotSize);
@@ -283,40 +277,6 @@ public class InventoryUIConfig : MonoBehaviour
         }
 
         root.MarkDirtyRepaint();
-    }
-
-    // ✅ CRITICAL: This method syncs inventory items to UI slots
-    void SyncItemsToSlots()
-    {
-        if (inventorySource == null) {
-            Debug.LogWarning("No inventory source to sync with");
-            return;
-        }
-
-        if (_createdSlots == null || _createdSlots.Count == 0) {
-            Debug.LogWarning("No slots created yet");
-            return;
-        }
-
-        Debug.Log($"Syncing {inventorySource.itemList.Count} items to {_createdSlots.Count} slots");
-
-        // Clear all slots first
-        foreach (var slot in _createdSlots) {
-            slot.ClearItem();
-        }
-
-        // Assign items to slots
-        for (int i = 0; i < inventorySource.itemList.Count && i < _createdSlots.Count; i++) {
-            var item = inventorySource.itemList[i];
-            if (item != null && item.itemData != null) {
-                Debug.Log($"Setting item {item.itemData.itemName} at slot {i}");
-                _createdSlots[i].SetItem(item, 1);
-            }
-        }
-
-        // Force UI refresh
-        if (targetDocument != null && targetDocument.rootVisualElement != null)
-            targetDocument.rootVisualElement.MarkDirtyRepaint();
     }
 
     static void ClearInlineBorderColors(VisualElement el)

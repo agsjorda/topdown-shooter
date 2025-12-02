@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Item_DataSO
   itemId: 
   itemName: health potion
-  icon: {fileID: 2800000, guid: 3c638adb5dfbbe64aa680b528ae4e2df, type: 3}
+  icon: {fileID: 21300000, guid: 3c638adb5dfbbe64aa680b528ae4e2df, type: 3}
   description: Smal Health Potion
   stackable: 1
   maxStack: 99

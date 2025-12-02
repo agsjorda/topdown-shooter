@@ -258,4 +258,14 @@
 .equipSlot-icon:hover {
     scale: 0.9 0.9;
 }
+/* Drag & Drop Styles */
+.inventorySlots.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
 
+.inventorySlots.drop-target {
+    border-color: #4CAF50 ;
+    border-width: 3px ;
+    background-color: rgba(76, 175, 80, 0.1);
+}

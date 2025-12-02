@@ -6,20 +6,13 @@ using UnityEngine;
 public class Inventory_Base : MonoBehaviour
 {
     // Notify UI to refresh when contents change
-    public event Action InventoryChanged;
+    public event Action OnInventoryChanged;
 
     //Maximum number of items the inventory can hold
     public int maxInventorySize = 24;
     public List<Inventory_Item> itemList = new List<Inventory_Item>();
 
-    // Cache to track changes
-    private int _lastItemCount = 0;
-
-    public bool CanAddItem()
-    {
-        if (itemList == null) return false;
-        return itemList.Count < maxInventorySize;
-    }
+    public bool CanAddItem() => itemList.Count < maxInventorySize;
 
     public void AddItem(Inventory_Item itemToAdd)
     {
@@ -39,24 +32,21 @@ public class Inventory_Base : MonoBehaviour
         Debug.Log($"Added item: {itemToAdd.itemData.itemName}. Total items: {itemList.Count}");
 
         // Notify UI to update
-        InventoryChanged?.Invoke();
+        OnInventoryChanged?.Invoke();
     }
 
-    // Get item at specific slot index
-    public Inventory_Item GetItemAtSlot(int slotIndex)
+    // Add this method to the Inventory_Base class
+    public void SwapItems(int indexA, int indexB)
     {
-        if (slotIndex < 0 || slotIndex >= itemList.Count)
-            return null;
+        if (itemList == null) return;
+        if (indexA < 0 || indexA >= itemList.Count) return;
+        if (indexB < 0 || indexB >= itemList.Count) return;
+        if (indexA == indexB) return;
 
-        return itemList[slotIndex];
-    }
+        var temp = itemList[indexA];
+        itemList[indexA] = itemList[indexB];
+        itemList[indexB] = temp;
 
-    // Update to check for changes
-    void Update()
-    {
-        if (itemList.Count != _lastItemCount) {
-            _lastItemCount = itemList.Count;
-            InventoryChanged?.Invoke();
-        }
+        OnInventoryChanged?.Invoke();
     }
 }

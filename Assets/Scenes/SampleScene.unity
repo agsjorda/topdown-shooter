@@ -2807,6 +2807,7 @@ GameObject:
   - component: {fileID: 474115368}
   - component: {fileID: 474115370}
   - component: {fileID: 474115371}
+  - component: {fileID: 474115372}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
@@ -2928,6 +2929,20 @@ MonoBehaviour:
   tabHeightPx: 183
   tabIconWidthPx: 200
   tabIconHeightPx: 200
+--- !u!114 &474115372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 474115367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3380962fb42b53146994ee87521886de, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::InventoryController
+  inventory: {fileID: 1553978697}
+  ui: {fileID: 474115371}
 --- !u!1 &481987812
 GameObject:
   m_ObjectHideFlags: 0
