@@ -12,21 +12,51 @@ public class Inventory_Base : MonoBehaviour
     public int maxInventorySize = 24;
     public List<Inventory_Item> itemList = new List<Inventory_Item>();
 
-    public bool CanAddItem() => itemList.Count < maxInventorySize;
+    // Cache to track changes
+    private int _lastItemCount = 0;
+
+    public bool CanAddItem()
+    {
+        if (itemList == null) return false;
+        return itemList.Count < maxInventorySize;
+    }
 
     public void AddItem(Inventory_Item itemToAdd)
     {
-        if (CanAddItem()) {
-            itemList.Add(itemToAdd);
-            Debug.Log($"Added item: {itemToAdd.itemData.itemName}");
-            Debug.Log($"Current inventory size: {itemList.Count}/{maxInventorySize}");
-            Debug.Log("Inventory contents:");
-            foreach (var item in itemList) {
-                Debug.Log($" - {item.itemData.itemName}");
-            }
-            InventoryChanged?.Invoke(); // tell UI to update
-        } else {
-            Debug.Log("Inventory is full!");
+        if (itemToAdd == null) {
+            Debug.LogError("Cannot add null item");
+            return;
+        }
+
+        if (!CanAddItem()) {
+            Debug.Log("Inventory full");
+            return;
+        }
+
+        // Add the item to the list
+        itemList.Add(itemToAdd);
+
+        Debug.Log($"Added item: {itemToAdd.itemData.itemName}. Total items: {itemList.Count}");
+
+        // Notify UI to update
+        InventoryChanged?.Invoke();
+    }
+
+    // Get item at specific slot index
+    public Inventory_Item GetItemAtSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= itemList.Count)
+            return null;
+
+        return itemList[slotIndex];
+    }
+
+    // Update to check for changes
+    void Update()
+    {
+        if (itemList.Count != _lastItemCount) {
+            _lastItemCount = itemList.Count;
+            InventoryChanged?.Invoke();
         }
     }
 }

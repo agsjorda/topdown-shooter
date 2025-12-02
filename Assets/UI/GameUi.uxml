@@ -25,8 +25,8 @@
             <ui:VisualElement name="Header" style="flex-grow: 0; height: 15%; background-color: rgba(34, 34, 34, 0.7); align-items: center; justify-content: center;">
                 <ui:Label text="Inventory" style="-unity-font-definition: url(&quot;project://database/Assets/TextMesh%20Pro/Fonts/Bangers.ttf?fileID=12800000&amp;guid=137330a480fa8604184ebd4d28ff5ade&amp;type=3#Bangers&quot;); color: rgb(255, 255, 255); font-size: 100%;" />
             </ui:VisualElement>
-            <ui:VisualElement name="Content" style="flex-grow: 1; flex-direction: row; background-color: rgba(0, 0, 0, 0.43); background-image: url(&quot;project://database/Assets/Textures/inventoryBlur.renderTexture?fileID=8400000&amp;guid=85e8d7d3de2bd1647bbec14c5f1ba928&amp;type=2#inventoryBlur&quot;);">
-                <ui:VisualElement name="characterPreview-container" style="flex-grow: 1; align-items: center; display: flex; align-self: auto; justify-content: center; flex-direction: column; width: 45%;">
+            <ui:VisualElement name="Content" style="flex-grow: 1; align-items: flex-start; justify-content: center; flex-direction: row; background-color: rgba(0, 0, 0, 0.21);">
+                <ui:VisualElement name="characterPreview-container" style="flex-grow: 1; align-items: center; display: flex; align-self: auto; justify-content: center; flex-direction: column; width: 45%; height: 100%;">
                     <ui:VisualElement name="playerPreview" style="flex-grow: 0; width: 90%; background-color: rgba(34, 34, 34, 0); background-image: url(&quot;project://database/Assets/Textures/playerPreview_renderTexture.renderTexture?fileID=8400000&amp;guid=d2ac92518687b3f4a907aeba90d08cd3&amp;type=2#playerPreview_renderTexture&quot;); -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); height: 90%; flex-shrink: 0;" />
                     <ui:VisualElement class="equipSlots">
                         <ui:VisualElement class="equipSlot-icon" style="background-image: url(&quot;project://database/Assets/UI/icons/pistol-gun.png?fileID=2800000&amp;guid=67946d87233370d40a32743df378e812&amp;type=3#pistol-gun&quot;);" />
@@ -41,13 +41,10 @@
                         <ui:VisualElement class="equipSlot-icon" style="background-image: url(&quot;project://database/Assets/UI/icons/boots.png?fileID=2800000&amp;guid=b27836b0d8d48fe47affacaa720edbe1&amp;type=3#boots&quot;);" />
                     </ui:VisualElement>
                 </ui:VisualElement>
-                <ui:VisualElement name="inventory-container" style="flex-grow: 0; align-items: center; flex-shrink: 0; width: 55%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-wrap: wrap;">
-                    <ui:VisualElement name="tabAndContentContainer" style="width: 90%; height: 100%; align-items: center; justify-content: flex-start; flex-grow: 0;">
-                        <ui:VisualElement name="tabButtonsContainer" style="width: 80%; height: 15%; flex-direction: row; align-items: center; justify-content: center; margin-left: 0; margin-top: 5%;">
-                            
-                        </ui:VisualElement>
-                        <ui:VisualElement name="tabContentContainer" style="flex-grow: 0; flex-direction: row; width: 90%; height: 70%; flex-shrink: 1; align-items: flex-start; justify-content: center; flex-wrap: wrap; overflow: hidden;" />
-                    </ui:VisualElement>
+                <ui:VisualElement name="inventory-container" style="flex-grow: 1; align-items: center; flex-shrink: 1; width: 55%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-wrap: wrap; height: 100%;">
+                    <ui:VisualElement name="tabButtonsContainer" style="width: 80%; height: 15%; flex-direction: row; align-items: center; justify-content: center; margin-left: 0; margin-top: 5%; flex-grow: 0;" />
+                    <ui:VisualElement name="tabContentContainer" style="flex-grow: 0; flex-direction: row; width: 80%; height: 70%; flex-shrink: 1; align-items: flex-start; justify-content: center; flex-wrap: wrap; overflow: hidden;" />
+                    <ui:VisualElement style="flex-grow: 1; width: 100%;" />
                 </ui:VisualElement>
             </ui:VisualElement>
             <ui:VisualElement name="Footer" style="flex-grow: 0; flex-shrink: 0; height: 10%; background-color: rgba(34, 34, 34, 0.7);" />

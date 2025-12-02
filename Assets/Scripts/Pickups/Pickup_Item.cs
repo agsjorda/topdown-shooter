@@ -23,19 +23,6 @@ public class Pickup_Item : Interactable
         }
     }
 
-    private void OnValidate()
-    {
-        // Only update the name in OnValidate, visuals are handled elsewhere
-        if (itemData != null) {
-            gameObject.name = "Pickup_Item - " + itemData.itemName;
-
-            // Optional: Update visuals if in play mode and spriteRenderer exists
-            if (Application.isPlaying && spriteRenderer != null) {
-                UpdateVisuals();
-            }
-        }
-    }
-
     private void UpdateVisuals()
     {
         if (spriteRenderer != null && itemData != null) {
@@ -45,13 +32,23 @@ public class Pickup_Item : Interactable
 
     public override void Interaction()
     {
-        playerInventory = Object.FindFirstObjectByType<Inventory_Base>();
+        if (playerInventory == null) {
+            playerInventory = Object.FindFirstObjectByType<Inventory_Base>();
+            if (playerInventory == null) {
+                Debug.LogError("Pickup_Item: No Inventory_Base found in scene!");
+                return;
+            }
+        }
 
-        if (playerInventory != null) {
+        if (playerInventory != null && itemToAdd != null) {
+            Debug.Log($"Attempting to add {itemToAdd.itemData.itemName} to inventory");
             playerInventory.AddItem(itemToAdd);
-            Destroy(gameObject);
-        } else {
-            Debug.LogWarning("No Inventory_Base found in scene");
+
+            if (playerInventory.CanAddItem()) {
+                Destroy(gameObject);
+            } else {
+                Debug.LogWarning("Failed to add item - inventory might be full");
+            }
         }
     }
 }

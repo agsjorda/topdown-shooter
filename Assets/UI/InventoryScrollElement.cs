@@ -79,21 +79,9 @@ public partial class InventoryScrollElement : VisualElement
         }
     }
 
-    /// <summary>
-    /// Center this wrapper inside a flex parent (horizontal & vertical).
-    /// Requires parent to use flex layout.
-    /// </summary>
-    public void CenterInParent()
-    {
-        style.alignSelf = Align.Center;
-        // margin auto horizontally
-        style.marginLeft = StyleKeyword.Auto;
-        style.marginRight = StyleKeyword.Auto;
-    }
 
-    public void SetScrollerVisibility(ScrollerVisibility vertical, ScrollerVisibility horizontal)
+    public void SetScrollerVisibility(ScrollerVisibility vertical)
     {
         InnerScroll.verticalScrollerVisibility = vertical;
-        InnerScroll.horizontalScrollerVisibility = horizontal;
     }
 }

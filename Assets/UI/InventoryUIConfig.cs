@@ -11,6 +11,7 @@ public class InventoryUIConfig : MonoBehaviour
     [Header("Inventory Source")]
     public Inventory_Base inventorySource;
 
+    #region Slots Properties
     [Header("Slot Layout")]
     [Range(40, 300)] public int slotSize = 100;
     [Range(1, 200)] public int slotCount = 30;
@@ -26,45 +27,42 @@ public class InventoryUIConfig : MonoBehaviour
     [Header("Slot Border Color")]
     public bool useCustomBorderColor = false;
     public Color slotBorderColor = new Color(0.4f, 0.4f, 0.4f, 1f);
+    #endregion
 
+    #region Scroll Wrapper
     [Header("Scroll Wrapper")]
     public bool autoCreateScrollWrapper = true;
     public int scrollWidthPx = 0;
     public int scrollHeightPx = 350;
-    public bool centerWrapper = true;
     public ScrollerVisibility verticalVisibility = ScrollerVisibility.Auto;
-    public ScrollerVisibility horizontalVisibility = ScrollerVisibility.Hidden;
 
     [Header("Wrapper Background")]
     public bool wrapperUseBackground = false;
     public Texture2D wrapperBackgroundTexture;
     public Sprite wrapperBackgroundSprite;
     public Color wrapperBackgroundTint = Color.white;
+    #endregion
 
-    #region Tabs
+    #region Tab Properties
     [System.Serializable]
     public class TabDescriptor
     {
         public string id = "all";
         public string label = "";
-        public Texture2D iconTexture; // Sprite removed
+        public Texture2D iconTexture;
         public Color iconTint = Color.white;
     }
 
     [Header("Tabs")]
     public List<TabDescriptor> tabs = new List<TabDescriptor>();
     public int activeTabIndex = 0;
-
-    [Header("Tab Size (applies to all tabs)")]
-    [Range(20, 400)] public int tabWidthPx = 0;   // 0 = use USS
-    [Range(20, 400)] public int tabHeightPx = 0;  // 0 = use USS
-
-    [Header("Tab Icon Size (applies to all tabs)")]
-    [Range(16, 512)] public int tabIconWidthPx = 0;   // 0 = use USS
-    [Range(16, 512)] public int tabIconHeightPx = 0;  // 0 = use USS 
+    [Range(20, 400)] public int tabWidthPx = 0;
+    [Range(20, 400)] public int tabHeightPx = 0;
+    [Range(16, 512)] public int tabIconWidthPx = 0;
+    [Range(16, 512)] public int tabIconHeightPx = 0;
     #endregion
 
-    // cache for change detection (removed _cBorderPreset)
+    // cache for change detection
     int _cSlotSize, _cSlotCount;
     float _cCellMargin, _cBorderRadius;
     bool _cUseBg, _cUseCustomBorder;
@@ -73,32 +71,50 @@ public class InventoryUIConfig : MonoBehaviour
     Sprite _cBgSprite;
     int _cTabW, _cTabH, _cTabIconW, _cTabIconH;
 
+    // cached UI containers and slots
+    VisualElement _tabContentContainer;
+    InventoryScrollElement _scrollWrapper;
+    VisualElement _slotsContainer;
+    List<BaseSlot> _createdSlots = new List<BaseSlot>();
+
     void Awake()
     {
         if (targetDocument == null)
             targetDocument = GetComponent<UIDocument>();
-        SyncSlotCountFromInventory();
     }
 
     void OnEnable()
     {
         if (targetDocument == null) targetDocument = GetComponent<UIDocument>();
-        if (inventorySource != null) inventorySource.InventoryChanged += OnInventoryChanged;
 
-        SyncSlotCountFromInventory();
+        // Subscribe to inventory changes
+        if (inventorySource != null) {
+            inventorySource.InventoryChanged -= OnInventoryChanged;
+            inventorySource.InventoryChanged += OnInventoryChanged;
+            Debug.Log("Subscribed to inventory changes");
+        }
+
+        CacheContainers();
         BuildOrUpdate();
         Cache();
+
+        // Initial inventory sync
+        SyncItemsToSlots();
     }
 
     void OnDisable()
     {
-        if (inventorySource != null) inventorySource.InventoryChanged -= OnInventoryChanged;
+        // Unsubscribe from inventory changes
+        if (inventorySource != null) {
+            inventorySource.InventoryChanged -= OnInventoryChanged;
+            Debug.Log("Unsubscribed from inventory changes");
+        }
     }
 
     void OnValidate()
     {
         if (!Application.isPlaying) {
-            SyncSlotCountFromInventory();
+            CacheContainers();
             BuildOrUpdate();
             Cache();
         }
@@ -108,30 +124,20 @@ public class InventoryUIConfig : MonoBehaviour
     {
         if (!Application.isPlaying) return;
 
-        // Keep slotCount in sync at runtime too
-        if (inventorySource != null && slotCount != Mathf.Max(1, inventorySource.maxInventorySize)) {
-            slotCount = Mathf.Max(1, inventorySource.maxInventorySize);
-        }
-
         if (HasChanged()) {
             BuildOrUpdate();
             Cache();
         }
     }
 
-    private void OnInventoryChanged()
+    // This is called when inventory changes
+    void OnInventoryChanged()
     {
-        SyncSlotCountFromInventory();
-        BuildOrUpdate();
-        Cache();
+        Debug.Log("Inventory changed - updating UI");
+        SyncItemsToSlots();
     }
 
-    private void SyncSlotCountFromInventory()
-    {
-        if (inventorySource != null)
-            slotCount = Mathf.Max(1, inventorySource.maxInventorySize);
-    }
-
+    #region Caching
     bool HasChanged()
     {
         return _cSlotSize != slotSize
@@ -168,25 +174,49 @@ public class InventoryUIConfig : MonoBehaviour
         _cTabIconH = tabIconHeightPx;
     }
 
-    private void BuildOrUpdate()
+    void CacheContainers()
     {
-        if (targetDocument == null || targetDocument.rootVisualElement == null) return;
+        var root = targetDocument != null ? targetDocument.rootVisualElement : null;
+        if (root == null) return;
 
-        var root = targetDocument.rootVisualElement;
+        _tabContentContainer = _tabContentContainer ?? root.Q<VisualElement>("tabContentContainer");
+        if (_tabContentContainer == null) return;
 
-        // Build tabs first (reads/writes tabButtonsContainer)
+        _scrollWrapper = _scrollWrapper ?? _tabContentContainer.Q<InventoryScrollElement>();
+        if (autoCreateScrollWrapper && _scrollWrapper == null) {
+            _scrollWrapper = new InventoryScrollElement();
+            _tabContentContainer.Add(_scrollWrapper);
+        }
+
+        _slotsContainer = _scrollWrapper != null
+            ? _scrollWrapper.SlotsContainer
+            : _tabContentContainer.Q<VisualElement>(className: "inventory-slots-container");
+
+        if (_scrollWrapper != null) {
+            _scrollWrapper.SetBackground(wrapperBackgroundTexture, wrapperBackgroundSprite, wrapperBackgroundTint, wrapperUseBackground);
+            _scrollWrapper.SetSize(scrollWidthPx, scrollHeightPx);
+            _scrollWrapper.SetScrollerVisibility(verticalVisibility);
+        }
+    }
+    #endregion
+
+    void BuildOrUpdate()
+    {
+        var root = targetDocument != null ? targetDocument.rootVisualElement : null;
+        if (root == null) return;
+
         BuildOrUpdateTabs(root);
-
-        // Build slots inside scroll wrapper
         BuildOrUpdateSlots(root);
+
+        // Sync items after creating slots
+        SyncItemsToSlots();
     }
 
-    private void BuildOrUpdateTabs(VisualElement root)
+    void BuildOrUpdateTabs(VisualElement root)
     {
         var tabButtonsContainer = root.Q<VisualElement>("tabButtonsContainer");
         if (tabButtonsContainer == null) return;
 
-        // Apply global sizes from inspector sliders
         InventoryTabElement.SetGlobalSize(tabWidthPx, tabHeightPx);
         InventoryTabElement.SetGlobalIconSize(tabIconWidthPx, tabIconHeightPx);
 
@@ -196,22 +226,17 @@ public class InventoryUIConfig : MonoBehaviour
             var def = tabs[i];
             var tab = new InventoryTabElement();
             tab.SetId(def.id);
-            tab.SetIcon(def.iconTexture, def.iconTint); // Texture2D only
+            tab.SetIcon(def.iconTexture, def.iconTint);
             tab.SetLabel(def.label);
             tab.SetActive(i == Mathf.Clamp(activeTabIndex, 0, Mathf.Max(0, tabs.Count - 1)));
 
             int capturedIndex = i;
-            tab.Clicked += _ =>
-            {
-                SetActiveTab(tabButtonsContainer, capturedIndex);
-                // TODO: filter content by TabId if needed
-            };
-
+            tab.Clicked += _ => SetActiveTab(tabButtonsContainer, capturedIndex);
             tabButtonsContainer.Add(tab);
         }
     }
 
-    private void SetActiveTab(VisualElement tabButtonsContainer, int index)
+    void SetActiveTab(VisualElement tabButtonsContainer, int index)
     {
         activeTabIndex = Mathf.Clamp(index, 0, Mathf.Max(0, tabs.Count - 1));
         int i = 0;
@@ -222,41 +247,22 @@ public class InventoryUIConfig : MonoBehaviour
         }
     }
 
-    private void BuildOrUpdateSlots(VisualElement root)
+    void BuildOrUpdateSlots(VisualElement root)
     {
-        var tabContentContainer = root.Q<VisualElement>("tabContentContainer");
-        if (tabContentContainer == null) return;
+        if (_tabContentContainer == null || _slotsContainer == null)
+            CacheContainers();
+        if (_slotsContainer == null) return;
 
-        var scrollWrapper = tabContentContainer.Q<InventoryScrollElement>();
-        if (autoCreateScrollWrapper && scrollWrapper == null) {
-            scrollWrapper = new InventoryScrollElement();
-            tabContentContainer.Add(scrollWrapper);
-        }
-
-        VisualElement slotsContainer = scrollWrapper != null
-            ? scrollWrapper.SlotsContainer
-            : tabContentContainer.Q<VisualElement>(className: "inventory-slots-container");
-
-        if (scrollWrapper != null) {
-            scrollWrapper.SetBackground(wrapperBackgroundTexture, wrapperBackgroundSprite, wrapperBackgroundTint, wrapperUseBackground);
-            scrollWrapper.SetSize(scrollWidthPx, scrollHeightPx);
-            scrollWrapper.SetScrollerVisibility(verticalVisibility, horizontalVisibility);
-            if (centerWrapper) scrollWrapper.CenterInParent();
-        }
-
-        if (slotsContainer == null) return;
-
-        slotsContainer.Clear();
-
-        int itemCount = inventorySource != null ? inventorySource.itemList.Count : 0;
+        _slotsContainer.Clear();
+        _createdSlots.Clear();
 
         for (int i = 0; i < slotCount; i++) {
-            var slot = new InventorySlotElement();
-            slot.SetIndex(i + 1);
+            var slot = new BaseSlot();
+            slot.SetSlotIndex(i);
             slot.SetSlotSize(slotSize);
             slot.SetCellMargin(cellMargin);
 
-            slot.ApplyVisuals(
+            slot.ApplyBackground(
                 slotUseBackground,
                 slotBackgroundTexture,
                 slotBackgroundSprite,
@@ -264,41 +270,60 @@ public class InventoryUIConfig : MonoBehaviour
                 slotBorderRadius
             );
 
-            // Default: let USS control borders (null inline colors)
-            void ClearInlineBorderColors()
-            {
-                slot.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderRightColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderTopColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
-            }
-            ClearInlineBorderColors();
+            ClearInlineBorderColors(slot);
 
-            // If custom color is enabled, override hover color using inline style on hover
             if (useCustomBorderColor) {
-                var hoverColor = slotBorderColor; // capture
-
-                slot.RegisterCallback<MouseEnterEvent>(_ =>
-                {
-                    slot.SetStaticBorderColor(hoverColor); // inline color beats USS
-                });
-
-                slot.RegisterCallback<MouseLeaveEvent>(_ =>
-                {
-                    ClearInlineBorderColors(); // restore USS default color when not hovering
-                });
+                var hoverColor = slotBorderColor;
+                slot.RegisterCallback<MouseEnterEvent>(_ => slot.SetStaticBorderColor(hoverColor));
+                slot.RegisterCallback<MouseLeaveEvent>(_ => ClearInlineBorderColors(slot));
             }
 
-            if (i < itemCount) {
-                var invItem = inventorySource.itemList[i];
-                slot.SetItem(invItem != null ? invItem.itemData : null, 1);
-            } else {
-                slot.ClearItem();
-            }
-
-            slotsContainer.Add(slot);
+            _slotsContainer.Add(slot);
+            _createdSlots.Add(slot);
         }
 
         root.MarkDirtyRepaint();
+    }
+
+    // ✅ CRITICAL: This method syncs inventory items to UI slots
+    void SyncItemsToSlots()
+    {
+        if (inventorySource == null) {
+            Debug.LogWarning("No inventory source to sync with");
+            return;
+        }
+
+        if (_createdSlots == null || _createdSlots.Count == 0) {
+            Debug.LogWarning("No slots created yet");
+            return;
+        }
+
+        Debug.Log($"Syncing {inventorySource.itemList.Count} items to {_createdSlots.Count} slots");
+
+        // Clear all slots first
+        foreach (var slot in _createdSlots) {
+            slot.ClearItem();
+        }
+
+        // Assign items to slots
+        for (int i = 0; i < inventorySource.itemList.Count && i < _createdSlots.Count; i++) {
+            var item = inventorySource.itemList[i];
+            if (item != null && item.itemData != null) {
+                Debug.Log($"Setting item {item.itemData.itemName} at slot {i}");
+                _createdSlots[i].SetItem(item, 1);
+            }
+        }
+
+        // Force UI refresh
+        if (targetDocument != null && targetDocument.rootVisualElement != null)
+            targetDocument.rootVisualElement.MarkDirtyRepaint();
+    }
+
+    static void ClearInlineBorderColors(VisualElement el)
+    {
+        el.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
+        el.style.borderRightColor = new StyleColor(StyleKeyword.Null);
+        el.style.borderTopColor = new StyleColor(StyleKeyword.Null);
+        el.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
     }
 }
