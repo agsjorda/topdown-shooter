@@ -2808,6 +2808,7 @@ GameObject:
   - component: {fileID: 474115370}
   - component: {fileID: 474115371}
   - component: {fileID: 474115372}
+  - component: {fileID: 474115373}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
@@ -2884,25 +2885,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryUIConfig
   targetDocument: {fileID: 474115368}
-  inventorySource: {fileID: 1553978697}
   slotSize: 200
   slotCount: 24
   cellMargin: 4
-  slotUseBackground: 0
-  slotBackgroundTexture: {fileID: 0}
-  slotBackgroundSprite: {fileID: 0}
-  slotBackgroundTint: {r: 1, g: 1, b: 1, a: 1}
-  slotBorderRadius: 5
-  useCustomBorderColor: 0
-  slotBorderColor: {r: 0.4, g: 0.4, b: 0.4, a: 1}
   autoCreateScrollWrapper: 1
   scrollWidthPx: 0
   scrollHeightPx: 0
-  verticalVisibility: 0
-  wrapperUseBackground: 0
-  wrapperBackgroundTexture: {fileID: 0}
-  wrapperBackgroundSprite: {fileID: 0}
-  wrapperBackgroundTint: {r: 1, g: 1, b: 1, a: 1}
+  verticalVisibility: 2
   tabs:
   - id: all
     label: 
@@ -2941,9 +2930,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3380962fb42b53146994ee87521886de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InventoryController
-  targetDocument: {fileID: 474115368}
   inventory: {fileID: 1553978697}
   ui: {fileID: 474115371}
+--- !u!114 &474115373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 474115367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2accd89df0ea0f4eaddfbc07ad471ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DragDropController
+  inventoryController: {fileID: 474115372}
+  uiDocument: {fileID: 474115368}
+  dragThreshold: 5
+  debugMode: 1
+  highlightEmptySlots: 1
 --- !u!1 &481987812
 GameObject:
   m_ObjectHideFlags: 0
