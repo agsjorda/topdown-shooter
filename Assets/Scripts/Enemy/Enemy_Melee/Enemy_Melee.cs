@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct AttackData
+public struct AttackData_EnemyMelee
 {
     public string attackName;
     public float attackRange;
@@ -21,7 +21,7 @@ public enum EnemyMeleeType { Regular, Shield, Dodge, AxeThrow }
 
 public class Enemy_Melee : Enemy
 {
-    private Enemy_Visuals enemyVisuals;
+    public Enemy_Visuals enemyVisuals { get; private set; }
 
     #region States
     public IdleState_Melee idleState { get; private set; }
@@ -38,7 +38,7 @@ public class Enemy_Melee : Enemy
     public EnemyMeleeType meleeType;
     public Transform shieldTransform;
     public float dodgeCooldown;
-    public float lastDodgeTime = -10;
+    public float lastTimeDodge = -10;
 
     [Header("Axe Throw Ability")]
     public GameObject axePrefab;
@@ -50,8 +50,8 @@ public class Enemy_Melee : Enemy
 
 
     [Header("Attack Data")]
-    public AttackData attackData;
-    public List<AttackData> attackList;
+    public AttackData_EnemyMelee attackData;
+    public List<AttackData_EnemyMelee> attackList;
 
     protected override void Awake()
     {
@@ -73,9 +73,11 @@ public class Enemy_Melee : Enemy
         base.Start();
 
         stateMachine.Initialize(idleState);
-        InitializeSpeciality();
+        ResetCooldown();
+        InitializePerk();
 
         enemyVisuals.SetupLook();
+        UpdateAttackData();
     }
 
     protected override void Update()
@@ -84,8 +86,7 @@ public class Enemy_Melee : Enemy
 
         stateMachine.currentState.Update();
 
-        if (ShouldEnterBattleMode())
-            EnterBattleMode();
+
     }
 
     override public void EnterBattleMode()
@@ -103,7 +104,17 @@ public class Enemy_Melee : Enemy
         moveSpeed = moveSpeed * .6f;
         EnableWeaponModel(false);
     }
-    private void InitializeSpeciality()
+
+    public void UpdateAttackData()
+    {
+        Enemy_WeaponModel currentWeapon = enemyVisuals.currentWeaponModel.GetComponent<Enemy_WeaponModel>();
+
+        if (currentWeapon.weaponData != null) {
+            attackList = new List<AttackData_EnemyMelee>(currentWeapon.weaponData.attackData);
+            turnSpeed = currentWeapon.weaponData.turnSpeed;
+        }
+    }
+    private void InitializePerk()
     {
         if (meleeType == EnemyMeleeType.AxeThrow) {
             enemyVisuals.SetupWeaponType(Enemy_MeleeWeaponType.Throw);
@@ -113,6 +124,10 @@ public class Enemy_Melee : Enemy
             anim.SetFloat("ChaseIndex", 1);
             shieldTransform.gameObject.SetActive(true);
             enemyVisuals.SetupWeaponType(Enemy_MeleeWeaponType.OneHand);
+        }
+
+        if (meleeType == EnemyMeleeType.Dodge) {
+            enemyVisuals.SetupWeaponType(Enemy_MeleeWeaponType.Unarmed);
         }
     }
 
@@ -130,12 +145,6 @@ public class Enemy_Melee : Enemy
         enemyVisuals.currentWeaponModel.gameObject.SetActive(active);
     }
 
-    public bool IsPlayerInAttackRange()
-    {
-        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
-        return distanceToPlayer < attackData.attackRange;
-    }
-
 
     public void ActivateDodgeRoll()
     {
@@ -147,23 +156,10 @@ public class Enemy_Melee : Enemy
 
         float dodgeAnimationDuration = GetAnimationClipDuration("Dodge Roll");
 
-        if (Time.time > lastDodgeTime + dodgeAnimationDuration + dodgeCooldown) {
-            lastDodgeTime = Time.time;
+        if (Time.time > lastTimeDodge + dodgeAnimationDuration + dodgeCooldown) {
+            lastTimeDodge = Time.time;
             anim.SetTrigger("Dodge");
         }
-    }
-
-    private float GetAnimationClipDuration(string clipName)
-    {
-        AnimationClip[] clips = anim.runtimeAnimatorController.animationClips;
-
-        foreach (AnimationClip clip in clips) {
-            if (clip.name == clipName) {
-                return clip.length;
-            }
-        }
-        Debug.LogWarning(clipName + " Animation clip not found");
-        return 0;
     }
 
     public bool CanThrowAxe()
@@ -179,6 +175,29 @@ public class Enemy_Melee : Enemy
         return false;
     }
 
+    private void ResetCooldown()
+    {
+        lastTimeDodge -= dodgeCooldown;
+        lastTimeAxeThrown -= axeThrowCooldown;
+    }
+    private float GetAnimationClipDuration(string clipName)
+    {
+        AnimationClip[] clips = anim.runtimeAnimatorController.animationClips;
+
+        foreach (AnimationClip clip in clips) {
+            if (clip.name == clipName) {
+                return clip.length;
+            }
+        }
+        Debug.LogWarning(clipName + " Animation clip not found");
+        return 0;
+    }
+
+    public bool IsPlayerInAttackRange()
+    {
+        float distanceToPlayer = Vector3.Distance(transform.position, player.position);
+        return distanceToPlayer < attackData.attackRange;
+    }
 
     protected override void OnDrawGizmos()
     {

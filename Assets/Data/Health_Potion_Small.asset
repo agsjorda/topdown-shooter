@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2aeb1601490334aa4128fe10707e93, type: 3}
+  m_Name: Health_Potion_Small
+  m_EditorClassIdentifier: Assembly-CSharp::Item_DataSO
+  _itemId: e8236df51d424859be7f58422e9e0b43
+  itemName: health potion
+  icon: {fileID: 21300000, guid: 3c638adb5dfbbe64aa680b528ae4e2df, type: 3}
+  description: Smal Health Potion
+  stackable: 1
+  maxStack: 99

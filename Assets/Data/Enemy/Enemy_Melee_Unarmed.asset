@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d6fec701e4bf9f46bbf0c8b25b83937, type: 3}
+  m_Name: Enemy_Melee_Unarmed
+  m_EditorClassIdentifier: Assembly-CSharp::Enemy_MeleeWeaponData
+  attackData:
+  - attackName: Flying Kick
+    attackRange: 2
+    moveSpeed: 5
+    attackIndex: 0
+    annimationSpeed: 1
+    attackType: 1
+  - attackName: Boxing Attack
+    attackRange: 1
+    moveSpeed: 0
+    attackIndex: 1
+    annimationSpeed: 1.5
+    attackType: 0
+  turnSpeed: 10

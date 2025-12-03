@@ -14,6 +14,7 @@ public class ObjectPool : MonoBehaviour
     [Header("To Initialize")]
     [SerializeField] private GameObject weaponPickup;
     [SerializeField] private GameObject ammoPickup;
+    [SerializeField] private GameObject floatingText;
 
     private void Awake()
     {
@@ -28,6 +29,7 @@ public class ObjectPool : MonoBehaviour
     {
         InitializeNewPool(weaponPickup);
         InitializeNewPool(ammoPickup);
+        InitializeNewPool(floatingText);
     }
 
     // ───────────────────────────────
@@ -35,6 +37,11 @@ public class ObjectPool : MonoBehaviour
     // ───────────────────────────────
     public GameObject GetObject(GameObject prefab, bool autoActivate = true)
     {
+        if (prefab == null) {
+            Debug.LogWarning("ObjectPool.GetObject called with null prefab.");
+            return null;
+        }
+
         if (!poolDictionary.ContainsKey(prefab))
             InitializeNewPool(prefab);
 
@@ -43,11 +50,14 @@ public class ObjectPool : MonoBehaviour
 
         GameObject objectToGet = poolDictionary[prefab].Dequeue();
 
-        objectToGet.transform.parent = null;
+        // FIX: Use SetParent instead of .parent
+        objectToGet.transform.SetParent(null, true); // worldPositionStays = true when unparenting
         ResetPooledObjectState(objectToGet);
 
         if (autoActivate)
             objectToGet.SetActive(true);
+
+        Debug.Log($"ObjectPool: Dequeued '{objectToGet.name}' for prefab '{prefab.name}'. Remaining = {poolDictionary[prefab].Count}");
 
         return objectToGet;
     }
@@ -60,7 +70,8 @@ public class ObjectPool : MonoBehaviour
         GameObject obj = GetObject(prefab, false); // get inactive
 
         if (parent != null) {
-            obj.transform.SetParent(parent);
+            // FIX: Use SetParent with worldPositionStays = false for UI elements
+            obj.transform.SetParent(parent, false);
             obj.transform.localPosition = localPosition;
             obj.transform.localRotation = localRotation;
         } else {
@@ -71,7 +82,8 @@ public class ObjectPool : MonoBehaviour
         obj.SetActive(true);
 
         if (!keepParented && parent != null)
-            obj.transform.SetParent(null);
+            // FIX: Use SetParent with worldPositionStays = true when unparenting
+            obj.transform.SetParent(null, true);
 
         return obj;
     }
@@ -92,19 +104,33 @@ public class ObjectPool : MonoBehaviour
 
     private void ReturnToPool(GameObject objectToReturn)
     {
-        GameObject originalPrefab = objectToReturn.GetComponent<PooledObject>().originalPrefab;
+        var pooledComp = objectToReturn.GetComponent<PooledObject>();
+        if (pooledComp == null || pooledComp.originalPrefab == null) {
+            Debug.LogWarning($"ObjectPool: ReturnToPool received non-pooled object '{objectToReturn.name}', destroying.");
+            Destroy(objectToReturn);
+            return;
+        }
+
+        GameObject originalPrefab = pooledComp.originalPrefab;
 
         // reset physics
         var rb = objectToReturn.GetComponent<Rigidbody>();
         if (rb != null) {
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
-            rb.isKinematic = false; // ensure it's ready for reuse
+            rb.isKinematic = false;
         }
 
         objectToReturn.SetActive(false);
-        objectToReturn.transform.parent = transform;
+        // FIX: Use SetParent with worldPositionStays = false for UI elements
+        objectToReturn.transform.SetParent(transform, false);
+
+        if (!poolDictionary.ContainsKey(originalPrefab))
+            poolDictionary[originalPrefab] = new Queue<GameObject>();
+
         poolDictionary[originalPrefab].Enqueue(objectToReturn);
+
+        Debug.Log($"ObjectPool: Returned '{objectToReturn.name}' to pool for '{originalPrefab.name}'. New size = {poolDictionary[originalPrefab].Count}");
     }
 
     // ───────────────────────────────
@@ -112,18 +138,42 @@ public class ObjectPool : MonoBehaviour
     // ───────────────────────────────
     private void InitializeNewPool(GameObject prefab)
     {
-        poolDictionary[prefab] = new Queue<GameObject>();
+        if (prefab == null) {
+            Debug.LogWarning("InitializeNewPool called with null prefab, skipping.");
+            return;
+        }
+
+        if (!poolDictionary.ContainsKey(prefab))
+            poolDictionary[prefab] = new Queue<GameObject>();
+
         for (int i = 0; i < poolSize; i++) {
             CreateNewObject(prefab);
         }
+
+        Debug.Log($"ObjectPool: Initialized pool for '{prefab.name}' with {poolDictionary[prefab].Count} instances.");
     }
 
     private void CreateNewObject(GameObject prefab)
     {
+        if (prefab == null) return;
+
         GameObject newObject = Instantiate(prefab, transform);
-        newObject.AddComponent<PooledObject>().originalPrefab = prefab;
+        var pooled = newObject.AddComponent<PooledObject>();
+        pooled.originalPrefab = prefab;
         newObject.SetActive(false);
+
+        if (!poolDictionary.ContainsKey(prefab))
+            poolDictionary[prefab] = new Queue<GameObject>();
+
         poolDictionary[prefab].Enqueue(newObject);
+
+        //Debug.Log($"ObjectPool: Created pooled instance '{newObject.name}' for prefab '{prefab.name}'. Queue size = {poolDictionary[prefab].Count}");
+    }
+
+    public int GetPoolCount(GameObject prefab)
+    {
+        if (prefab == null) return 0;
+        return poolDictionary.ContainsKey(prefab) ? poolDictionary[prefab].Count : 0;
     }
 
     // ───────────────────────────────

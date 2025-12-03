@@ -35,7 +35,7 @@ public class MoveState_Melee : EnemyState
         //enemy.transform.rotation = enemy.FaceTarget(enemy.agent.steeringTarget);
         enemy.FaceTarget(GetNextPathPoint());
 
-        if (enemy.agent.remainingDistance <= enemy.agent.stoppingDistance + .5f)
+        if (enemy.agent.remainingDistance <= enemy.agent.stoppingDistance + .05f)
             stateMachine.ChangeState(enemy.idleState);
     }
 }

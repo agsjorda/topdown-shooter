@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum Enemy_MeleeWeaponType { OneHand, Throw }
+public enum Enemy_MeleeWeaponType { OneHand, Throw, Unarmed }
 public class Enemy_Visuals : MonoBehaviour
 {
     [Header("Weapon Visuals")]
@@ -18,11 +18,27 @@ public class Enemy_Visuals : MonoBehaviour
     [SerializeField] private Texture[] colorTextures;
     [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
 
-    private void Start()
+
+    private void Awake()
     {
         weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
+    }
+    private void Start()
+    {
+        // In case Awake wasn't enough (editor changes), refresh
+        if (weaponModels == null || weaponModels.Length == 0)
+            weaponModels = GetComponentsInChildren<Enemy_WeaponModel>(true);
+
         CollectCorruptionCrystals();
         corruptionAmount = Random.Range(2, 8);
+    }
+
+    public void EnableWeaponTrail(bool enable)
+    {
+        if (currentWeaponModel != null) {
+            Enemy_WeaponModel weaponModelComponent = currentWeaponModel.GetComponent<Enemy_WeaponModel>();
+            weaponModelComponent.EnableTrailEffects(enable);
+        }
     }
 
 
@@ -72,7 +88,18 @@ public class Enemy_Visuals : MonoBehaviour
         int randomIndex = Random.Range(0, filteredWeaponModels.Count);
         currentWeaponModel = filteredWeaponModels[randomIndex].gameObject;
         currentWeaponModel.SetActive(true);
+        OverrideAnimatorControllerIfAble();
     }
+
+    private void OverrideAnimatorControllerIfAble()
+    {
+        AnimatorOverrideController overrideController = currentWeaponModel.GetComponent<Enemy_WeaponModel>().overrideController;
+
+        if (overrideController != null) {
+            GetComponentInChildren<Animator>().runtimeAnimatorController = overrideController;
+        }
+    }
+
     private void SetupRandomColor()
     {
         int randomIndex = Random.Range(0, colorTextures.Length);

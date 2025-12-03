@@ -1,17 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using System.IO;
 using UnityEditor;
-using System.IO;
-using System;
+using UnityEngine;
 
 
 public class CelCustomEditor : MaterialEditor
 {
     float spacing = 20;
     string saveName = "Preset Name";
-    string celOutlinePath = "Custom/CelOutline";
-    string celNoOutlinePath = "Custom/Cel";
+    //string celOutlinePath = "Custom/CelOutline";
+    //string celNoOutlinePath = "Custom/Cel";
 
     void showProperty(string propertyName)
     {
@@ -30,8 +27,7 @@ public class CelCustomEditor : MaterialEditor
     {
         MaterialProperty property = GetMaterialProperty(targets, propertyName);
         ShaderProperty(property, property.displayName);
-        if (property.floatValue < 0)
-        {
+        if (property.floatValue < 0) {
             property.floatValue = 0;
         }
     }
@@ -41,25 +37,20 @@ public class CelCustomEditor : MaterialEditor
 
         //GUILayout.Space(spacing);
         EditorGUILayout.LabelField("Load Existing Preset", EditorStyles.boldLabel);
-        foreach (var path in Directory.GetFiles(FlexibleCelShader.PresetHelper.PresetDirectoryPath))
-        {
+        foreach (var path in Directory.GetFiles(FlexibleCelShader.PresetHelper.PresetDirectoryPath)) {
             string fileName = Path.GetFileName(path);
-            if (Path.GetExtension(fileName) == ".json")
-            {
+            if (Path.GetExtension(fileName) == ".json") {
                 string presetName = Path.GetFileNameWithoutExtension(fileName);
                 EditorGUILayout.BeginHorizontal();
-                if (GUILayout.Button(presetName))
-                {
+                if (GUILayout.Button(presetName)) {
                     MaterialProperty[] properties = GetMaterialProperties(targets);
                     properties = FlexibleCelShader.PresetHelper.LoadPreset(presetName, properties);
                 }
                 Color c = GUI.backgroundColor;
                 GUIStyle style = new GUIStyle(EditorStyles.miniButton);
                 style.normal.textColor = Color.red;
-                if (GUILayout.Button("Delete", style, GUILayout.Width(60)))
-                {
-                    if (EditorUtility.DisplayDialog("Delete " + presetName, "Are you sure you want to delete " + presetName + "? This cannot be undone.", "Delete", "Cancel"))
-                    {
+                if (GUILayout.Button("Delete", style, GUILayout.Width(60))) {
+                    if (EditorUtility.DisplayDialog("Delete " + presetName, "Are you sure you want to delete " + presetName + "? This cannot be undone.", "Delete", "Cancel")) {
                         FlexibleCelShader.PresetHelper.DeletePreset(presetName);
                     }
                 }
@@ -71,8 +62,7 @@ public class CelCustomEditor : MaterialEditor
         EditorGUILayout.LabelField("Save Current As New Preset", EditorStyles.boldLabel);
         EditorGUILayout.BeginHorizontal();
         saveName = GUILayout.TextField(saveName, GUILayout.ExpandWidth(true));
-        if (GUILayout.Button("Save", EditorStyles.miniButton, GUILayout.Width(60)))
-        {
+        if (GUILayout.Button("Save", EditorStyles.miniButton, GUILayout.Width(60))) {
             FlexibleCelShader.PresetHelper.SavePreset(saveName, GetMaterialProperties(targets));
             saveName = "Preset Name";
         }

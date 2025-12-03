@@ -15,17 +15,21 @@ public class AttackState_Melee : EnemyState
     public override void Enter()
     {
         base.Enter();
+        enemy.UpdateAttackData();
+        enemy.EnableWeaponModel(true);
+        enemy.enemyVisuals.EnableWeaponTrail(true);
+
+        attackMoveSpeed = enemy.attackData.moveSpeed;
+        enemy.anim.SetFloat("AttackAnimationSpeed", enemy.attackData.annimationSpeed);
+        enemy.anim.SetFloat("AttackIndex", enemy.attackData.attackIndex);
+        enemy.anim.SetFloat("SlashAttackIndex", Random.Range(0, 5));
 
         enemy.agent.isStopped = true;
         enemy.agent.velocity = Vector3.zero;
 
-        attackMoveSpeed = enemy.attackData.moveSpeed;
         attackDirection = enemy.transform.position + (enemy.transform.forward * MAX_ATTACK_DISTANCE);
 
-        enemy.anim.SetFloat("AttackAnimationSpeed", enemy.attackData.annimationSpeed);
-        enemy.anim.SetFloat("AttackIndex", enemy.attackData.attackIndex);
-        enemy.anim.SetFloat("SlashAttackIndex", Random.Range(0, 5));
-        enemy.EnableWeaponModel(true);
+
     }
 
     public override void Update()
@@ -52,11 +56,13 @@ public class AttackState_Melee : EnemyState
     {
         base.Exit();
         SetupNextAttack();
+
+        enemy.enemyVisuals.EnableWeaponTrail(false);
     }
 
     private void SetupNextAttack()
     {
-        int recoveryIndex = PlayerClose() ? 1 : 0;
+        int recoveryIndex = PlayerClose() ? 1 : Random.Range(0, 2);
 
         enemy.anim.SetFloat("RecoveryIndex", recoveryIndex);
         enemy.attackData = UpdatedAttackData();
@@ -65,9 +71,9 @@ public class AttackState_Melee : EnemyState
     private bool PlayerClose() => Vector3.Distance(enemy.transform.position, enemy.player.position) <= 1;
 
     //Create Random AttackData from enemy.attackList excluding Charge attack if player is close
-    private AttackData UpdatedAttackData()
+    private AttackData_EnemyMelee UpdatedAttackData()
     {
-        List<AttackData> validAttacks = new List<AttackData>(enemy.attackList);
+        List<AttackData_EnemyMelee> validAttacks = new List<AttackData_EnemyMelee>(enemy.attackList);
 
         if (PlayerClose()) {
             validAttacks.RemoveAll(attack => attack.attackType == AttackType_Melee.Charge);

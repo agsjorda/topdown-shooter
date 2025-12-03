@@ -5,6 +5,9 @@ using UnityEngine.AI;
 public class Enemy : MonoBehaviour
 {
     [SerializeField] protected int healthPoints = 25;
+    // Add a reference to the same FloatingText prefab used by the pool
+    [Header("VFX")]
+    [SerializeField] private GameObject damagePopup;
 
     [Header("Idle data")]
     public float idleTime;
@@ -47,6 +50,8 @@ public class Enemy : MonoBehaviour
 
     protected virtual void Update()
     {
+        if (ShouldEnterBattleMode())
+            EnterBattleMode();
     }
 
     protected bool ShouldEnterBattleMode()
@@ -69,6 +74,17 @@ public class Enemy : MonoBehaviour
     {
         EnterBattleMode();
         healthPoints--;
+
+        // Spawn a pooled floating text and show the damage
+        if (ObjectPool.instance != null && damagePopup != null) {
+            GameObject go = ObjectPool.instance.SpawnFromPool(damagePopup, null, transform.position + Vector3.up * 2f, Quaternion.identity);
+            if (go != null) {
+                var ft = go.GetComponent<FloatingText>() ?? go.GetComponentInChildren<FloatingText>();
+                ft?.Show("10"); // replace "10" with actual damage value
+            }
+        } else {
+            Debug.LogWarning("ObjectPool or floatingTextPrefab not assigned. Assign prefab on Enemy or in ObjectPool.");
+        }
     }
 
     public virtual void DeathImpact(Vector3 force, Vector3 impactPoint, Rigidbody rb)
