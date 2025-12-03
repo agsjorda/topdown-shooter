@@ -8,25 +8,11 @@ public class InventoryUIConfig : MonoBehaviour
     [Header("Target")]
     public UIDocument targetDocument;
 
-    [Header("Inventory Source")]
-    public Inventory_Base inventorySource;
-
-    #region Slots Properties
+    #region Slots Properties (Only size, count, and margin remain)
     [Header("Slot Layout")]
     [Range(40, 300)] public int slotSize = 100;
     [Range(1, 200)] public int slotCount = 30;
     [Range(0f, 50f)] public float cellMargin = 8f;
-
-    [Header("Slot Visuals")]
-    public bool slotUseBackground = false;
-    public Texture2D slotBackgroundTexture;
-    public Sprite slotBackgroundSprite;
-    public Color slotBackgroundTint = Color.white;
-    [Range(0f, 50f)] public float slotBorderRadius = 5f;
-
-    [Header("Slot Border Color")]
-    public bool useCustomBorderColor = false;
-    public Color slotBorderColor = new Color(248, 163, 46, 0.7f);
     #endregion
 
     #region Scroll Wrapper
@@ -35,15 +21,9 @@ public class InventoryUIConfig : MonoBehaviour
     public int scrollWidthPx = 0;
     public int scrollHeightPx = 350;
     public ScrollerVisibility verticalVisibility = ScrollerVisibility.Auto;
-
-    [Header("Wrapper Background")]
-    public bool wrapperUseBackground = false;
-    public Texture2D wrapperBackgroundTexture;
-    public Sprite wrapperBackgroundSprite;
-    public Color wrapperBackgroundTint = Color.white;
     #endregion
 
-    #region Tab Properties
+    #region Tab Properties (Tabs remain unchanged)
     [System.Serializable]
     public class TabDescriptor
     {
@@ -62,31 +42,32 @@ public class InventoryUIConfig : MonoBehaviour
     [Range(16, 512)] public int tabIconHeightPx = 0;
     #endregion
 
-    // cache for change detection
+    // Cache for change detection (only for size, count, margin)
     int _cSlotSize, _cSlotCount;
-    float _cCellMargin, _cBorderRadius;
-    bool _cUseBg, _cUseCustomBorder;
-    Color _cBgTint, _cBorderColor;
-    Texture2D _cBgTex;
-    Sprite _cBgSprite;
+    float _cCellMargin;
     int _cTabW, _cTabH, _cTabIconW, _cTabIconH;
 
-    // cached UI containers and slots
+    // Cached UI containers and slots
     VisualElement _tabContentContainer;
     InventoryScrollElement _scrollWrapper;
     VisualElement _slotsContainer;
 
-    // Store the actual created slots (match the type you instantiate below)
+    // Store the actual created slots
     private readonly List<BaseSlot> _createdSlots = new List<BaseSlot>();
 
-    // Expose read-only access so external controllers can use them
+    // Expose read-only access
     public IReadOnlyList<BaseSlot> Slots => _createdSlots;
     public int CreatedSlotCount => _createdSlots.Count;
     public BaseSlot GetSlot(int index) => (index >= 0 && index < _createdSlots.Count) ? _createdSlots[index] : null;
+
     public bool TryGetSlot(int index, out BaseSlot slot)
     {
-        if (index >= 0 && index < _createdSlots.Count) { slot = _createdSlots[index]; return true; }
-        slot = null; return false;
+        if (index >= 0 && index < _createdSlots.Count) {
+            slot = _createdSlots[index];
+            return true;
+        }
+        slot = null;
+        return false;
     }
 
     void Awake()
@@ -98,8 +79,6 @@ public class InventoryUIConfig : MonoBehaviour
     void OnEnable()
     {
         if (targetDocument == null) targetDocument = GetComponent<UIDocument>();
-
-        // No inventory event subscription here; controller owns data sync.
         CacheContainers();
         BuildOrUpdate();
         Cache();
@@ -124,7 +103,7 @@ public class InventoryUIConfig : MonoBehaviour
         }
     }
 
-    // Public entry point for external rebuilds (used by controller)
+    // Public entry point for external rebuilds
     public void RebuildUI()
     {
         CacheContainers();
@@ -138,13 +117,6 @@ public class InventoryUIConfig : MonoBehaviour
         return _cSlotSize != slotSize
             || _cSlotCount != slotCount
             || !Mathf.Approximately(_cCellMargin, cellMargin)
-            || !Mathf.Approximately(_cBorderRadius, slotBorderRadius)
-            || _cUseBg != slotUseBackground
-            || _cBgTex != slotBackgroundTexture
-            || _cBgSprite != slotBackgroundSprite
-            || _cBgTint != slotBackgroundTint
-            || _cUseCustomBorder != useCustomBorderColor
-            || _cBorderColor != slotBorderColor
             || _cTabW != tabWidthPx
             || _cTabH != tabHeightPx
             || _cTabIconW != tabIconWidthPx
@@ -156,13 +128,6 @@ public class InventoryUIConfig : MonoBehaviour
         _cSlotSize = slotSize;
         _cSlotCount = slotCount;
         _cCellMargin = cellMargin;
-        _cBorderRadius = slotBorderRadius;
-        _cUseBg = slotUseBackground;
-        _cBgTex = slotBackgroundTexture;
-        _cBgSprite = slotBackgroundSprite;
-        _cBgTint = slotBackgroundTint;
-        _cUseCustomBorder = useCustomBorderColor;
-        _cBorderColor = slotBorderColor;
         _cTabW = tabWidthPx;
         _cTabH = tabHeightPx;
         _cTabIconW = tabIconWidthPx;
@@ -188,7 +153,6 @@ public class InventoryUIConfig : MonoBehaviour
             : _tabContentContainer.Q<VisualElement>(className: "inventory-slots-container");
 
         if (_scrollWrapper != null) {
-            _scrollWrapper.SetBackground(wrapperBackgroundTexture, wrapperBackgroundSprite, wrapperBackgroundTint, wrapperUseBackground);
             _scrollWrapper.SetSize(scrollWidthPx, scrollHeightPx);
             _scrollWrapper.SetScrollerVisibility(verticalVisibility);
         }
@@ -247,43 +211,18 @@ public class InventoryUIConfig : MonoBehaviour
 
         _slotsContainer.Clear();
         _createdSlots.Clear();
-        _createdSlots.Capacity = slotCount; // optional pre-alloc
+        _createdSlots.Capacity = slotCount;
 
         for (int i = 0; i < slotCount; i++) {
-            // If you have a specialized slot, instantiate it instead of BaseSlot
             var slot = new BaseSlot();
             slot.SetSlotIndex(i);
             slot.SetSlotSize(slotSize);
             slot.SetCellMargin(cellMargin);
-
-            slot.ApplyBackground(
-                slotUseBackground,
-                slotBackgroundTexture,
-                slotBackgroundSprite,
-                slotBackgroundTint,
-                slotBorderRadius
-            );
-
-            ClearInlineBorderColors(slot);
-
-            if (useCustomBorderColor) {
-                var hoverColor = slotBorderColor;
-                slot.RegisterCallback<MouseEnterEvent>(_ => slot.SetStaticBorderColor(hoverColor));
-                slot.RegisterCallback<MouseLeaveEvent>(_ => ClearInlineBorderColors(slot));
-            }
 
             _slotsContainer.Add(slot);
             _createdSlots.Add(slot);
         }
 
         root.MarkDirtyRepaint();
-    }
-
-    static void ClearInlineBorderColors(VisualElement el)
-    {
-        el.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
-        el.style.borderRightColor = new StyleColor(StyleKeyword.Null);
-        el.style.borderTopColor = new StyleColor(StyleKeyword.Null);
-        el.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
     }
 }
