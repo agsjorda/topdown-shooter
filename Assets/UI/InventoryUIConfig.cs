@@ -8,22 +8,17 @@ public class InventoryUIConfig : MonoBehaviour
     [Header("Target")]
     public UIDocument targetDocument;
 
-    #region Slots Properties (Only size, count, and margin remain)
     [Header("Slot Layout")]
     [Range(40, 300)] public int slotSize = 100;
     [Range(1, 200)] public int slotCount = 30;
     [Range(0f, 50f)] public float cellMargin = 8f;
-    #endregion
 
-    #region Scroll Wrapper
     [Header("Scroll Wrapper")]
     public bool autoCreateScrollWrapper = true;
     public int scrollWidthPx = 0;
     public int scrollHeightPx = 350;
     public ScrollerVisibility verticalVisibility = ScrollerVisibility.Auto;
-    #endregion
 
-    #region Tab Properties (Tabs remain unchanged)
     [System.Serializable]
     public class TabDescriptor
     {
@@ -40,25 +35,23 @@ public class InventoryUIConfig : MonoBehaviour
     [Range(20, 400)] public int tabHeightPx = 0;
     [Range(16, 512)] public int tabIconWidthPx = 0;
     [Range(16, 512)] public int tabIconHeightPx = 0;
-    #endregion
 
-    // Cache for change detection (only for size, count, margin)
-    int _cSlotSize, _cSlotCount;
-    float _cCellMargin;
-    int _cTabW, _cTabH, _cTabIconW, _cTabIconH;
+    private int _cachedSlotSize, _cachedSlotCount;
+    private float _cachedCellMargin;
+    private int _cachedTabW, _cachedTabH, _cachedTabIconW, _cachedTabIconH;
 
-    // Cached UI containers and slots
-    VisualElement _tabContentContainer;
-    InventoryScrollElement _scrollWrapper;
-    VisualElement _slotsContainer;
-
-    // Store the actual created slots
+    private VisualElement _tabContentContainer;
+    private InventoryScrollElement _scrollWrapper;
+    private VisualElement _slotsContainer;
     private readonly List<BaseSlot> _createdSlots = new List<BaseSlot>();
 
-    // Expose read-only access
     public IReadOnlyList<BaseSlot> Slots => _createdSlots;
     public int CreatedSlotCount => _createdSlots.Count;
-    public BaseSlot GetSlot(int index) => (index >= 0 && index < _createdSlots.Count) ? _createdSlots[index] : null;
+
+    public BaseSlot GetSlot(int index)
+    {
+        return (index >= 0 && index < _createdSlots.Count) ? _createdSlots[index] : null;
+    }
 
     public bool TryGetSlot(int index, out BaseSlot slot)
     {
@@ -72,16 +65,15 @@ public class InventoryUIConfig : MonoBehaviour
 
     void Awake()
     {
-        if (targetDocument == null)
-            targetDocument = GetComponent<UIDocument>();
+        targetDocument ??= GetComponent<UIDocument>();
     }
 
     void OnEnable()
     {
-        if (targetDocument == null) targetDocument = GetComponent<UIDocument>();
+        targetDocument ??= GetComponent<UIDocument>();
         CacheContainers();
         BuildOrUpdate();
-        Cache();
+        CacheValues();
     }
 
     void OnValidate()
@@ -89,7 +81,7 @@ public class InventoryUIConfig : MonoBehaviour
         if (!Application.isPlaying) {
             CacheContainers();
             BuildOrUpdate();
-            Cache();
+            CacheValues();
         }
     }
 
@@ -97,78 +89,75 @@ public class InventoryUIConfig : MonoBehaviour
     {
         if (!Application.isPlaying) return;
 
-        if (HasChanged()) {
+        if (HasLayoutChanged()) {
             BuildOrUpdate();
-            Cache();
+            CacheValues();
         }
     }
 
-    // Public entry point for external rebuilds
     public void RebuildUI()
     {
         CacheContainers();
         BuildOrUpdate();
-        Cache();
+        CacheValues();
     }
 
-    #region Caching
-    bool HasChanged()
+    #region Private Methods
+    private bool HasLayoutChanged()
     {
-        return _cSlotSize != slotSize
-            || _cSlotCount != slotCount
-            || !Mathf.Approximately(_cCellMargin, cellMargin)
-            || _cTabW != tabWidthPx
-            || _cTabH != tabHeightPx
-            || _cTabIconW != tabIconWidthPx
-            || _cTabIconH != tabIconHeightPx;
+        return _cachedSlotSize != slotSize
+            || _cachedSlotCount != slotCount
+            || !Mathf.Approximately(_cachedCellMargin, cellMargin)
+            || _cachedTabW != tabWidthPx
+            || _cachedTabH != tabHeightPx
+            || _cachedTabIconW != tabIconWidthPx
+            || _cachedTabIconH != tabIconHeightPx;
     }
 
-    void Cache()
+    private void CacheValues()
     {
-        _cSlotSize = slotSize;
-        _cSlotCount = slotCount;
-        _cCellMargin = cellMargin;
-        _cTabW = tabWidthPx;
-        _cTabH = tabHeightPx;
-        _cTabIconW = tabIconWidthPx;
-        _cTabIconH = tabIconHeightPx;
+        _cachedSlotSize = slotSize;
+        _cachedSlotCount = slotCount;
+        _cachedCellMargin = cellMargin;
+        _cachedTabW = tabWidthPx;
+        _cachedTabH = tabHeightPx;
+        _cachedTabIconW = tabIconWidthPx;
+        _cachedTabIconH = tabIconHeightPx;
     }
 
-    void CacheContainers()
+    private void CacheContainers()
     {
-        var root = targetDocument != null ? targetDocument.rootVisualElement : null;
+        var root = targetDocument?.rootVisualElement;
         if (root == null) return;
 
-        _tabContentContainer = _tabContentContainer ?? root.Q<VisualElement>("tabContentContainer");
+        _tabContentContainer ??= root.Q<VisualElement>("tabContentContainer");
         if (_tabContentContainer == null) return;
 
-        _scrollWrapper = _scrollWrapper ?? _tabContentContainer.Q<InventoryScrollElement>();
+        _scrollWrapper ??= _tabContentContainer.Q<InventoryScrollElement>();
         if (autoCreateScrollWrapper && _scrollWrapper == null) {
             _scrollWrapper = new InventoryScrollElement();
             _tabContentContainer.Add(_scrollWrapper);
         }
 
-        _slotsContainer = _scrollWrapper != null
-            ? _scrollWrapper.SlotsContainer
-            : _tabContentContainer.Q<VisualElement>(className: "inventory-slots-container");
+        _slotsContainer = _scrollWrapper?.SlotsContainer
+            ?? _tabContentContainer.Q<VisualElement>(className: "inventory-slots-container");
 
         if (_scrollWrapper != null) {
             _scrollWrapper.SetSize(scrollWidthPx, scrollHeightPx);
             _scrollWrapper.SetScrollerVisibility(verticalVisibility);
         }
     }
-    #endregion
 
-    void BuildOrUpdate()
+    private void BuildOrUpdate()
     {
-        var root = targetDocument != null ? targetDocument.rootVisualElement : null;
+        var root = targetDocument?.rootVisualElement;
         if (root == null) return;
 
         BuildOrUpdateTabs(root);
         BuildOrUpdateSlots(root);
     }
 
-    void BuildOrUpdateTabs(VisualElement root)
+    private void BuildOrUpdateTabs(VisualElement root)
     {
         var tabButtonsContainer = root.Q<VisualElement>("tabButtonsContainer");
         if (tabButtonsContainer == null) return;
@@ -187,12 +176,14 @@ public class InventoryUIConfig : MonoBehaviour
             tab.SetActive(i == Mathf.Clamp(activeTabIndex, 0, Mathf.Max(0, tabs.Count - 1)));
 
             int capturedIndex = i;
-            tab.Clicked += _ => SetActiveTab(tabButtonsContainer, capturedIndex);
+            // FIXED: Check what Clicked event signature expects
+            // If it's Action<InventoryTabElement>, pass the tab parameter
+            tab.Clicked += (clickedTab) => SetActiveTab(tabButtonsContainer, capturedIndex);
             tabButtonsContainer.Add(tab);
         }
     }
 
-    void SetActiveTab(VisualElement tabButtonsContainer, int index)
+    private void SetActiveTab(VisualElement tabButtonsContainer, int index)
     {
         activeTabIndex = Mathf.Clamp(index, 0, Mathf.Max(0, tabs.Count - 1));
         int i = 0;
@@ -203,14 +194,16 @@ public class InventoryUIConfig : MonoBehaviour
         }
     }
 
-    void BuildOrUpdateSlots(VisualElement root)
+    private void BuildOrUpdateSlots(VisualElement root)
     {
         if (_tabContentContainer == null || _slotsContainer == null)
             CacheContainers();
+
         if (_slotsContainer == null) return;
 
         _slotsContainer.Clear();
         _createdSlots.Clear();
+
         _createdSlots.Capacity = slotCount;
 
         for (int i = 0; i < slotCount; i++) {
@@ -225,4 +218,5 @@ public class InventoryUIConfig : MonoBehaviour
 
         root.MarkDirtyRepaint();
     }
+    #endregion
 }

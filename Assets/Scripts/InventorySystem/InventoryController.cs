@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -12,13 +11,13 @@ public class InventoryController : MonoBehaviour
     [SerializeField] private Inventory_Base inventory;
     [SerializeField] private InventoryUIConfig ui;
 
-    public BaseSlot[] Slots;
+    public BaseSlot[] Slots { get; private set; }
     private IReadOnlyList<BaseSlot> slots;
 
     void Awake()
     {
-        if (inventory == null) inventory = Object.FindFirstObjectByType<Inventory_Base>();
-        if (ui == null) ui = Object.FindFirstObjectByType<InventoryUIConfig>();
+        inventory ??= FindObjectOfType<Inventory_Base>();
+        ui ??= FindObjectOfType<InventoryUIConfig>();
     }
 
     void OnEnable()
@@ -47,7 +46,12 @@ public class InventoryController : MonoBehaviour
 
         if (ui != null && ui.Slots != null) {
             slots = ui.Slots;
-            Slots = slots.ToArray();
+
+            // FIXED: IReadOnlyList doesn't have CopyTo, so convert to array properly
+            Slots = new BaseSlot[slots.Count];
+            for (int i = 0; i < slots.Count; i++) {
+                Slots[i] = slots[i];
+            }
         } else {
             Debug.LogError("UI Config or slots not found!");
             yield break;
@@ -56,25 +60,23 @@ public class InventoryController : MonoBehaviour
         SyncAllSlotsFromInventory();
     }
 
-    private void OnInventoryChanged()
-    {
-        SyncAllSlotsFromInventory();
-    }
+    private void OnInventoryChanged() => SyncAllSlotsFromInventory();
 
     private void SyncAllSlotsFromInventory()
     {
         if (slots == null || inventory == null) return;
 
-        // Clear all slots first
-        for (int i = 0; i < slots.Count; i++) {
+        // Clear only necessary slots
+        int slotsToClear = Mathf.Min(slots.Count, inventory.maxInventorySize);
+        for (int i = 0; i < slotsToClear; i++) {
             slots[i].ClearItem();
         }
 
-        // Fill slots with inventory items
-        int max = Mathf.Min(slots.Count, inventory.itemList.Count);
-        for (int i = 0; i < max; i++) {
+        // Fill slots with items
+        int itemsToDisplay = Mathf.Min(slots.Count, inventory.itemList.Count);
+        for (int i = 0; i < itemsToDisplay; i++) {
             var invItem = inventory.itemList[i];
-            if (invItem != null && invItem.itemData != null) {
+            if (invItem?.itemData != null) {
                 slots[i].SetItem(invItem);
             }
         }
