@@ -2891,7 +2891,7 @@ MonoBehaviour:
   autoCreateScrollWrapper: 1
   scrollWidthPx: 0
   scrollHeightPx: 0
-  verticalVisibility: 0
+  verticalVisibility: 2
   tabs:
   - id: all
     label: 

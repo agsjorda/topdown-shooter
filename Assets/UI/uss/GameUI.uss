@@ -226,16 +226,42 @@
     align-items: flex-start;
     padding: 10px;
     gap: 8px;
-    border: 10px solid rgb(102, 102, 102);
+    border-left-color: rgb(102, 102, 102);
+    border-right-color: rgb(102, 102, 102);
+    border-top-color: rgb(102, 102, 102);
+    border-bottom-color: rgb(102, 102, 102);
+    border-top-width: 10px;
+    border-right-width: 10px;
+    border-bottom-width: 10px;
+    border-left-width: 10px;
+    border-top-style: solid;
+    border-right-style: solid;
+    border-bottom-style: solid;
+    border-left-style: solid;
 }
 
+
+/* ===== EXISTING SLOT STYLES (Keep these) ===== */
 .inventorySlots {
     flex-shrink: 0;
+
     width: 250px;
     height: 250px;
+
     background-color: rgba(34, 34, 34, 0.4);
-    border: 5px solid rgb(102, 102, 102);
+
+    border-left-width: 5px;
+    border-right-width: 5px;
+    border-top-width: 5px;
+    border-bottom-width: 5px;
+
+    border-left-color: rgb(102, 102, 102);
+    border-right-color: rgb(102, 102, 102);
+    border-top-color: rgb(102, 102, 102);
+    border-bottom-color: rgb(102, 102, 102);
+
     border-radius: 5px;
+
     justify-content: center;
     align-items: center;
     display: flex;
@@ -247,49 +273,138 @@
     flex-grow: 1;
 }
 
-/* Ensure hover visuals are applied either by :hover or the code-toggled class */
-.inventorySlots:hover,
-.inventorySlots.inventorySlots--hover {
-    transform: scale(1.02);
-    transition-duration: 0.2s;
-    transition-timing-function: ease-in-out;
-    background-color: rgba(34, 34, 34, 0.7);
-    border-color: rgb(248, 163, 46);
+
+.inventorySlots:hover {
+    scale: 1.02 1.02 1.02;
+
+    border-left-color: rgb(248, 163, 46);
+    border-right-color: rgb(248, 163, 46);
+    border-top-color: rgb(248, 163, 46);
+    border-bottom-color: rgb(248, 163, 46);
+
     border-top-width: 2px;
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 2px;
+
+    background-color: rgba(34, 34, 34, 0.7);
 }
 
-/* For drag-and-drop visual feedback */
-/* .inventorySlots--dragging {
-    opacity: 0.3 !important; 
-    border-color: rgba(248, 163, 46, 0.5) !important;
+
+/* ============================
+   DRAG & DROP SLOT STATES
+   ============================ */
+
+/* Slot being dragged */
+.inventorySlots--dragging {
+    opacity: 0.3;
+    border-left-color: rgba(248, 163, 46, 0.5);
+    border-right-color: rgba(248, 163, 46, 0.5);
+    border-top-color: rgba(248, 163, 46, 0.5);
+    border-bottom-color: rgba(248, 163, 46, 0.5);
 }
 
+/* Empty slot you are hovering over */
+.inventorySlots--empty-highlight {
+    border-left-color: rgba(0, 255, 100, 0.5);
+    border-right-color: rgba(0, 255, 100, 0.5);
+    border-top-color: rgba(0, 255, 100, 0.5);
+    border-bottom-color: rgba(0, 255, 100, 0.5);
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    background-color: rgba(0, 50, 0, 0.2);
+}
+
+/* Valid drop target */
 .inventorySlots--drop-target {
-    border-color: rgb(0, 255, 100) !important; 
-    background-color: rgba(0, 50, 0, 0.3) !important;
-    transform: scale(1.03) !important; 
+    border-left-color: rgb(0, 255, 100);
+    border-right-color: rgb(0, 255, 100);
+    border-top-color: rgb(0, 255, 100);
+    border-bottom-color: rgb(0, 255, 100);
+    border-top-width: 4px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
+    border-left-width: 4px;
+    background-color: rgba(0, 50, 0, 0.3);
+    scale: 1.05 1.05;
 }
 
+/* Shared transitions - match your working example */
+.inventorySlots,
+.inventorySlots--dragging,
+.inventorySlots--empty-highlight,
+.inventorySlots--drop-target {
+    transition-property: 
+        background-color,
+        border-left-color,
+        border-right-color,
+        border-top-color,
+        border-bottom-color,
+        border-top-width,
+        border-right-width,
+        border-bottom-width,
+        border-left-width,
+        opacity,
+        scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-in-out;
+}
+
+/* ============================
+   DRAG GHOST ELEMENT
+   ============================ */
 
 .drag-ghost {
     position: absolute;
-    width: 250px; 
-    height: 250px; 
+    width: 128px;
+    height: 128px;
     visibility: hidden;
-    opacity: 0.8;
+    opacity: 0;
     pointer-events: none;
-    border: 2px solid rgba(248, 163, 46, 0.7);
-    border-radius: 5px;
+    
+    /* Individual border properties */
+    border-left-color: rgba(248, 163, 46, 0.7);
+    border-right-color: rgba(248, 163, 46, 0.7);
+    border-top-color: rgba(248, 163, 46, 0.7);
+    border-bottom-color: rgba(248, 163, 46, 0.7);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    
     background-color: rgba(34, 34, 34, 0.8);
-    z-index: 9999; 
+    z-index: 9999;
+    -unity-background-scale-mode: scale-to-fit;
+
+    transition-property: opacity, border-left-color, border-right-color, border-top-color, border-bottom-color, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
 }
 
-.drag-ghost .ghost-icon {
-    padding: 15px; 
-    width: 100%;
-    height: 100%;
-    object-fit: scale-down;
-} */
+.drag-ghost--visible {
+    visibility: visible;
+    opacity: 0.8;
+}
+
+.drag-ghost--over-empty {
+    border-left-color: rgba(0, 255, 100, 0.7);
+    border-right-color: rgba(0, 255, 100, 0.7);
+    border-top-color: rgba(0, 255, 100, 0.7);
+    border-bottom-color: rgba(0, 255, 100, 0.7);
+    scale: 1.1 1.1;
+}
+
+.drag-ghost--over-occupied {
+    border-left-color: rgba(255, 100, 100, 0.7);
+    border-right-color: rgba(255, 100, 100, 0.7);
+    border-top-color: rgba(255, 100, 100, 0.7);
+    border-bottom-color: rgba(255, 100, 100, 0.7);
+    scale: 1.05 1.05;
+}

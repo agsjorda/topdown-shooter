@@ -12,7 +12,7 @@ public class DragDropController : MonoBehaviour
     [Header("Drag Settings")]
     [SerializeField] private float dragThreshold = 5f;
     [SerializeField] private bool debugMode = true;
-    [SerializeField] private bool highlightEmptySlots = true; // Optional feature
+    [SerializeField] private bool highlightEmptySlots = true;
 
     // Drag state
     private bool isDragging = false;
@@ -46,7 +46,6 @@ public class DragDropController : MonoBehaviour
     {
         yield return null;
 
-        // Wait for inventory to initialize
         int maxWait = 60;
         int waited = 0;
         while ((inventoryController?.Slots == null) && waited < maxWait) {
@@ -60,10 +59,7 @@ public class DragDropController : MonoBehaviour
         }
 
         slots = new List<Slot>(inventoryController.Slots);
-
-        // Create drag ghost AFTER slots are available
         CreateDragGhost();
-
         RegisterSlotEvents();
 
         isInitialized = true;
@@ -83,29 +79,10 @@ public class DragDropController : MonoBehaviour
             existingGhost.RemoveFromHierarchy();
         }
 
-        // Create new ghost - SIMPLIFIED: no USS classes initially
+        // Create new ghost with USS classes only
         dragGhost = new VisualElement();
         dragGhost.name = "dragGhost";
-        dragGhost.style.position = Position.Absolute;
-        dragGhost.style.width = 250;
-        dragGhost.style.height = 250;
-        dragGhost.style.visibility = Visibility.Hidden;
-        dragGhost.style.opacity = 0.8f;
-        // dragGhost.style.borderWidth = 2;
-        dragGhost.style.borderTopWidth = 2;
-        dragGhost.style.borderRightWidth = 2;
-        dragGhost.style.borderBottomWidth = 2;
-        dragGhost.style.borderLeftWidth = 2;
-        // dragGhost.style.borderColor = new Color(0.97f, 0.64f, 0.18f, 0.7f);
-        dragGhost.style.borderTopColor = new Color(0.97f, 0.64f, 0.18f, 0.7f);
-        dragGhost.style.borderRightColor = new Color(0.97f, 0.64f, 0.18f, 0.7f);
-        dragGhost.style.borderBottomColor = new Color(0.97f, 0.64f, 0.18f, 0.7f);
-        dragGhost.style.borderLeftColor = new Color(0.97f, 0.64f, 0.18f, 0.7f);
-        dragGhost.style.borderTopLeftRadius = 5;
-        dragGhost.style.borderTopRightRadius = 5;
-        dragGhost.style.borderBottomLeftRadius = 5;
-        dragGhost.style.borderBottomRightRadius = 5;
-        dragGhost.style.backgroundColor = new Color(0.13f, 0.13f, 0.13f, 0.8f);
+        dragGhost.AddToClassList("drag-ghost");
         dragGhost.pickingMode = PickingMode.Ignore;
 
         root.Add(dragGhost);
@@ -117,12 +94,10 @@ public class DragDropController : MonoBehaviour
 
         foreach (var slot in slots) {
             if (slot != null) {
-                // Clear existing events first
                 slot.UnregisterCallback<PointerDownEvent>(OnSlotPointerDown);
                 slot.UnregisterCallback<PointerMoveEvent>(OnSlotPointerMove);
                 slot.UnregisterCallback<PointerUpEvent>(OnSlotPointerUp);
 
-                // Register events
                 slot.RegisterCallback<PointerDownEvent>(OnSlotPointerDown);
                 slot.RegisterCallback<PointerMoveEvent>(OnSlotPointerMove);
                 slot.RegisterCallback<PointerUpEvent>(OnSlotPointerUp);
@@ -142,7 +117,6 @@ public class DragDropController : MonoBehaviour
             }
         }
 
-        // Remove ghost
         if (dragGhost != null && dragGhost.parent != null) {
             dragGhost.RemoveFromHierarchy();
             dragGhost = null;
@@ -214,9 +188,8 @@ public class DragDropController : MonoBehaviour
 
         if (debugMode) Debug.Log($"Starting drag from slot {draggedSlot.SlotIndex}");
 
-        // Show ghost
+        // Show ghost with USS class
         if (dragGhost != null && draggedSlot.Icon != null) {
-            // Get texture
             Texture2D texture = null;
             if (draggedSlot.Icon.image != null)
                 texture = draggedSlot.Icon.image as Texture2D;
@@ -225,12 +198,11 @@ public class DragDropController : MonoBehaviour
 
             if (texture != null) {
                 dragGhost.style.backgroundImage = new StyleBackground(texture);
-                dragGhost.style.unityBackgroundScaleMode = ScaleMode.ScaleToFit;
-                dragGhost.style.visibility = Visibility.Visible;
+                dragGhost.AddToClassList("drag-ghost--visible");
                 dragGhost.BringToFront();
 
-                // Fade original icon
-                draggedSlot.Icon.style.opacity = 0.3f;
+                // Add dragging class to original slot
+                draggedSlot.AddToClassList("inventorySlots--dragging");
 
                 // Optional: Highlight empty slots
                 if (highlightEmptySlots) {
@@ -238,48 +210,28 @@ public class DragDropController : MonoBehaviour
                 }
 
                 UpdateDragPosition(position);
-
-                if (debugMode) Debug.Log($"Ghost visible with texture: {texture.name}");
             }
         }
     }
 
-    // Optional: Highlight empty slots during drag
     private void HighlightEmptySlots()
     {
         if (slots == null) return;
 
         foreach (var slot in slots) {
             if (slot != null && slot != draggedSlot && !slot.HasItem) {
-                // Add visual indicator for empty slots
-                slot.style.borderTopColor = new Color(0, 1, 0, 0.5f);
-                slot.style.borderRightColor = new Color(0, 1, 0, 0.5f);
-                slot.style.borderBottomColor = new Color(0, 1, 0, 0.5f);
-                slot.style.borderLeftColor = new Color(0, 1, 0, 0.5f);
-                slot.style.borderTopWidth = 3;
-                slot.style.borderRightWidth = 3;
-                slot.style.borderBottomWidth = 3;
-                slot.style.borderLeftWidth = 3;
+                slot.AddToClassList("inventorySlots--empty-highlight");
             }
         }
     }
 
-    // Optional: Remove empty slot highlighting
     private void RemoveEmptySlotHighlighting()
     {
         if (slots == null) return;
 
         foreach (var slot in slots) {
             if (slot != null) {
-                // Reset border to default (let USS handle it)
-                slot.style.borderTopColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderRightColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderBottomColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderLeftColor = new StyleColor(StyleKeyword.Null);
-                slot.style.borderTopWidth = new StyleFloat(StyleKeyword.Null);
-                slot.style.borderRightWidth = new StyleFloat(StyleKeyword.Null);
-                slot.style.borderBottomWidth = new StyleFloat(StyleKeyword.Null);
-                slot.style.borderLeftWidth = new StyleFloat(StyleKeyword.Null);
+                slot.RemoveFromClassList("inventorySlots--empty-highlight");
             }
         }
     }
@@ -287,13 +239,26 @@ public class DragDropController : MonoBehaviour
     private void UpdateDragPosition(Vector2 position)
     {
         if (dragGhost != null) {
-            // Center the ghost on cursor (half of 250px slot size)
-            dragGhost.style.left = position.x - 125f;
-            dragGhost.style.top = position.y - 125f;
+            dragGhost.style.left = position.x - (dragGhost.resolvedStyle.width / 2);
+            dragGhost.style.top = position.y - (dragGhost.resolvedStyle.height / 2);
+
+            // Optional: Change ghost style based on what's under cursor
+            Slot target = FindDropTarget(position);
+            if (target != null) {
+                if (target.HasItem) {
+                    dragGhost.RemoveFromClassList("drag-ghost--over-empty");
+                    dragGhost.AddToClassList("drag-ghost--over-occupied");
+                } else {
+                    dragGhost.RemoveFromClassList("drag-ghost--over-occupied");
+                    dragGhost.AddToClassList("drag-ghost--over-empty");
+                }
+            } else {
+                dragGhost.RemoveFromClassList("drag-ghost--over-empty");
+                dragGhost.RemoveFromClassList("drag-ghost--over-occupied");
+            }
         }
     }
 
-    // METHOD 1: RECOMMENDED - Simple and clean
     private void HandleDrop(Vector2 dropPosition)
     {
         if (draggedSlot == null || inventoryController == null) return;
@@ -306,8 +271,11 @@ public class DragDropController : MonoBehaviour
                 Debug.Log($"Dropping from slot {draggedSlot.SlotIndex} to slot {targetSlot.SlotIndex} ({action})");
             }
 
-            // BEST APPROACH: Always use MoveItem - let inventory handle the logic
-            inventoryController.MoveItem(draggedSlot.SlotIndex, targetSlot.SlotIndex);
+            // Add drop target highlight briefly
+            targetSlot.AddToClassList("inventorySlots--drop-target");
+
+            // Wait one frame for visual feedback, then move
+            StartCoroutine(DelayedMoveItem(draggedSlot.SlotIndex, targetSlot.SlotIndex, targetSlot));
         } else if (targetSlot == draggedSlot) {
             if (debugMode) Debug.Log("Dropped back on original slot - cancelled");
         } else {
@@ -315,38 +283,16 @@ public class DragDropController : MonoBehaviour
         }
     }
 
-    /*
-    // METHOD 2: Alternative - Explicit swap vs move (more code)
-    private void HandleDrop(Vector2 dropPosition)
+    private System.Collections.IEnumerator DelayedMoveItem(int fromIndex, int toIndex, Slot targetSlot)
     {
-        if (draggedSlot == null || inventoryController == null) return;
-        
-        Slot targetSlot = FindDropTarget(dropPosition);
-        
-        if (targetSlot != null && targetSlot != draggedSlot)
-        {
-            if (debugMode) Debug.Log($"Dropping from slot {draggedSlot.SlotIndex} to slot {targetSlot.SlotIndex}");
-            
-            // Check if target slot has an item
-            if (targetSlot.HasItem)
-            {
-                // Swap items
-                if (debugMode) Debug.Log("Swapping items between slots");
-                inventoryController.SwapSlots(draggedSlot.SlotIndex, targetSlot.SlotIndex);
-            }
-            else
-            {
-                // Move to empty slot
-                if (debugMode) Debug.Log("Moving item to empty slot");
-                inventoryController.MoveItem(draggedSlot.SlotIndex, targetSlot.SlotIndex);
-            }
-        }
-        else
-        {
-            if (debugMode) Debug.Log("Dropped outside valid target - cancelled");
+        yield return null; // Wait one frame for visual feedback
+        inventoryController.MoveItem(fromIndex, toIndex);
+
+        // Remove highlight after move
+        if (targetSlot != null) {
+            targetSlot.RemoveFromClassList("inventorySlots--drop-target");
         }
     }
-    */
 
     private Slot FindDropTarget(Vector2 position)
     {
@@ -355,7 +301,6 @@ public class DragDropController : MonoBehaviour
         foreach (var slot in slots) {
             if (slot != null && slot != draggedSlot) {
                 var bounds = slot.worldBound;
-                // Add a little padding for easier dropping
                 var paddedBounds = new Rect(
                     bounds.x - 10,
                     bounds.y - 10,
@@ -373,19 +318,19 @@ public class DragDropController : MonoBehaviour
 
     private void ResetDrag()
     {
-        // Restore original icon opacity
-        if (draggedSlot != null && draggedSlot.Icon != null) {
-            draggedSlot.Icon.style.opacity = 1f;
+        // Remove dragging class from original slot
+        if (draggedSlot != null) {
+            draggedSlot.RemoveFromClassList("inventorySlots--dragging");
         }
 
-        // Optional: Remove empty slot highlighting
+        // Remove empty slot highlighting
         if (highlightEmptySlots) {
             RemoveEmptySlotHighlighting();
         }
 
-        // Hide ghost
+        // Hide ghost by removing visible class
         if (dragGhost != null) {
-            dragGhost.style.visibility = Visibility.Hidden;
+            dragGhost.RemoveFromClassList("drag-ghost--visible");
             dragGhost.style.backgroundImage = null;
         }
 
@@ -396,9 +341,6 @@ public class DragDropController : MonoBehaviour
         if (debugMode) Debug.Log("Drag reset");
     }
 
-    // Public method to check if currently dragging (for other scripts)
     public bool IsDragging() => isDragging;
-
-    // Public method to get currently dragged slot (for other scripts)
     public Slot GetDraggedSlot() => draggedSlot;
 }
