@@ -29,15 +29,23 @@ public partial class Slot : VisualElement
 
     public int SlotIndex { get; private set; }
     public bool HasItem => _hasItem;
-    public string ItemId => _itemId; // Public getter for GUID
+    public string ItemId => _itemId;
 
     protected int slotSize = 100;
     protected float cellMargin = 8f;
 
+    // REMOVED: Event for drag start - we'll handle it differently
+    // public event Action<Vector2, Slot> OnBeginDrag;
+
     public Slot()
     {
         AddToClassList("inventorySlots");
+        focusable = true;
+        pickingMode = PickingMode.Position;
     }
+
+    // REMOVED: Method to trigger drag
+    // public void BeginDrag(Vector2 position) { }
 
     public virtual void SetItem(Inventory_Item item, int qty = 1)
     {
@@ -47,7 +55,7 @@ public partial class Slot : VisualElement
         }
 
         _hasItem = true;
-        _itemId = item.itemData.itemId ?? string.Empty; // Store the GUID
+        _itemId = item.itemData.itemId ?? string.Empty;
 
         if (item.itemData.icon != null) {
             if (Icon.image != item.itemData.icon.texture) {
@@ -66,7 +74,7 @@ public partial class Slot : VisualElement
     public virtual void ClearItem()
     {
         _hasItem = false;
-        _itemId = string.Empty; // Clear the GUID
+        _itemId = string.Empty;
 
         if (Icon.image != null) {
             Icon.image = null;
@@ -78,14 +86,8 @@ public partial class Slot : VisualElement
         }
     }
 
-    // Optional: Method to check if this slot contains a specific item
-    public bool ContainsItem(string itemId)
-    {
-        return _hasItem && !string.IsNullOrEmpty(_itemId) && _itemId == itemId;
-    }
-
-    // Optional: Method to check if slot is empty
-    public bool IsEmpty() => !_hasItem || string.IsNullOrEmpty(_itemId);
+    // REMOVED: Visual feedback during drag (handled in DragDropController)
+    // public void SetDragState(bool isDragging) { }
 
     public virtual void SetSlotIndex(int index) => SlotIndex = index;
 

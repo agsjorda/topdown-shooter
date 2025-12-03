@@ -119,47 +119,6 @@
 }
 
 
-.inventory-slots-container {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: space-around;
-    align-items: flex-start;
-    padding: 10px;
-    gap: 8px;
-    border: 10px solid rgb(102, 102, 102);
-}
-
-.inventorySlots {
-    flex-shrink: 0;
-    width: 250px;
-    height: 250px;
-    background-color: rgba(34, 34, 34, 0.4);
-    border: 5px solid rgb(102, 102, 102);
-    border-radius: 5px;
-    justify-content: center;
-    align-items: center;
-    display: flex;
-}
-
-.inventorySlots-icon {
-    padding: 15px;
-    flex-shrink: 0;
-    flex-grow: 1;
-}
-
-/* Ensure hover visuals are applied either by :hover or the code-toggled class */
-.inventorySlots:hover,
-.inventorySlots.inventorySlots--hover {
-    transform: scale(1.02);
-    transition-duration: 0.2s;
-    transition-timing-function: ease-in-out;
-    background-color: rgba(34, 34, 34, 0.7);
-    border-color: rgb(248, 163, 46);
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-}
 
 .inventoryTab {
     background-color: rgba(0, 0, 0, 0);
@@ -258,14 +217,79 @@
 .equipSlot-icon:hover {
     scale: 0.9 0.9;
 }
-/* Drag & Drop Styles */
-.inventorySlots.dragging {
-    opacity: 0.5;
-    cursor: grabbing;
+
+/* ------------Inventory Slots Styling------------- */
+.inventory-slots-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 10px;
+    gap: 8px;
+    border: 10px solid rgb(102, 102, 102);
 }
 
-.inventorySlots.drop-target {
-    border-color: #4CAF50 ;
-    border-width: 3px ;
-    background-color: rgba(76, 175, 80, 0.1);
+.inventorySlots {
+    flex-shrink: 0;
+    width: 250px;
+    height: 250px;
+    background-color: rgba(34, 34, 34, 0.4);
+    border: 5px solid rgb(102, 102, 102);
+    border-radius: 5px;
+    justify-content: center;
+    align-items: center;
+    display: flex;
 }
+
+.inventorySlots-icon {
+    padding: 15px;
+    flex-shrink: 0;
+    flex-grow: 1;
+}
+
+/* Ensure hover visuals are applied either by :hover or the code-toggled class */
+.inventorySlots:hover,
+.inventorySlots.inventorySlots--hover {
+    transform: scale(1.02);
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+    background-color: rgba(34, 34, 34, 0.7);
+    border-color: rgb(248, 163, 46);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+}
+
+/* For drag-and-drop visual feedback */
+/* .inventorySlots--dragging {
+    opacity: 0.3 !important; 
+    border-color: rgba(248, 163, 46, 0.5) !important;
+}
+
+.inventorySlots--drop-target {
+    border-color: rgb(0, 255, 100) !important; 
+    background-color: rgba(0, 50, 0, 0.3) !important;
+    transform: scale(1.03) !important; 
+}
+
+
+.drag-ghost {
+    position: absolute;
+    width: 250px; 
+    height: 250px; 
+    visibility: hidden;
+    opacity: 0.8;
+    pointer-events: none;
+    border: 2px solid rgba(248, 163, 46, 0.7);
+    border-radius: 5px;
+    background-color: rgba(34, 34, 34, 0.8);
+    z-index: 9999; 
+}
+
+.drag-ghost .ghost-icon {
+    padding: 15px; 
+    width: 100%;
+    height: 100%;
+    object-fit: scale-down;
+} */

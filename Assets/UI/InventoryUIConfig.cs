@@ -45,7 +45,7 @@ public class InventoryUIConfig : MonoBehaviour
     private VisualElement _slotsContainer;
     private readonly List<Slot> _createdSlots = new List<Slot>();
 
-    public IReadOnlyList<Slot> Slots => _createdSlots;
+    public List<Slot> Slots => _createdSlots;
     public int CreatedSlotCount => _createdSlots.Count;
 
     public Slot GetSlot(int index)
