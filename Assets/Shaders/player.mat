@@ -21,7 +21,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: player
-  m_Shader: {fileID: 4800000, guid: 1100a21ca5134304c8d0e9e437be6d47, type: 3}
+  m_Shader: {fileID: 4800000, guid: 0f05cf78516b0454f8ffde8c7136e13b, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -59,6 +59,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _BlurAmount: 2
     - _ColorMask: 15
     - _Culling: 2
     - _Max: 1
@@ -77,6 +78,6 @@ Material:
     - _ZTest: 4
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 0.12156863}
+    - _Color: {r: 2, g: 2, b: 2, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

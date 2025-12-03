@@ -23,7 +23,7 @@ public class PlayerAim : MonoBehaviour
     [Range(0.5f, 3f)]
     [SerializeField] private float maxCameraDistance = 1.6f;
     [Range(1f, 10f)]
-    [SerializeField] private float cameraSensitivity = 3f;
+    //[SerializeField] private float cameraSensitivity = 3f;
 
     [Tooltip("Smooth time used by SmoothDamp. Lower = snappier following.")] //remove if change update camera position to Lerp
     [SerializeField] private float cameraFollowSmoothTime = 0.12f; //remove if change update camera position to Lerp

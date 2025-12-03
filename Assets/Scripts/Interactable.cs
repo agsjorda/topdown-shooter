@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class Interactable : MonoBehaviour
 {
-    protected PlayerWeaponController weaponController;
-
     protected MeshRenderer mesh;
     [SerializeField] private Material highlightMaterial;
     protected Material defaultMaterial;
@@ -13,7 +11,8 @@ public class Interactable : MonoBehaviour
         if (mesh == null)
             mesh = GetComponentInChildren<MeshRenderer>();
 
-        defaultMaterial = mesh.sharedMaterial;
+        if (mesh != null)
+            defaultMaterial = mesh.sharedMaterial;
     }
 
     protected void UpdateMeshAndMaterial(MeshRenderer newMesh)
@@ -29,6 +28,8 @@ public class Interactable : MonoBehaviour
 
     public void HighlightActive(bool active)
     {
+        if (mesh == null) return;
+
         if (active)
             mesh.material = highlightMaterial;
         else
@@ -37,9 +38,6 @@ public class Interactable : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        if (weaponController == null)
-            weaponController = other.GetComponent<PlayerWeaponController>();
-
         PlayerInteraction playerInteraction = other.GetComponent<PlayerInteraction>();
 
         if (playerInteraction == null)

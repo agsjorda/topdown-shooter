@@ -16,11 +16,11 @@ TagManager:
   - Player
   - Bullet
   - Aim
+  - FOVMask
   - Enemy
-  - 
-  - 
-  - 
-  - 
+  - minimapRender
+  - Enemy_Bullet
+  - PlayerPreview
   - 
   - 
   - 
