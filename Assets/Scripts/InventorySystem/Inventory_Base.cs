@@ -23,8 +23,55 @@ public class Inventory_Base : MonoBehaviour
             return;
         }
 
-        itemList.Add(itemToAdd);
+        // Find the first empty slot
+        int emptySlotIndex = FindFirstEmptySlot();
+
+        if (emptySlotIndex >= 0) {
+            // Insert at the first empty slot
+            InsertAtSlot(emptySlotIndex, itemToAdd);
+        } else {
+            // No empty slots found, add to the end
+            itemList.Add(itemToAdd);
+        }
+
         NotifyInventoryChanged();
+        Debug.Log($"Added item to slot {emptySlotIndex}: {itemToAdd.itemData.itemName}");
+    }
+
+    // NEW: Find first empty slot (null or beyond list)
+    private int FindFirstEmptySlot()
+    {
+        // Check existing slots for null (empty)
+        for (int i = 0; i < itemList.Count; i++) {
+            if (itemList[i] == null) {
+                return i;
+            }
+        }
+
+        // If no null slots but we have space, return the next index
+        if (itemList.Count < maxInventorySize) {
+            return itemList.Count;
+        }
+
+        // No empty slots available
+        return -1;
+    }
+
+    // NEW: Insert item at specific slot
+    private void InsertAtSlot(int slotIndex, Inventory_Item item)
+    {
+        if (slotIndex < 0 || slotIndex >= maxInventorySize) {
+            Debug.LogError($"Invalid slot index: {slotIndex}");
+            return;
+        }
+
+        // If slot is beyond current list size, expand list
+        while (itemList.Count <= slotIndex) {
+            itemList.Add(null);
+        }
+
+        // Place item at the slot
+        itemList[slotIndex] = item;
     }
 
     public void SwapItems(int indexA, int indexB)
@@ -39,107 +86,7 @@ public class Inventory_Base : MonoBehaviour
         NotifyInventoryChanged();
     }
 
-    // FIXED VERSION: Proper move that doesn't shift other items
-    public void MoveItem(int fromIndex, int toIndex)
-    {
-        if (itemList == null || fromIndex == toIndex) return;
-
-        // Validate indices
-        if (fromIndex < 0 || fromIndex >= itemList.Count) {
-            Debug.LogError($"Invalid fromIndex: {fromIndex}, itemList count: {itemList.Count}");
-            return;
-        }
-
-        if (toIndex < 0 || toIndex >= maxInventorySize) {
-            Debug.LogError($"Invalid toIndex: {toIndex}, maxInventorySize: {maxInventorySize}");
-            return;
-        }
-
-        Debug.Log($"Moving item from {fromIndex} to {toIndex}");
-
-        // Get the item to move
-        var itemToMove = itemList[fromIndex];
-
-        // If target slot is beyond current list size, we need to expand the list
-        if (toIndex >= itemList.Count) {
-            // Expand list with nulls up to the target index
-            while (itemList.Count <= toIndex) {
-                itemList.Add(null);
-            }
-
-            // Remove from original position
-            itemList.RemoveAt(fromIndex);
-
-            // Insert null at original position to maintain positions
-            if (fromIndex < itemList.Count) {
-                itemList.Insert(fromIndex, null);
-            }
-
-            // Place item at target position
-            itemList[toIndex] = itemToMove;
-        } else {
-            // Target position is within current list bounds
-            // Check if target slot is empty
-            if (itemList[toIndex] == null) {
-                // Target is empty - just move item there
-                itemList[fromIndex] = null;
-                itemList[toIndex] = itemToMove;
-            } else {
-                // Target has item - swap them
-                (itemList[fromIndex], itemList[toIndex]) = (itemList[toIndex], itemList[fromIndex]);
-            }
-        }
-
-        // Clean up trailing nulls (optional - keeps list compact)
-        RemoveTrailingNulls();
-
-        NotifyInventoryChanged();
-
-        Debug.Log($"Move completed. List count: {itemList.Count}");
-    }
-
-    // Helper method to remove null entries at the end
-    private void RemoveTrailingNulls()
-    {
-        for (int i = itemList.Count - 1; i >= 0; i--) {
-            if (itemList[i] == null)
-                itemList.RemoveAt(i);
-            else
-                break; // Stop when we find a non-null item
-        }
-    }
-
-    // NEW: Alternative method that maintains exact slot positions
-    public void MoveItemToEmptySlot(int fromIndex, int toIndex)
-    {
-        if (itemList == null || fromIndex == toIndex) return;
-
-        if (fromIndex < 0 || fromIndex >= itemList.Count) return;
-        if (toIndex < 0 || toIndex >= maxInventorySize) return;
-
-        // Ensure list is large enough
-        while (itemList.Count <= toIndex) {
-            itemList.Add(null);
-        }
-
-        var itemToMove = itemList[fromIndex];
-
-        // Check if target is actually empty
-        if (itemList[toIndex] != null) {
-            Debug.LogWarning($"Target slot {toIndex} is not empty! Using swap instead.");
-            SwapItems(fromIndex, toIndex);
-            return;
-        }
-
-        // Move item
-        itemList[fromIndex] = null;
-        itemList[toIndex] = itemToMove;
-
-        NotifyInventoryChanged();
-        Debug.Log($"Moved item from {fromIndex} to empty slot {toIndex}");
-    }
-
-    // NEW: Smart move that handles all cases correctly
+    // Keep your existing SmartMoveItem method
     public void SmartMoveItem(int fromIndex, int toIndex)
     {
         if (itemList == null || fromIndex == toIndex) return;
