@@ -1,84 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 [DisallowMultipleComponent]
 public class InventoryController : MonoBehaviour
 {
-    [Header("References")]
-    [SerializeField] private UIDocument targetDocument;
     [SerializeField] private Inventory_Base inventory;
     [SerializeField] private InventoryUIConfig ui;
 
-    public BaseSlot[] Slots { get; private set; }
-    private IReadOnlyList<BaseSlot> slots;
-
-    void Awake()
-    {
-        inventory ??= FindObjectOfType<Inventory_Base>();
-        ui ??= FindObjectOfType<InventoryUIConfig>();
-    }
+    public IReadOnlyList<Slot> Slots => ui?.Slots; // Expose slots for drag controller
 
     void OnEnable()
     {
-        if (ui != null) {
-            ui.RebuildUI();
-        }
-
-        StartCoroutine(InitSlots());
-
-        if (inventory != null) {
-            inventory.OnInventoryChanged -= OnInventoryChanged;
-            inventory.OnInventoryChanged += OnInventoryChanged;
-        }
+        StartCoroutine(Initialize());
     }
 
     void OnDisable()
     {
         if (inventory != null)
-            inventory.OnInventoryChanged -= OnInventoryChanged;
+            inventory.OnInventoryChanged -= SyncInventory;
     }
 
-    private IEnumerator InitSlots()
+    private IEnumerator Initialize()
     {
         yield return null;
 
-        if (ui != null && ui.Slots != null) {
-            slots = ui.Slots;
+        if (ui == null || inventory == null) yield break;
 
-            // FIXED: IReadOnlyList doesn't have CopyTo, so convert to array properly
-            Slots = new BaseSlot[slots.Count];
-            for (int i = 0; i < slots.Count; i++) {
-                Slots[i] = slots[i];
-            }
-        } else {
-            Debug.LogError("UI Config or slots not found!");
-            yield break;
-        }
-
-        SyncAllSlotsFromInventory();
+        inventory.OnInventoryChanged -= SyncInventory;
+        inventory.OnInventoryChanged += SyncInventory;
+        SyncInventory();
     }
 
-    private void OnInventoryChanged() => SyncAllSlotsFromInventory();
-
-    private void SyncAllSlotsFromInventory()
+    private void SyncInventory()
     {
-        if (slots == null || inventory == null) return;
+        if (ui?.Slots == null || inventory?.itemList == null) return;
 
-        // Clear only necessary slots
-        int slotsToClear = Mathf.Min(slots.Count, inventory.maxInventorySize);
-        for (int i = 0; i < slotsToClear; i++) {
+        var slots = ui.Slots;
+        for (int i = 0; i < slots.Count; i++)
             slots[i].ClearItem();
-        }
 
-        // Fill slots with items
-        int itemsToDisplay = Mathf.Min(slots.Count, inventory.itemList.Count);
-        for (int i = 0; i < itemsToDisplay; i++) {
-            var invItem = inventory.itemList[i];
-            if (invItem?.itemData != null) {
-                slots[i].SetItem(invItem);
-            }
+        int itemCount = Mathf.Min(slots.Count, inventory.itemList.Count);
+        for (int i = 0; i < itemCount; i++) {
+            var item = inventory.itemList[i];
+            if (item?.itemData != null)
+                slots[i].SetItem(item);
         }
     }
 }

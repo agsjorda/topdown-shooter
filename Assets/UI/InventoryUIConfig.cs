@@ -43,17 +43,17 @@ public class InventoryUIConfig : MonoBehaviour
     private VisualElement _tabContentContainer;
     private InventoryScrollElement _scrollWrapper;
     private VisualElement _slotsContainer;
-    private readonly List<BaseSlot> _createdSlots = new List<BaseSlot>();
+    private readonly List<Slot> _createdSlots = new List<Slot>();
 
-    public IReadOnlyList<BaseSlot> Slots => _createdSlots;
+    public IReadOnlyList<Slot> Slots => _createdSlots;
     public int CreatedSlotCount => _createdSlots.Count;
 
-    public BaseSlot GetSlot(int index)
+    public Slot GetSlot(int index)
     {
         return (index >= 0 && index < _createdSlots.Count) ? _createdSlots[index] : null;
     }
 
-    public bool TryGetSlot(int index, out BaseSlot slot)
+    public bool TryGetSlot(int index, out Slot slot)
     {
         if (index >= 0 && index < _createdSlots.Count) {
             slot = _createdSlots[index];
@@ -207,7 +207,7 @@ public class InventoryUIConfig : MonoBehaviour
         _createdSlots.Capacity = slotCount;
 
         for (int i = 0; i < slotCount; i++) {
-            var slot = new BaseSlot();
+            var slot = new Slot();
             slot.SetSlotIndex(i);
             slot.SetSlotSize(slotSize);
             slot.SetCellMargin(cellMargin);
