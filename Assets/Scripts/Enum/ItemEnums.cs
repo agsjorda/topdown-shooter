@@ -5,8 +5,11 @@ public enum ItemType
     Weapon,
     Armor,
     Consumable,
+    Material,
+    Quest,
     Miscellaneous
 }
+
 
 //Referenced in Weapon and WeaponController
 

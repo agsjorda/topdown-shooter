@@ -118,8 +118,7 @@
     transition-duration: 0.3s;
 }
 
-
-
+/* ------------Inventory Tabs Styling------------- */
 .inventoryTab {
     background-color: rgba(0, 0, 0, 0);
     border-bottom-width: 2px;
@@ -165,6 +164,7 @@
     scale: 1.05 1.05;
 }
 
+/* ------------Equipment Slots Styling------------- */
 .equipSlots {
     flex-grow: 1;
     position: absolute;
@@ -226,10 +226,11 @@
     align-items: flex-start;
     padding: 10px;
     gap: 8px;
-    border-left-color: rgb(102, 102, 102);
-    border-right-color: rgb(102, 102, 102);
-    border-top-color: rgb(102, 102, 102);
-    border-bottom-color: rgb(102, 102, 102);
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
     border-top-width: 10px;
     border-right-width: 10px;
     border-bottom-width: 10px;
@@ -255,10 +256,11 @@
     border-top-width: 5px;
     border-bottom-width: 5px;
 
-    border-left-color: rgb(102, 102, 102);
-    border-right-color: rgb(102, 102, 102);
-    border-top-color: rgb(102, 102, 102);
-    border-bottom-color: rgb(102, 102, 102);
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
 
     border-radius: 5px;
 

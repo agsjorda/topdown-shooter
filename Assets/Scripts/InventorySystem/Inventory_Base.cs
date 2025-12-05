@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +7,7 @@ public class Inventory_Base : MonoBehaviour
     public event Action OnInventoryChanged;
 
     public int maxInventorySize = 24;
+    //Item list can contain nulls representing empty slots
     public List<Inventory_Item> itemList = new List<Inventory_Item>();
 
     public bool CanAddItem() => itemList.Count < maxInventorySize;
