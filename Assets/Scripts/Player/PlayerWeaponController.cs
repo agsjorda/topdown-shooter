@@ -29,8 +29,10 @@ public class PlayerWeaponController : MonoBehaviour
     private void Start()
     {
         player = GetComponent<Player>();
+        if (weaponSlots == null) weaponSlots = new List<Weapon>(maxSlots);
+        // If list is empty, add a slot for index 0
+        if (weaponSlots.Count == 0) weaponSlots.Add(new Weapon(defaultWeaponData));
         AssignInputEvents();
-
         Invoke(nameof(EquipStartingWeapon), 0.1f);
     }
 
@@ -52,13 +54,21 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void EquipWeapon(int i)
     {
-        if (i >= weaponSlots.Count)
+        if (i < 0 || i >= weaponSlots.Count) {
+            Debug.LogWarning($"EquipWeapon: index {i} out of range ({weaponSlots.Count}).");
             return;
+        }
 
         SetWeaponReady(false);
-
         currentWeapon = weaponSlots[i];
 
+        // Clean visuals first, then show the correct ones
+        player.weaponVisuals.SwitchOffWeaponModels();
+        // Ensure backup layer is hidden when equipping primary
+        // If you have a method, call it; otherwise add one in PlayerWeaponVisuals
+        // player.weaponVisuals.SwitchOffBackupWeaponModels();
+
+        player.weaponVisuals.SwitchOnCurrentWeaponModel();
         player.weaponVisuals.PlayWeaponEquipAnimation();
 
         CameraManager.instance.ChangeCameraDistance(currentWeapon.cameraDistance);
@@ -66,30 +76,26 @@ public class PlayerWeaponController : MonoBehaviour
 
     public void PickupWeapon(Weapon newWeapon)
     {
-
-        if (WeaponInSlots(newWeapon.weaponType) != null) {
-            Debug.Log("Already have this weapon!");
-            WeaponInSlots(newWeapon.weaponType).totalReserveAmmo += newWeapon.bulletsInMagazine;
+        var existing = WeaponInSlots(newWeapon.weaponType);
+        if (existing != null) {
+            existing.totalReserveAmmo += newWeapon.bulletsInMagazine;
+            Debug.Log("Already have this weapon! Merged ammo.");
             return;
         }
 
-        if (weaponSlots.Count >= maxSlots && newWeapon.weaponType != currentWeapon.weaponType) {
-
-            int weaponIndex = weaponSlots.IndexOf(currentWeapon);
-
-            player.weaponVisuals.SwitchOffWeaponModels();
-            weaponSlots[weaponIndex] = newWeapon;
-
-            DropWeaponOnTheGround();
-
-            EquipWeapon(weaponIndex);
-            Debug.Log("Can't carry more than 2 weapons!");
+        if (weaponSlots.Count >= maxSlots) {
+            var inventory = Object.FindFirstObjectByType<Inventory_Base>();
+            if (inventory != null && inventory.CanAddItem()) {
+                inventory.AddItem(new Inventory_Item(newWeapon.weaponData));
+                Debug.Log("Weapon slots full. Sent picked weapon to inventory.");
+            } else {
+                Debug.Log("Inventory full or missing, cannot store picked weapon.");
+            }
             return;
         }
 
         weaponSlots.Add(newWeapon);
         player.weaponVisuals.SwitchOnBackupWeaponModel();
-
     }
 
     private void DropWeapon()
@@ -229,11 +235,11 @@ public class PlayerWeaponController : MonoBehaviour
         controls.Character.Fire.performed += ctx => isShooting = true;
         controls.Character.Fire.canceled += ctx => isShooting = false;
 
-        controls.Character.EquipSlot1.performed += ctx => EquipWeapon(0);
-        controls.Character.EquipSlot2.performed += ctx => EquipWeapon(1);
-        controls.Character.EquipSlot3.performed += ctx => EquipWeapon(2);
-        controls.Character.EquipSlot4.performed += ctx => EquipWeapon(3);
-        controls.Character.EquipSlot5.performed += ctx => EquipWeapon(4);
+        controls.Character.EquipSlot1.performed += ctx => { if (weaponSlots.Count > 0) EquipWeapon(0); };
+        controls.Character.EquipSlot2.performed += ctx => { if (weaponSlots.Count > 1) EquipWeapon(1); };
+        controls.Character.EquipSlot3.performed += ctx => { if (weaponSlots.Count > 2) EquipWeapon(2); };
+        controls.Character.EquipSlot4.performed += ctx => { if (weaponSlots.Count > 3) EquipWeapon(3); };
+        controls.Character.EquipSlot5.performed += ctx => { if (weaponSlots.Count > 4) EquipWeapon(4); };
         controls.Character.DropCurrentWeapon.performed += ctx => DropWeapon();
 
         controls.Character.Reload.performed += ctx =>

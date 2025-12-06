@@ -44,14 +44,12 @@ public class Pickup_Weapon : Interactable
 
     public override void Interaction()
     {
-        // Find weapon controller when needed, not in base class
-        PlayerWeaponController weaponController = Object.FindFirstObjectByType<PlayerWeaponController>();
+        var weaponController = Object.FindFirstObjectByType<PlayerWeaponController>();
+        if (weaponController == null) { Debug.LogWarning("No PlayerWeaponController found"); return; }
 
-        if (weaponController != null) {
-            weaponController.PickupWeapon(weapon);
-            ObjectPool.instance.ReturnObject(gameObject);
-        } else {
-            Debug.LogWarning("No PlayerWeaponController found for weapon pickup");
-        }
+        // Always let the controller decide: adds to slots or replaces/drops as needed,
+        // and turns on backup visuals when adding a second weapon.
+        weaponController.PickupWeapon(weapon);
+        ObjectPool.instance.ReturnObject(gameObject);
     }
 }
