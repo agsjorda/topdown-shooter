@@ -2,54 +2,147 @@ using UnityEngine;
 
 public class Pickup_Weapon : Interactable
 {
+    [Header("Weapon Data")]
     [SerializeField] private Weapon_Data weaponData;
-    [SerializeField] private Weapon weapon;
-    [SerializeField] private BackupWeaponModel[] models;
+    [SerializeField] private WeaponModel[] weaponModels;
 
-    private bool oldWeapon;
+    private Weapon weapon;
 
-    private void Start()
+    protected override void Awake()
     {
-        if (oldWeapon == false)
+        base.Awake();
+
+        if (weaponData != null && weapon == null)
             weapon = new Weapon(weaponData);
 
-        SetupGameObject();
+        SetupVisuals();
     }
 
-    public void SetupPickupWeapon(Weapon weapon, Transform transform)
+    protected override void InitializeComponents()
     {
-        oldWeapon = true;
-        this.weapon = weapon;
+        base.InitializeComponents();
+
+        // Auto-populate weapon models if not set
+        if (weaponModels == null || weaponModels.Length == 0)
+            weaponModels = GetComponentsInChildren<WeaponModel>(true);
+    }
+
+    #region Setup Methods
+    public void SetupPickupWeapon(Weapon weaponToDrop, Vector3 position)
+    {
+        weapon = weaponToDrop;
         weaponData = weapon.weaponData;
-        this.transform.position = transform.position + new Vector3(0, 0.75f, 0);
+        transform.position = position;
+
+        SetupVisuals();
     }
 
-    [ContextMenu("Update Item Model")]
-    public void SetupGameObject()
+    private void SetupVisuals()
     {
-        gameObject.name = "Pickup_Weapon - " + weaponData.weaponType.ToString();
-        SetupWeaponModel();
+        // Update name for clarity
+        gameObject.name = $"Pickup_Weapon - {weaponData?.weaponType}";
+
+        // Hide all models first
+        HideAllModels();
+
+        // Show appropriate backup model
+        ShowWeaponModel();
+
+        // Update renderer for highlighting
+        UpdateActiveRenderer();
     }
 
-    private void SetupWeaponModel()
+    private void HideAllModels()
     {
-        foreach (BackupWeaponModel model in models) {
-            model.gameObject.SetActive(false);
-            if (model.weaponType == weaponData.weaponType) {
-                model.gameObject.SetActive(true);
-                UpdateMeshAndMaterial(model.GetComponent<MeshRenderer>());
+        if (weaponModels == null) return;
+
+        foreach (var model in weaponModels) {
+            if (model != null)
+                model.SetActive(false);
+        }
+    }
+
+    private void ShowWeaponModel()
+    {
+        if (weaponData == null || weaponModels == null) return;
+
+        foreach (var model in weaponModels) {
+            if (model != null &&
+                model.weaponType == weaponData.weaponType &&
+                model.modelType == WeaponModelType.Backup) {
+                model.SetActive(true);
+                break; // Only show one matching model
             }
         }
     }
 
+    private void UpdateActiveRenderer()
+    {
+        if (weaponModels == null) return;
+
+        // Find the first active model and use its renderer for highlighting
+        foreach (var model in weaponModels) {
+            if (model != null && model.gameObject.activeSelf) {
+                Renderer modelRenderer = model.GetComponent<Renderer>();
+                if (modelRenderer != null) {
+                    objectRenderer = modelRenderer;
+                    if (defaultMaterial == null)
+                        defaultMaterial = modelRenderer.sharedMaterial;
+                    break;
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region Interaction
     public override void Interaction()
     {
-        var weaponController = Object.FindFirstObjectByType<PlayerWeaponController>();
-        if (weaponController == null) { Debug.LogWarning("No PlayerWeaponController found"); return; }
+        PlayerWeaponController weaponController = Object.FindFirstObjectByType<PlayerWeaponController>();
+        if (weaponController == null) {
+            Debug.LogWarning($"{name}: No PlayerWeaponController found");
+            return;
+        }
 
-        // Always let the controller decide: adds to slots or replaces/drops as needed,
-        // and turns on backup visuals when adding a second weapon.
+        // PickupWeapon returns void, so just call it and then return to pool
         weaponController.PickupWeapon(weapon);
-        ObjectPool.instance.ReturnObject(gameObject);
+        ReturnToPool();
     }
+
+    private void ReturnToPool()
+    {
+        if (ObjectPool.instance != null)
+            ObjectPool.instance.ReturnObject(gameObject);
+        else
+            Destroy(gameObject);
+    }
+
+    public override bool CanInteract(Transform playerTransform)
+    {
+        if (!base.CanInteract(playerTransform))
+            return false;
+
+        // Additional check: ensure weapon pickup is valid
+        return weapon != null && weaponData != null;
+    }
+    #endregion
+
+    #region Editor
+    [ContextMenu("Update Weapon Model")]
+    private void UpdateWeaponModelInEditor()
+    {
+        SetupVisuals();
+    }
+
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();
+
+        // Visual indicator for weapon pickups
+        if (weaponData != null) {
+            Gizmos.color = Color.magenta;
+            Gizmos.DrawIcon(transform.position + Vector3.up * 0.5f, "d_PreMatCube", true);
+        }
+    }
+    #endregion
 }

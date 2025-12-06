@@ -2,23 +2,36 @@ using UnityEngine;
 
 public class Pickup_Item : Interactable
 {
-    private SpriteRenderer spriteRenderer;
+    [Header("Item Data")]
     [SerializeField] private Item_DataSO itemData;
 
-    private Inventory_Item itemToAdd;
+    private SpriteRenderer spriteRenderer;
+    private Inventory_Item inventoryItem;
     private Inventory_Base playerInventory;
 
-    private void Awake()
+    protected override void Awake()
     {
-        InitializeComponents();
+        base.Awake();
+        InitializePickup();
     }
 
-    private void InitializeComponents()
+    protected override void InitializeComponents()
     {
-        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        base.InitializeComponents();
 
+        // Get sprite renderer specifically for 2D items
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+
+        // Use sprite renderer as the main renderer for highlighting
+        if (spriteRenderer != null)
+            objectRenderer = spriteRenderer;
+    }
+
+    private void InitializePickup()
+    {
         if (itemData != null) {
-            itemToAdd = new Inventory_Item(itemData);
+            inventoryItem = new Inventory_Item(itemData);
             UpdateVisuals();
         }
     }
@@ -27,28 +40,66 @@ public class Pickup_Item : Interactable
     {
         if (spriteRenderer != null && itemData != null) {
             spriteRenderer.sprite = itemData.icon;
+
+            // Update name for clarity in hierarchy
+            gameObject.name = $"Pickup_Item - {itemData.itemName}";
         }
     }
 
+    #region Interaction
     public override void Interaction()
     {
         if (playerInventory == null) {
             playerInventory = Object.FindFirstObjectByType<Inventory_Base>();
             if (playerInventory == null) {
-                Debug.LogError("Pickup_Item: No Inventory_Base found in scene!");
+                Debug.LogError($"{name}: No Inventory_Base found in scene!");
                 return;
             }
         }
 
-        if (playerInventory != null && itemToAdd != null) {
-            Debug.Log($"Attempting to add {itemToAdd.itemData.itemName} to inventory");
-            playerInventory.AddItem(itemToAdd);
+        Debug.Log($"Attempting to add {inventoryItem.itemData.itemName} to inventory");
 
-            if (playerInventory.CanAddItem()) {
-                Destroy(gameObject);
-            } else {
-                Debug.LogWarning("Failed to add item - inventory might be full");
-            }
+        // Fix: Inventory_Base.AddItem returns void, not bool. Use CanAddItem() to check before adding.
+        if (playerInventory.CanAddItem()) {
+            playerInventory.AddItem(inventoryItem);
+            DestroyPickup();
+        } else {
+            Debug.LogWarning("Failed to add item - inventory might be full");
         }
     }
+
+    private void DestroyPickup()
+    {
+        // Try object pooling first, then destroy
+        if (ObjectPool.instance != null)
+            ObjectPool.instance.ReturnObject(gameObject);
+        else
+            Destroy(gameObject);
+    }
+
+    public override bool CanInteract(Transform playerTransform)
+    {
+        if (!base.CanInteract(playerTransform))
+            return false;
+
+        // Additional check: ensure inventory exists and has space
+        if (playerInventory == null)
+            playerInventory = Object.FindFirstObjectByType<Inventory_Base>();
+
+        return playerInventory != null && playerInventory.CanAddItem();
+    }
+    #endregion
+
+    #region Editor
+    protected override void OnDrawGizmosSelected()
+    {
+        base.OnDrawGizmosSelected();
+
+        // Visual indicator for item pickups
+        if (itemData != null) {
+            Gizmos.color = Color.green;
+            Gizmos.DrawIcon(transform.position + Vector3.up * 0.3f, "d_Toolbar Plus", true);
+        }
+    }
+    #endregion
 }

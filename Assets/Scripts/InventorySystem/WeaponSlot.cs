@@ -6,7 +6,6 @@ public class WeaponSlot
     public bool isEquipped;
 
     public bool IsEmpty => weapon == null;
-    public bool HasWeapon => !IsEmpty;
 
     public void Clear()
     {
@@ -18,10 +17,5 @@ public class WeaponSlot
     {
         weapon = newWeapon;
         isEquipped = false;
-    }
-
-    public void SetEquipped(bool equipped)
-    {
-        isEquipped = equipped;
     }
 }

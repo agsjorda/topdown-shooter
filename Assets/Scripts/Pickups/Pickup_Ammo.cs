@@ -73,4 +73,13 @@ public class Pickup_Ammo : Interactable
             }
         }
     }
+
+    private void UpdateMeshAndMaterial(MeshRenderer meshRenderer)
+    {
+        // Example implementation: enable the renderer if not null
+        if (meshRenderer != null) {
+            meshRenderer.enabled = true;
+            // You can add more logic here to update mesh/material as needed
+        }
+    }
 }

@@ -28,6 +28,8 @@ public enum WeaponType //Referenced in Weapon and WeaponModel
     Shotgun,
     Rifle
 }
+
+public enum WeaponModelType { Primary, Backup }
 public enum EquipType { SideEquipAnimation, BackEquipAnimation };
 public enum HoldType { CommonHold = 1, LowHold, HighHold };
 
