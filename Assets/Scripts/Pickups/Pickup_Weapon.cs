@@ -8,6 +8,9 @@ public class Pickup_Weapon : Interactable
 
     private Weapon weapon;
 
+    // Add this field to fix CS0103
+    private Material defaultMaterial;
+
     protected override void Awake()
     {
         base.Awake();

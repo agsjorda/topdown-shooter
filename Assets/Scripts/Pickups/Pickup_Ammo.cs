@@ -12,17 +12,37 @@ public struct AmmoData
 public class Pickup_Ammo : Interactable
 {
     [SerializeField] private AmmoBoxType ammoBoxType;
-
     [SerializeField] private List<AmmoData> smallBoxAmmo;
     [SerializeField] private List<AmmoData> bigBoxAmmo;
-
     [SerializeField] private GameObject[] boxModel;
 
-    private void Start()
+    protected override void Awake()
     {
-        SetupBoxModel();
+        SetupBoxModel(); // Setup before base.Awake() so renderer is ready
+        base.Awake();
     }
 
+    private void SetupBoxModel()
+    {
+        // First, deactivate all models
+        foreach (var model in boxModel) {
+            if (model != null)
+                model.SetActive(false);
+        }
+
+        // Activate the correct model based on ammoBoxType
+        int modelIndex = (int)ammoBoxType;
+        if (modelIndex >= 0 && modelIndex < boxModel.Length && boxModel[modelIndex] != null) {
+            boxModel[modelIndex].SetActive(true);
+
+            // Get the renderer from the active model
+            Renderer activeRenderer = boxModel[modelIndex].GetComponent<Renderer>();
+            if (activeRenderer != null) {
+                // This updates the base class's objectRenderer reference
+                UpdateRenderer(activeRenderer);
+            }
+        }
+    }
 
     public override void Interaction()
     {
@@ -30,56 +50,46 @@ public class Pickup_Ammo : Interactable
         if (weaponController == null)
             return;
 
-        List<AmmoData> currentAmmoList = smallBoxAmmo;
-
-        if (ammoBoxType == AmmoBoxType.bigBox) {
-            currentAmmoList = bigBoxAmmo;
-        }
+        List<AmmoData> currentAmmoList = ammoBoxType == AmmoBoxType.bigBox ? bigBoxAmmo : smallBoxAmmo;
 
         foreach (var ammo in currentAmmoList) {
             Weapon weapon = weaponController.WeaponInSlots(ammo.weaponType);
-
             AddBulletsToWeapon(weapon, GetBulletAmount(ammo));
         }
 
-        ObjectPool.instance.ReturnObject(gameObject);
+        // Return to pool or destroy
+        if (ObjectPool.instance != null)
+            ObjectPool.instance.ReturnObject(gameObject);
+        else
+            Destroy(gameObject);
     }
-
 
     private int GetBulletAmount(AmmoData ammoData)
     {
-        float min = Mathf.Min(ammoData.minAmount, ammoData.maxAmount);
-        float max = Mathf.Max(ammoData.minAmount, ammoData.maxAmount);
-
-        float randomAmount = Random.Range(min, max + 1);
-
-        return Mathf.RoundToInt(randomAmount);
+        int min = Mathf.Min(ammoData.minAmount, ammoData.maxAmount);
+        int max = Mathf.Max(ammoData.minAmount, ammoData.maxAmount);
+        return Random.Range(min, max + 1);
     }
+
     private void AddBulletsToWeapon(Weapon weapon, int amount)
     {
-        if (weapon == null)
-            return;
-
-        weapon.totalReserveAmmo += amount;
+        if (weapon != null)
+            weapon.totalReserveAmmo += amount;
     }
 
-    private void SetupBoxModel()
+    #region Editor
+    protected override void OnValidate()
     {
-        for (int i = 0; i < boxModel.Length; i++) {
-            boxModel[i].SetActive(false);
-            if (i == (int)ammoBoxType) {
-                boxModel[i].SetActive(true);
-                UpdateMeshAndMaterial(boxModel[i].GetComponent<MeshRenderer>());
+        base.OnValidate();
+
+        // Auto-setup in editor when ammoBoxType changes
+        if (boxModel != null && boxModel.Length > 0) {
+            // Show correct model in editor
+            for (int i = 0; i < boxModel.Length; i++) {
+                if (boxModel[i] != null)
+                    boxModel[i].SetActive(i == (int)ammoBoxType);
             }
         }
     }
-
-    private void UpdateMeshAndMaterial(MeshRenderer meshRenderer)
-    {
-        // Example implementation: enable the renderer if not null
-        if (meshRenderer != null) {
-            meshRenderer.enabled = true;
-            // You can add more logic here to update mesh/material as needed
-        }
-    }
+    #endregion
 }

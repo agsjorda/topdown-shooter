@@ -32,6 +32,7 @@ public enum WeaponType //Referenced in Weapon and WeaponModel
 public enum WeaponModelType { Primary, Backup }
 public enum EquipType { SideEquipAnimation, BackEquipAnimation };
 public enum HoldType { CommonHold = 1, LowHold, HighHold };
+public enum HangType { LowBackHang, BackHang, SideHang };
 
 //Pickup_Ammo
 public enum AmmoBoxType { smallBox, bigBox }

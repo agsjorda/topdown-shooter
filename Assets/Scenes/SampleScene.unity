@@ -305,6 +305,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pickup_Item
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   itemData: {fileID: 11400000, guid: b859f5295ca52754bb9477b2d6a70b56, type: 2}
 --- !u!1001 &101031698
 PrefabInstance:
@@ -3187,11 +3190,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 492182499}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c652a85b2fc07842a3220286e0d24f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 4
+  modelType: 0
   hangType: 1
+  equipAnimationType: 1
+  holdType: 3
+  gunPoint: {fileID: 109540293}
+  holdPoint: {fileID: 1299676305}
 --- !u!1001 &496006139
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3456,6 +3464,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   weaponData: {fileID: 11400000, guid: 0563c685419ce2c468562d25060c1e2a, type: 2}
   weaponModels: []
 --- !u!4 &513225245
@@ -4097,11 +4108,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 575136507}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c652a85b2fc07842a3220286e0d24f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 3
+  modelType: 0
   hangType: 0
+  equipAnimationType: 0
+  holdType: 2
+  gunPoint: {fileID: 1611117461}
+  holdPoint: {fileID: 727965974}
 --- !u!1 &575875439
 GameObject:
   m_ObjectHideFlags: 0
@@ -4442,7 +4458,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 4
   modelType: 0
-  hangType: 0
+  hangType: 1
   equipAnimationType: 1
   holdType: 3
   gunPoint: {fileID: 109540293}
@@ -4894,6 +4910,128 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1252634408}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &653897842
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 653897843}
+  - component: {fileID: 653897846}
+  - component: {fileID: 653897845}
+  - component: {fileID: 653897844}
+  m_Layer: 0
+  m_Name: Pickup_Ammo - Ammo (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &653897843
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653897842}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.208, y: 0, z: -0.13000011}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 2111318451}
+  - {fileID: 1268470730}
+  m_Father: {fileID: 1986915530}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &653897844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653897842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3b5283f7cc2dd549b293f89bc93c688, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PooledObject
+  originalPrefab: {fileID: 2716842780576957897, guid: 1e7602fd735f9af4cb614d55004107ed, type: 3}
+--- !u!65 &653897845
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653897842}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.5, y: 1.5, z: 1.5}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &653897846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 653897842}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d0ba52eaef8dc5439cba809a4a28503, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PickupAmmo
+  highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
+  ammoBoxType: 1
+  smallBoxAmmo:
+  - weaponType: 0
+    minAmount: 0
+    maxAmount: 30
+  - weaponType: 1
+    minAmount: 0
+    maxAmount: 22
+  - weaponType: 3
+    minAmount: 0
+    maxAmount: 30
+  - weaponType: 2
+    minAmount: 0
+    maxAmount: 40
+  - weaponType: 4
+    minAmount: 0
+    maxAmount: 35
+  bigBoxAmmo:
+  - weaponType: 2
+    minAmount: 30
+    maxAmount: 100
+  - weaponType: 4
+    minAmount: 20
+    maxAmount: 100
+  - weaponType: 3
+    minAmount: 10
+    maxAmount: 50
+  - weaponType: 0
+    minAmount: 10
+    maxAmount: 40
+  - weaponType: 1
+    minAmount: 10
+    maxAmount: 40
+  boxModel:
+  - {fileID: 2111318450}
+  - {fileID: 1268470729}
 --- !u!4 &660569184 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5507751349985238819, guid: e617c0d5cd6b2cc45b8fba5307df193b, type: 3}
@@ -8897,7 +9035,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1252634408
 Transform:
   m_ObjectHideFlags: 0
@@ -8931,7 +9069,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 0
   modelType: 0
-  hangType: 0
+  hangType: 2
   equipAnimationType: 0
   holdType: 1
   gunPoint: {fileID: 632746457}
@@ -9048,6 +9186,96 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1264734694}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1268470729
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1268470730}
+  - component: {fileID: 1268470732}
+  - component: {fileID: 1268470731}
+  m_Layer: 0
+  m_Name: BoxAmmo_Big
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1268470730
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268470729}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 653897843}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1268470731
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268470729}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 3758952881610933197, guid: df6b0bcb80551a44e8e1650144b3398c, type: 3}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1268470732
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1268470729}
+  m_Mesh: {fileID: -1574808226195643225, guid: df6b0bcb80551a44e8e1650144b3398c, type: 3}
 --- !u!1 &1297391667
 GameObject:
   m_ObjectHideFlags: 0
@@ -9187,6 +9415,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   weaponData: {fileID: 11400000, guid: 20e4593f17b993d4c959bc058741866e, type: 2}
   weaponModels: []
 --- !u!4 &1301174887
@@ -9265,6 +9496,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Pickup_Item
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   itemData: {fileID: 11400000, guid: efc9792d25db35847b8f322582ba0cb9, type: 2}
 --- !u!136 &1307184772
 CapsuleCollider:
@@ -11039,11 +11273,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1550913902}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c652a85b2fc07842a3220286e0d24f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 0
-  hangType: 2
+  modelType: 0
+  hangType: 0
+  equipAnimationType: 0
+  holdType: 1
+  gunPoint: {fileID: 632746457}
+  holdPoint: {fileID: 398699218}
 --- !u!1 &1553978685
 GameObject:
   m_ObjectHideFlags: 0
@@ -11235,6 +11474,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c81a870dd519ff847a9768711c88fbab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
+  interactionCooldown: 0.5
+  interactionHintUI: {fileID: 0}
+  interactionHintText: {fileID: 0}
 --- !u!114 &1553978696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13243,6 +13485,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   weaponData: {fileID: 11400000, guid: 1d393a4b156cb9e43b51795b7ba9f0db, type: 2}
   weaponModels: []
 --- !u!4 &1860716199
@@ -14171,6 +14416,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   weaponData: {fileID: 11400000, guid: 2d7b30867c00ab94fa44c1eea10d8e1c, type: 2}
   weaponModels: []
 --- !u!4 &1942531625
@@ -14312,7 +14560,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 2
   modelType: 0
-  hangType: 0
+  hangType: 1
   equipAnimationType: 1
   holdType: 1
   gunPoint: {fileID: 535561396}
@@ -14545,7 +14793,7 @@ Transform:
   - {fileID: 1942531625}
   - {fileID: 1301174887}
   - {fileID: 2874652710670440396}
-  - {fileID: 2695944653005996955}
+  - {fileID: 653897843}
   - {fileID: 1307184770}
   - {fileID: 76431821}
   m_Father: {fileID: 0}
@@ -14566,7 +14814,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1988803471
 Transform:
   m_ObjectHideFlags: 0
@@ -14593,11 +14841,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 1988803470}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c652a85b2fc07842a3220286e0d24f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 2
+  modelType: 0
   hangType: 1
+  equipAnimationType: 1
+  holdType: 1
+  gunPoint: {fileID: 535561396}
+  holdPoint: {fileID: 1669150648}
 --- !u!1 &1995810256
 GameObject:
   m_ObjectHideFlags: 0
@@ -15048,6 +15301,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c81a870dd519ff847a9768711c88fbab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
+  interactionCooldown: 0.5
+  interactionHintUI: {fileID: 0}
+  interactionHintText: {fileID: 0}
 --- !u!114 &2063436877
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15127,7 +15383,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   weaponType: 1
   modelType: 0
-  hangType: 0
+  hangType: 2
   equipAnimationType: 0
   holdType: 1
   gunPoint: {fileID: 2132542242}
@@ -15207,11 +15463,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 2083076947}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
+  m_Script: {fileID: 11500000, guid: 4c652a85b2fc07842a3220286e0d24f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   weaponType: 1
+  modelType: 0
   hangType: 2
+  equipAnimationType: 0
+  holdType: 1
+  gunPoint: {fileID: 2132542242}
+  holdPoint: {fileID: 689894739}
 --- !u!1 &2086971284
 GameObject:
   m_ObjectHideFlags: 0
@@ -15647,6 +15908,96 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BackupWeaponModel
   weaponType: 3
   hangType: 0
+--- !u!1 &2111318450
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2111318451}
+  - component: {fileID: 2111318453}
+  - component: {fileID: 2111318452}
+  m_Layer: 0
+  m_Name: BoxAmmo_Small
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &2111318451
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111318450}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 653897843}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &2111318452
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111318450}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 3758952881610933197, guid: df6b0bcb80551a44e8e1650144b3398c, type: 3}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &2111318453
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2111318450}
+  m_Mesh: {fileID: -6219172196520173615, guid: df6b0bcb80551a44e8e1650144b3398c, type: 3}
 --- !u!4 &2118927891 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2515697713448990657, guid: 1876e96a48eea50458d7e14f141123ed, type: 3}
@@ -18387,21 +18738,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1883878497}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &1467039391590882879
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4707865978877609240}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2695944653005996955}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1478468385180057939
 GameObject:
   m_ObjectHideFlags: 0
@@ -19913,43 +20249,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2434631569519417756
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2716842780251863211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d0ba52eaef8dc5439cba809a4a28503, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PickupAmmo
-  highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
-  ammoBoxType: 1
-  smallBoxAmmo:
-  - weaponType: 0
-    minAmount: 0
-    maxAmount: 0
-  - weaponType: 1
-    minAmount: 0
-    maxAmount: 0
-  - weaponType: 3
-    minAmount: 0
-    maxAmount: 0
-  bigBoxAmmo:
-  - weaponType: 2
-    minAmount: 0
-    maxAmount: 0
-  - weaponType: 4
-    minAmount: 0
-    maxAmount: 0
-  - weaponType: 3
-    minAmount: 0
-    maxAmount: 0
-  boxModel:
-  - {fileID: 8885671627816596931}
-  - {fileID: 4707865978877609240}
 --- !u!1 &2449738302759801157
 GameObject:
   m_ObjectHideFlags: 0
@@ -20082,6 +20381,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupAmmo
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   ammoBoxType: 0
   smallBoxAmmo:
   - weaponType: 0
@@ -20409,23 +20711,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2695944653005996955
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2716842780251863211}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 9090150650494315158}
-  - {fileID: 1467039391590882879}
-  m_Father: {fileID: 1986915530}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2704063138401449212
 Transform:
   m_ObjectHideFlags: 0
@@ -20453,25 +20738,6 @@ GameObject:
   - component: {fileID: 7359145815463136272}
   m_Layer: 8
   m_Name: mixamorig:LeftFoot
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!1 &2716842780251863211
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2695944653005996955}
-  - component: {fileID: 2434631569519417756}
-  - component: {fileID: 7502805907467061996}
-  - component: {fileID: 7502805907467061997}
-  m_Layer: 0
-  m_Name: Pickup_Ammo - Ammo (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -22081,6 +22347,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   weaponData: {fileID: 11400000, guid: 1ea6c6e01927fcc459db9c0fd2a3370d, type: 2}
   weaponModels: []
 --- !u!4 &3758175791338600257
@@ -23290,55 +23559,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!23 &4501571905058825762
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8885671627816596931}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 3758952881610933197, guid: df6b0bcb80551a44e8e1650144b3398c, type: 3}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &4533880081965006606
 GameObject:
   m_ObjectHideFlags: 0
@@ -23686,24 +23906,6 @@ Transform:
   - {fileID: 1297391668}
   m_Father: {fileID: 1553978689}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &4707865978877609240
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1467039391590882879}
-  - component: {fileID: 6217038729000145584}
-  - component: {fileID: 6526475515997331969}
-  m_Layer: 0
-  m_Name: BoxAmmo_Big
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!1 &4749636635025109054
 GameObject:
   m_ObjectHideFlags: 0
@@ -24000,7 +24202,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &4910243168371799887
 GameObject:
   m_ObjectHideFlags: 0
@@ -26170,14 +26372,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!33 &5913146821641499574
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8885671627816596931}
-  m_Mesh: {fileID: -6219172196520173615, guid: df6b0bcb80551a44e8e1650144b3398c, type: 3}
 --- !u!1 &5928435409108306266
 GameObject:
   m_ObjectHideFlags: 0
@@ -26709,14 +26903,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!33 &6217038729000145584
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4707865978877609240}
-  m_Mesh: {fileID: -1574808226195643225, guid: df6b0bcb80551a44e8e1650144b3398c, type: 3}
 --- !u!1 &6223008305710202645
 GameObject:
   m_ObjectHideFlags: 0
@@ -27180,55 +27366,6 @@ MeshRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 3758952881610933197, guid: 7f13b6132aae5c047916a591495f3cf8, type: 3}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_MaskInteraction: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!23 &6526475515997331969
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4707865978877609240}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RayTracingAccelStructBuildFlagsOverride: 0
-  m_RayTracingAccelStructBuildFlags: 1
-  m_SmallMeshCulling: 1
-  m_ForceMeshLod: -1
-  m_MeshLodSelectionBias: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 3758952881610933197, guid: df6b0bcb80551a44e8e1650144b3398c, type: 3}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -29131,40 +29268,6 @@ Transform:
   - {fileID: 8107253760785490303}
   m_Father: {fileID: 11818083312712362}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!65 &7502805907467061996
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2716842780251863211}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.5, y: 1.5, z: 1.5}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7502805907467061997
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2716842780251863211}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3b5283f7cc2dd549b293f89bc93c688, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PooledObject
-  originalPrefab: {fileID: 2716842780576957897, guid: 1e7602fd735f9af4cb614d55004107ed, type: 3}
 --- !u!1 &7548527374663440550
 GameObject:
   m_ObjectHideFlags: 0
@@ -31565,24 +31668,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!1 &8885671627816596931
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9090150650494315158}
-  - component: {fileID: 5913146821641499574}
-  - component: {fileID: 4501571905058825762}
-  m_Layer: 0
-  m_Name: BoxAmmo_Small
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
 --- !u!4 &8887772472124305875
 Transform:
   m_ObjectHideFlags: 0
@@ -32115,21 +32200,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3095029835683854726}
   m_Mesh: {fileID: 8572669730779566818, guid: f49827ad7189fec49938adadf3fb1550, type: 3}
---- !u!4 &9090150650494315158
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8885671627816596931}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0.000000021855694, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2695944653005996955}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9096363628034200510
 GameObject:
   m_ObjectHideFlags: 0

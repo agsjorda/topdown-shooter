@@ -6,7 +6,6 @@ public class PlayerInteraction : MonoBehaviour
 {
     [Header("Interaction Settings")]
     [SerializeField] private float interactionCooldown = 0.5f;
-    [SerializeField] private LayerMask interactionLayer = ~0;
 
     [Header("Visual Feedback")]
     [SerializeField] private GameObject interactionHintUI;
@@ -25,27 +24,44 @@ public class PlayerInteraction : MonoBehaviour
 
     private void Awake()
     {
+        // Get player reference but DON'T access controls yet
         player = GetComponent<Player>();
-        controls = player.controls;
+    }
 
-        // Subscribe to input
-        controls.Character.Interaction.performed += OnInteractionPerformed;
+    private void Start()
+    {
+        if (player != null) {
+            controls = player.controls;
+
+            // Subscribe to input if controls exist
+            if (controls != null) {
+                controls.Character.Interaction.performed += OnInteractionPerformed;
+                Debug.Log("PlayerInteraction: Input events registered");
+            } else {
+                Debug.LogWarning("PlayerInteraction: Player controls are null!");
+            }
+        } else {
+            Debug.LogError("PlayerInteraction: Player component not found!");
+        }
     }
 
     private void OnEnable()
     {
+        // Enable controls if they exist
         if (controls != null)
             controls.Enable();
     }
 
     private void OnDisable()
     {
+        // Disable controls if they exist
         if (controls != null)
             controls.Disable();
     }
 
     private void OnDestroy()
     {
+        // Unsubscribe from input if controls exist
         if (controls != null)
             controls.Character.Interaction.performed -= OnInteractionPerformed;
     }
@@ -116,8 +132,6 @@ public class PlayerInteraction : MonoBehaviour
         return closest;
     }
 
-    // Backward compatibility method
-    public List<Interactable> GetInteractables() => new List<Interactable>(nearbyInteractables);
     #endregion
 
     #region Interaction
@@ -141,8 +155,6 @@ public class PlayerInteraction : MonoBehaviour
         }
     }
 
-    // For backward compatibility
-    private void InteractWithClosest() => TryInteract();
     #endregion
 
     #region UI Feedback
