@@ -66,6 +66,43 @@ public class InventoryController : MonoBehaviour
         inventory.SmartMoveItem(fromIndex, toIndex);
     }
 
+    // Add these methods to your existing InventoryController class:
+
+    public Inventory_Item GetItemAtSlot(int slotIndex)
+    {
+        // Return the item at the specified slot
+        if (slotIndex >= 0 && slotIndex < inventory.itemList.Count) {
+            return inventory.itemList[slotIndex];
+        }
+        return null;
+    }
+
+    public bool AddItemToSlot(Inventory_Item item, int slotIndex)
+    {
+        if (slotIndex >= 0 && slotIndex < inventory.maxInventorySize) {
+            // Ensure list is large enough
+            while (inventory.itemList.Count <= slotIndex) {
+                inventory.itemList.Add(null);
+            }
+
+            // If slot is empty, place item there
+            if (inventory.itemList[slotIndex] == null) {
+                inventory.itemList[slotIndex] = item;
+                inventory.NotifyInventoryChanged();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void RemoveItemAtSlot(int slotIndex)
+    {
+        if (slotIndex >= 0 && slotIndex < inventory.itemList.Count) {
+            inventory.itemList[slotIndex] = null;
+            inventory.NotifyInventoryChanged();
+        }
+    }
+
     // Keep SwapSlots for backward compatibility
     public void SwapSlots(int fromIndex, int toIndex)
     {
