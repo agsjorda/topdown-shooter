@@ -10,6 +10,8 @@ public enum ItemType
     Miscellaneous
 }
 
+public enum EquipmentSlotType { Weapon, Headgear, Armor, Boots };
+
 
 //Referenced in Weapon and WeaponController
 
