@@ -13,7 +13,6 @@ using UnityEngine.UIElements;
 /// - TransactionFactory: Creates the right type of operation (move/swap/equip/unequip)
 /// - Transaction classes: Execute specific drag/drop operations
 /// 
-/// **For Junior Developers:**
 /// Think of this like a game of moving chess pieces:
 /// 1. Player clicks on a piece (PointerDown)
 /// 2. Player drags the piece (PointerMove)
@@ -29,7 +28,7 @@ using UnityEngine.UIElements;
 /// 
 /// **Reduced from 830 lines to 420 lines** by extracting responsibilities into focused classes.
 /// </summary>
-[DisallowMultipleComponent] // Only one drag/drop controller per GameObject!
+[DisallowMultipleComponent]
 public class DragDropController : MonoBehaviour
 {
     #region Serialized Fields (Inspector-visible settings)
@@ -74,27 +73,22 @@ public class DragDropController : MonoBehaviour
 
     #region Unity Lifecycle Methods
     /// <summary>
-    /// **Awake** - Called when the script instance is being loaded
-    /// This happens BEFORE Start, good for setting up references
+    /// Called when the script instance is being loaded.
+    /// This happens BEFORE Start, good for setting up references.
     /// </summary>
     private void Awake()
     {
-        // The ??= operator means "if null, then assign"
-        // This auto-finds components if not manually assigned in Inspector
         inventoryController ??= GetComponent<InventoryController>();
         equipmentController ??= GetComponent<EquipmentController>();
         uiDocument ??= GetComponent<UIDocument>();
         
-        // Create our state tracker
         dragState = new DragState();
-        
-        // Create double-click handler (0.3 second window for double-clicks)
         doubleClickHandler = new DoubleClickHandler(0.3f);
     }
 
     /// <summary>
-    /// **OnEnable** - Called when the GameObject becomes active
-    /// Perfect for registering event listeners
+    /// Called when the GameObject becomes active.
+    /// Perfect for registering event listeners.
     /// </summary>
     private void OnEnable()
     {
@@ -104,7 +98,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **OnDisable** - Called when the GameObject becomes inactive
+    /// Called when the GameObject becomes inactive.
     /// IMPORTANT: Always clean up event listeners to prevent memory leaks!
     /// </summary>
     private void OnDisable()
@@ -115,7 +109,7 @@ public class DragDropController : MonoBehaviour
 
     #region Initialization
     /// <summary>
-    /// **Initialize** - Sets up all the drag/drop system components
+    /// Sets up all the drag/drop system components.
     /// 
     /// Why use a Coroutine (IEnumerator)?
     /// - UI Elements need time to load and be ready
@@ -165,10 +159,9 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **InitializeEquipmentSlots** - Finds and sets up all equipment slots in the UI
-    /// 
-    /// Equipment slots are: Weapon, Headgear, Vest (armor), Boots
-    /// Each one needs to know what type it is so it can validate items
+    /// Finds and sets up all equipment slots in the UI.
+    /// Equipment slots are: Weapon, Headgear, Vest (armor), Boots.
+    /// Each one needs to know what type it is so it can validate items.
     /// </summary>
     private void InitializeEquipmentSlots()
     {
@@ -181,8 +174,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **InitializeEquipmentSlot** - Helper method to set up one equipment slot
-    /// 
+    /// Helper method to set up one equipment slot.
     /// This method:
     /// 1. Finds the slot by name in the UI
     /// 2. Tells it what type it is (Weapon, Headgear, etc.)
@@ -219,7 +211,7 @@ public class DragDropController : MonoBehaviour
 
     #region Event Registration
     /// <summary>
-    /// **RegisterEventHandlers** - Hook up all mouse event listeners
+    /// Hook up all mouse event listeners.
     /// 
     /// UI Toolkit uses callback-based events (like JavaScript):
     /// - RegisterCallback<EventType>(method) = "When this event happens, call this method"
@@ -232,7 +224,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **RegisterInventorySlotEvents** - Listen for mouse events on inventory slots
+    /// Listen for mouse events on inventory slots.
     /// 
     /// We listen for 3 events:
     /// 1. PointerDown = Mouse button pressed (start of potential drag)
@@ -259,7 +251,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **RegisterEquipmentSlotEvents** - Listen for mouse events on equipment slots
+    /// Listen for mouse events on equipment slots.
     /// Same as inventory, but for equipment (weapon, armor, etc.)
     /// </summary>
     private void RegisterEquipmentSlotEvents()
@@ -278,7 +270,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **Cleanup** - Remove all event listeners and reset state
+    /// Remove all event listeners and reset state.
     /// 
     /// CRITICAL: If you don't unregister callbacks, they keep running even after
     /// the GameObject is destroyed, causing memory leaks and errors!
@@ -322,7 +314,7 @@ public class DragDropController : MonoBehaviour
 
     #region Pointer Event Handlers
     /// <summary>
-    /// **OnInventorySlotPointerDown** - Called when mouse button is pressed on inventory slot
+    /// Called when mouse button is pressed on inventory slot.
     /// 
     /// This is the START of a potential drag operation.
     /// We don't start dragging yet - user might just be clicking!
@@ -366,7 +358,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **OnEquipmentSlotPointerDown** - Called when mouse button pressed on equipment slot
+    /// Called when mouse button pressed on equipment slot.
     /// Same as inventory, but for equipment slots (weapon, armor, etc.)
     /// 
     /// **NEW: Also detects double-clicks for quick unequip!**
@@ -399,7 +391,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **OnPointerMove** - Called when mouse moves (while pointer is captured)
+    /// Called when mouse moves (while pointer is captured)
     /// 
     /// This is where we:
     /// 1. Check if user moved far enough to start dragging
@@ -428,7 +420,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **OnInventorySlotPointerUp** - Mouse button released on inventory slot
+    /// Mouse button released on inventory slot.
     /// 
     /// This is the END of the drag operation - time to perform the action!
     /// </summary>
@@ -447,7 +439,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **OnEquipmentSlotPointerUp** - Mouse button released on equipment slot
+    /// Mouse button released on equipment slot.
     /// Same as inventory but for equipment
     /// </summary>
     private void OnEquipmentSlotPointerUp(PointerUpEvent evt)
@@ -462,7 +454,7 @@ public class DragDropController : MonoBehaviour
 
     #region Drag Operations
     /// <summary>
-    /// **StartDrag** - Begin dragging (user moved mouse far enough)
+    /// Begin dragging (user moved mouse far enough)
     /// 
     /// This shows the "ghost" image that follows your mouse
     /// </summary>
@@ -494,7 +486,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **UpdateDragVisuals** - Update ghost position and show drop feedback
+    /// Update ghost position and show drop feedback
     /// 
     /// As you drag, this updates:
     /// - Ghost image position (follows mouse)
@@ -517,7 +509,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **ResetDrag** - Clean up after drag ends
+    /// Clean up after drag ends
     /// 
     /// This removes all visual effects and resets state
     /// </summary>
@@ -540,7 +532,7 @@ public class DragDropController : MonoBehaviour
 
     #region Drop Handling
     /// <summary>
-    /// **HandleDrop** - Execute the drag/drop action
+    /// Execute the drag/drop action
     /// 
     /// This is where the magic happens! Based on where you dragged FROM and TO,
     /// we create the right type of "transaction" to perform the action:
@@ -597,7 +589,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **ExecuteTransaction** - Run the transaction as a coroutine
+    /// Run the transaction as a coroutine
     /// 
     /// Why coroutine? Allows for smooth animations and visual feedback
     /// before actually performing the data changes
@@ -610,7 +602,7 @@ public class DragDropController : MonoBehaviour
 
     #region Validation
     /// <summary>
-    /// **ValidateDropTarget** - Check if we can drop here
+    /// Check if we can drop here
     /// 
     /// This provides real-time feedback while dragging:
     /// - Green = Valid drop location
@@ -658,7 +650,7 @@ public class DragDropController : MonoBehaviour
 
     #region Helper Methods
     /// <summary>
-    /// **GetSlotFromParent** - Find Slot component by walking up the UI hierarchy
+    /// Find Slot component by walking up the UI hierarchy
     /// 
     /// Sometimes you click on a child element (like an icon) instead of the slot itself.
     /// This walks up the parent chain to find the actual Slot component.
@@ -675,7 +667,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **GetEquipmentSlotFromTarget** - Find EquipmentSlot by walking up UI hierarchy
+    /// Find EquipmentSlot by walking up UI hierarchy
     /// Same as GetSlotFromParent but for equipment slots
     /// </summary>
     private EquipmentSlot GetEquipmentSlotFromTarget(VisualElement element)
@@ -693,7 +685,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **FindEquipmentSlotAtPosition** - Find which equipment slot is at mouse position
+    /// Find which equipment slot is at mouse position
     /// 
     /// Uses "worldBound" (the slot's screen rectangle) to check if mouse is inside.
     /// Added padding makes it easier to drop - don't need pixel-perfect accuracy!
@@ -715,7 +707,7 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **FindInventorySlotAtPosition** - Find which inventory slot is at mouse position
+    /// Find which inventory slot is at mouse position
     /// Same as equipment but with smaller padding (10 pixels instead of 20)
     /// Uses RectExtensions.Padded() for cleaner code.
     /// </summary>
@@ -742,13 +734,13 @@ public class DragDropController : MonoBehaviour
 
     #region Public API
     /// <summary>
-    /// **IsDragging** - Check if currently dragging something
+    /// Check if currently dragging something
     /// Useful for other systems (e.g., disable other UI while dragging)
     /// </summary>
     public bool IsDragging() => dragState?.IsDragging ?? false;
     
     /// <summary>
-    /// **GetDraggedSlot** - Get the inventory slot being dragged (if any)
+    /// Get the inventory slot being dragged (if any)
     /// Returns null if dragging from equipment or not dragging at all
     /// </summary>
     public Slot GetDraggedSlot() => dragState?.SourceInventorySlot;
@@ -756,10 +748,9 @@ public class DragDropController : MonoBehaviour
 
     #region Double-Click Handlers
     /// <summary>
-    /// **HandleQuickEquip** - Double-clicked an inventory item, equip it automatically
+    /// Double-clicked an inventory item, equip it automatically
     /// 
-    /// **For Junior Developers:**
-    /// This creates a QuickEquipTransaction which:
+    /// Creates a QuickEquipTransaction which:
     /// 1. Finds the right equipment slot for the item
     /// 2. If occupied, swaps items
     /// 3. If empty, just equips
@@ -796,10 +787,9 @@ public class DragDropController : MonoBehaviour
     }
 
     /// <summary>
-    /// **HandleQuickUnequip** - Double-clicked an equipped item, unequip it automatically
+    /// Double-clicked an equipped item, unequip it automatically
     /// 
-    /// **For Junior Developers:**
-    /// This creates a QuickUnequipTransaction which:
+    /// Creates a QuickUnequipTransaction which:
     /// 1. Finds the first empty inventory slot
     /// 2. Moves the equipped item there
     /// 

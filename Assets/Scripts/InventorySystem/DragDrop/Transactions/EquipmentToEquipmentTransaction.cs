@@ -1,9 +1,7 @@
 using System.Collections;
 using UnityEngine.UIElements;
 
-/// <summary>
 /// Handles moving/swapping items between equipment slots
-/// </summary>
 public class EquipmentToEquipmentTransaction : DragDropTransaction
 {
     private readonly EquipmentSlot sourceEquipment;
@@ -55,7 +53,6 @@ public class EquipmentToEquipmentTransaction : DragDropTransaction
         var currentlyEquipped = equipmentController?.GetEquippedItem(targetEquipment.SlotType);
         
         if (currentlyEquipped != null) {
-            // Swap between two equipment slots
             Log($"Swapping {itemToMove.itemData.itemName} with {currentlyEquipped.itemData.itemName} between equipment slots");
             
             sourceEquipment.ClearItem();
@@ -74,7 +71,6 @@ public class EquipmentToEquipmentTransaction : DragDropTransaction
             sourceEquipment.SetItem(currentlyEquipped);
             sourceEquipment.RefreshVisualState();
         } else {
-            // Move from one equipment slot to another
             Log($"Moving {itemToMove.itemData.itemName} from {sourceEquipment.SlotType} to {targetEquipment.SlotType}");
             
             sourceEquipment.ClearItem();

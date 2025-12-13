@@ -2,18 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-/// <summary>
 /// **QuickEquipTransaction** - Double-click to equip item from inventory
 /// 
-/// **What it does:**
+/// What it does:
 /// - Finds the appropriate equipment slot based on item type
 /// - If slot is empty: Equips the item
 /// - If slot is occupied: Swaps items (equipped item goes back to inventory)
 /// 
-/// **For Junior Developers:**
 /// This transaction is triggered by double-clicking an inventory item.
 /// It's like a shortcut - instead of dragging, just double-click!
-/// </summary>
 public class QuickEquipTransaction : DragDropTransaction
 {
     private readonly Inventory_Item itemToEquip;
@@ -22,7 +19,7 @@ public class QuickEquipTransaction : DragDropTransaction
     private readonly List<EquipmentSlot> equipmentSlots;
     private readonly List<Slot> inventorySlots;
     
-    private EquipmentSlot targetEquipmentSlot; // Determined during CanExecute
+    private EquipmentSlot targetEquipmentSlot;
 
     public QuickEquipTransaction(
         Inventory_Item itemToEquip,
@@ -49,7 +46,6 @@ public class QuickEquipTransaction : DragDropTransaction
             return false;
         }
 
-        // Find the appropriate equipment slot for this item
         targetEquipmentSlot = FindAppropriateEquipmentSlot();
 
         if (targetEquipmentSlot == null) {
@@ -57,7 +53,6 @@ public class QuickEquipTransaction : DragDropTransaction
             return false;
         }
 
-        // Validate that the equipment slot can accept this item
         if (!targetEquipmentSlot.CanAcceptItem(itemToEquip.itemData)) {
             Log($"Equipment slot {targetEquipmentSlot.SlotType} cannot accept {itemToEquip.itemData.itemName}");
             return false;
@@ -69,35 +64,28 @@ public class QuickEquipTransaction : DragDropTransaction
 
     public override IEnumerator Execute()
     {
-        yield return null; // Wait one frame for visual feedback
+        yield return null;
 
         var currentlyEquipped = equipmentController?.GetEquippedItem(targetEquipmentSlot.SlotType);
 
         if (currentlyEquipped != null) {
-            // SWAP: Equipment slot is occupied
             Log($"Swapping: Equipping {itemToEquip.itemData.itemName}, returning {currentlyEquipped.itemData.itemName} to slot {sourceSlotIndex}");
 
-            // Put currently equipped item back in inventory
             sourceSlot.ClearItem();
             sourceSlot.SetItem(currentlyEquipped);
             inventoryController?.RemoveItemAtSlot(sourceSlotIndex);
             inventoryController?.AddItemToSlot(currentlyEquipped, sourceSlotIndex);
         } else {
-            // SIMPLE EQUIP: Equipment slot is empty
             Log($"Equipping {itemToEquip.itemData.itemName} from slot {sourceSlotIndex}");
-
-            // Remove from inventory
             inventoryController?.RemoveItemAtSlot(sourceSlotIndex);
         }
 
-        // Equip the new item
         targetEquipmentSlot.ClearItem();
         targetEquipmentSlot.RefreshVisualState();
         equipmentController?.EquipItem(itemToEquip, targetEquipmentSlot.SlotType);
         targetEquipmentSlot.SetItem(itemToEquip);
         targetEquipmentSlot.RefreshVisualState();
 
-        // Visual feedback
         targetEquipmentSlot?.AddToClassList("inventorySlots--drop-target");
         yield return null;
         targetEquipmentSlot?.RemoveFromClassList("inventorySlots--drop-target");
