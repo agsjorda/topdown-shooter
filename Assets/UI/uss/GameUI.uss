@@ -369,6 +369,28 @@
     border-bottom-left-radius: 10px;
 }
 
+/* Position variants for each slot */
+.equipSlots--weapon {
+    /* Default position */
+}
+
+.equipSlots--headgear {
+    top: 224px;
+    left: 1200px;
+}
+
+.equipSlots--armor {
+    top: 812px;
+    left: 265px;
+}
+
+.equipSlots--boots {
+    top: 812px;
+    left: 1200px;
+    height: 188px;
+    width: 192px;
+}
+
 .equipSlots:hover {
     scale: 1.05 1.05 1.05;
     border-left-color: rgb(248, 163, 46);
@@ -382,20 +404,44 @@
     background-color: rgba(34, 34, 34, 0.7);
 }
 
+/* Base equipment slot icon styling - the actual equipment slot element */
 .equipSlot-icon {
     flex-grow: 1;
     width: 100%;
-    height: auto;
+    height: 100%;
     rotate: -45deg;
     position: relative;
     -unity-background-image-tint-color: rgb(178, 178, 178);
+    -unity-background-scale-mode: scale-to-fit;
     background-size: 100% 100%;
     scale: 0.8 0.8;
+    transition-property: scale;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+/* Icon variants - only set the background image */
+.equipSlot-icon--weapon {
+    background-image: url("project://database/Assets/UI/icons/pistol-gun.png?fileID=2800000&guid=67946d87233370d40a32743df378e812&type=3#pistol-gun");
+}
+
+.equipSlot-icon--headgear {
+    background-image: url("project://database/Assets/UI/icons/spartan-helmet.png?fileID=2800000&guid=b529bf87e379f584b8e09ca0590441e1&type=3#spartan-helmet");
+}
+
+.equipSlot-icon--armor {
+    background-image: url("project://database/Assets/UI/icons/lamellar.png?fileID=2800000&guid=5f54be2900ebead41911aaa3560779c6&type=3#lamellar");
+}
+
+.equipSlot-icon--boots {
+    background-image: url("project://database/Assets/UI/icons/boots.png?fileID=2800000&guid=b27836b0d8d48fe47affacaa720edbe1&type=3#boots");
 }
 
 .equipSlot-icon:hover {
     scale: 0.9 0.9;
 }
+
+/* Equipment slot wrapper styling */
 .equipment-slot {
     position: relative;
 }
@@ -428,29 +474,17 @@
     border-bottom-color: rgba(214, 158, 46, 0.7) !important;
 }
 
-/* Ensure equipment icon container is properly positioned */
+/* Equipment item icon - shown when slot has an item */
 .equipment-icon {
     position: absolute;
     width: 100%;
     height: 100%;
-    z-index: 2;
-}
-
-/* Default icon container should be behind the item icon */
-.default-icon-container {
-    z-index: 1;
-}
-
-/* When slot has item, hide default icon */
-.equipment-slot.has-item .default-icon-container {
-    opacity: 0;
+    top: 0;
+    left: 0;
+    rotate: -45deg;
+    -unity-background-scale-mode: scale-to-fit;
+    scale: 0.8 0.8;
     display: none;
-}
-
-/* When slot has item, show item icon */
-.equipment-slot.has-item .equipment-icon {
-    opacity: 1;
-    display: flex;
 }
 
 /* Equipment slot drop target */

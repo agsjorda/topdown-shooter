@@ -9,8 +9,8 @@ public class EquipmentSlotWrapper
     public Inventory_Item CurrentItem { get; private set; }
 
     private Image _icon;
-    private VisualElement _defaultIconContainer;
-    private StyleBackground _defaultBackground;
+    private Texture2D _originalBackgroundTexture;
+    private Sprite _originalBackgroundSprite;
 
     public EquipmentSlotWrapper(VisualElement element, EquipmentSlotType slotType)
     {
@@ -19,45 +19,55 @@ public class EquipmentSlotWrapper
         CurrentItem = null;
         HasItem = false;
 
-        // Store the original background image
-        _defaultBackground = element.style.backgroundImage;
-
-        // Clear the background image from the main element
-        element.style.backgroundImage = StyleKeyword.None;
-
-        // Create a container for the default icon
-        _defaultIconContainer = new VisualElement();
-        _defaultIconContainer.name = "default-icon-container";
-        _defaultIconContainer.AddToClassList("equipSlot-icon");
-        _defaultIconContainer.style.width = Length.Percent(100);
-        _defaultIconContainer.style.height = Length.Percent(100);
-
-        // Set the background image from the original element
-        if (_defaultBackground != null && _defaultBackground != StyleKeyword.Null) {
-            _defaultIconContainer.style.backgroundImage = _defaultBackground;
+        // Try to get background from inline style first
+        var bgImage = element.style.backgroundImage;
+        
+        Debug.Log($"[{slotType}] Init - Inline style keyword: {bgImage.keyword}, value: {bgImage.value}");
+        
+        if (bgImage.keyword == StyleKeyword.Undefined && bgImage.value != null) {
+            // Has inline style
+            if (bgImage.value.texture != null) {
+                _originalBackgroundTexture = bgImage.value.texture as Texture2D;
+                Debug.Log($"[{slotType}] Got texture from inline style: {_originalBackgroundTexture?.name}");
+            } else if (bgImage.value.sprite != null) {
+                _originalBackgroundSprite = bgImage.value.sprite;
+                _originalBackgroundTexture = _originalBackgroundSprite.texture;
+                Debug.Log($"[{slotType}] Got sprite from inline style: {_originalBackgroundSprite?.name}");
+            }
+        }
+        
+        // ALWAYS try resolvedStyle as it contains computed values from USS
+        var resolvedBg = element.resolvedStyle.backgroundImage;
+        Debug.Log($"[{slotType}] Resolved style - texture: {resolvedBg.texture != null}, sprite: {resolvedBg.sprite != null}");
+        
+        if (_originalBackgroundTexture == null && _originalBackgroundSprite == null) {
+            // Fallback to resolvedStyle
+            if (resolvedBg.texture != null) {
+                _originalBackgroundTexture = resolvedBg.texture as Texture2D;
+                Debug.Log($"[{slotType}] Got texture from resolved style: {_originalBackgroundTexture?.name}");
+            } else if (resolvedBg.sprite != null) {
+                _originalBackgroundSprite = resolvedBg.sprite;
+                _originalBackgroundTexture = _originalBackgroundSprite.texture;
+                Debug.Log($"[{slotType}] Got sprite from resolved style: {_originalBackgroundSprite?.name}");
+            }
         }
 
-        // Make it visible initially
-        _defaultIconContainer.style.display = DisplayStyle.Flex;
-        _defaultIconContainer.style.opacity = 1f;
+        Debug.Log($"[{slotType}] Final - Has texture: {_originalBackgroundTexture != null}, Has sprite: {_originalBackgroundSprite != null}");
 
-        // Add the default icon container to the element
-        element.Add(_defaultIconContainer);
+        // Create the item icon that will replace the background when equipped
+        _icon = new Image {
+            name = "equipment-icon",
+            scaleMode = ScaleMode.ScaleToFit
+        };
+        _icon.AddToClassList("equipment-icon");
+        _icon.style.width = Length.Percent(100);
+        _icon.style.height = Length.Percent(100);
+        _icon.style.position = Position.Absolute;
+        _icon.style.top = 0;
+        _icon.style.left = 0;
+        _icon.style.display = DisplayStyle.None;
 
-        // Create or find the item icon
-        _icon = element.Q<Image>("equipment-icon");
-        if (_icon == null) {
-            _icon = new Image {
-                name = "equipment-icon",
-                scaleMode = ScaleMode.ScaleToFit
-            };
-            _icon.AddToClassList("equipment-icon");
-            _icon.style.width = Length.Percent(100);
-            _icon.style.height = Length.Percent(100);
-            _icon.style.display = DisplayStyle.None;
-            _icon.style.opacity = 0f;
-            element.Add(_icon);
-        }
+        element.Add(_icon);
 
         // Add equipment slot classes
         element.AddToClassList("equipment-slot");
@@ -92,18 +102,14 @@ public class EquipmentSlotWrapper
         HasItem = true;
         CurrentItem = item;
 
-        // Hide default icon container
-        if (_defaultIconContainer != null) {
-            _defaultIconContainer.style.display = DisplayStyle.None;
-            _defaultIconContainer.style.opacity = 0f;
-        }
+        // Hide the default background by setting it to null
+        VisualElement.style.backgroundImage = StyleKeyword.None;
 
         // Show the item icon
         if (_icon != null && item.itemData.icon != null) {
             _icon.image = item.itemData.icon.texture;
             _icon.sprite = item.itemData.icon;
             _icon.style.display = DisplayStyle.Flex;
-            _icon.style.opacity = 1f;
         }
 
         // Add class to indicate slot has item
@@ -115,18 +121,20 @@ public class EquipmentSlotWrapper
         HasItem = false;
         CurrentItem = null;
 
+        // Restore the default background - prefer sprite if available
+        if (_originalBackgroundSprite != null) {
+            VisualElement.style.backgroundImage = new StyleBackground(_originalBackgroundSprite);
+        } else if (_originalBackgroundTexture != null) {
+            VisualElement.style.backgroundImage = new StyleBackground(_originalBackgroundTexture);
+        }
+
+        // DON'T restore tint color - let USS handle it via .equipSlot-icon class
+
         // Hide the item icon
         if (_icon != null) {
             _icon.image = null;
             _icon.sprite = null;
             _icon.style.display = DisplayStyle.None;
-            _icon.style.opacity = 0f;
-        }
-
-        // Show default icon container
-        if (_defaultIconContainer != null) {
-            _defaultIconContainer.style.display = DisplayStyle.Flex;
-            _defaultIconContainer.style.opacity = 1f;
         }
 
         // Remove class to indicate slot is empty
@@ -141,31 +149,31 @@ public class EquipmentSlotWrapper
     // Method to refresh the visual state
     public void RefreshVisualState()
     {
-        if (HasItem && CurrentItem != null && _icon != null && CurrentItem.itemData?.icon != null) {
-            // Ensure item icon is showing
-            _icon.image = CurrentItem.itemData.icon.texture;
-            _icon.sprite = CurrentItem.itemData.icon;
-            _icon.style.display = DisplayStyle.Flex;
-            _icon.style.opacity = 1f;
+        if (HasItem && CurrentItem != null && CurrentItem.itemData?.icon != null) {
+            // Has item - hide background, show item icon
+            VisualElement.style.backgroundImage = StyleKeyword.None;
 
-            // Ensure default icon is hidden
-            if (_defaultIconContainer != null) {
-                _defaultIconContainer.style.display = DisplayStyle.None;
-                _defaultIconContainer.style.opacity = 0f;
+            if (_icon != null) {
+                _icon.image = CurrentItem.itemData.icon.texture;
+                _icon.sprite = CurrentItem.itemData.icon;
+                _icon.style.display = DisplayStyle.Flex;
             }
 
             VisualElement.AddToClassList("has-item");
         } else {
-            // Ensure default icon is showing
-            if (_defaultIconContainer != null) {
-                _defaultIconContainer.style.display = DisplayStyle.Flex;
-                _defaultIconContainer.style.opacity = 1f;
+            // No item - restore background, hide item icon
+            if (_originalBackgroundSprite != null) {
+                VisualElement.style.backgroundImage = new StyleBackground(_originalBackgroundSprite);
+            } else if (_originalBackgroundTexture != null) {
+                VisualElement.style.backgroundImage = new StyleBackground(_originalBackgroundTexture);
             }
 
-            // Ensure item icon is hidden
+            // DON'T restore tint color - let USS handle it via .equipSlot-icon class
+
             if (_icon != null) {
+                _icon.image = null;
+                _icon.sprite = null;
                 _icon.style.display = DisplayStyle.None;
-                _icon.style.opacity = 0f;
             }
 
             VisualElement.RemoveFromClassList("has-item");

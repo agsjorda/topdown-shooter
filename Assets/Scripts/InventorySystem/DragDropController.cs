@@ -52,6 +52,9 @@ public class DragDropController : MonoBehaviour
     private System.Collections.IEnumerator Initialize()
     {
         yield return null;
+        
+        // Wait an extra frame for USS to be applied
+        yield return null;
 
         int maxWait = 60;
         int waited = 0;
@@ -678,13 +681,15 @@ public class DragDropController : MonoBehaviour
         yield return null;
 
         Inventory_Item itemToEquip = null;
+        int sourceSlotIndex = -1;
 
         if (_draggedFromEquipment != null) {
             itemToEquip = _draggedFromEquipment.GetEquippedItem();
             if (debugMode) Debug.Log($"Dragging from equipment slot: {itemToEquip?.itemData?.itemName}");
         } else {
             itemToEquip = inventoryController?.GetItemAtSlot(fromSlot.SlotIndex);
-            if (debugMode) Debug.Log($"Dragging from inventory slot: {itemToEquip?.itemData?.itemName}");
+            sourceSlotIndex = fromSlot.SlotIndex; // Store the source slot index
+            if (debugMode) Debug.Log($"Dragging from inventory slot {sourceSlotIndex}: {itemToEquip?.itemData?.itemName}");
         }
 
         if (itemToEquip != null) {
@@ -694,17 +699,15 @@ public class DragDropController : MonoBehaviour
                 if (debugMode) Debug.Log($"Target slot already has item: {currentlyEquipped.itemData.itemName}");
 
                 if (_draggedFromEquipment != null) {
-                    // Clear both slots first
+                    // Swapping between two equipment slots
                     _draggedFromEquipment.ClearItem();
                     _draggedFromEquipment.RefreshVisualState();
                     toEquipment.ClearItem();
                     toEquipment.RefreshVisualState();
 
-                    // Unequip from both slots
                     equipmentController?.UnequipSlot(_draggedFromEquipment.SlotType);
                     equipmentController?.UnequipSlot(toEquipment.SlotType);
 
-                    // Equip items in swapped positions
                     equipmentController?.EquipItem(itemToEquip, toEquipment.SlotType);
                     toEquipment.SetItem(itemToEquip);
                     toEquipment.RefreshVisualState();
@@ -715,20 +718,20 @@ public class DragDropController : MonoBehaviour
 
                     if (debugMode) Debug.Log($"Swapped {itemToEquip.itemData.itemName} with {currentlyEquipped.itemData.itemName} between equipment slots");
                 } else {
-                    int emptySlotIndex = FindEmptyInventorySlot();
-                    if (emptySlotIndex >= 0) {
-                        // Update visual slot for the item being moved to inventory
-                        if (emptySlotIndex >= 0 && emptySlotIndex < slots.Count) {
-                            var emptySlot = slots[emptySlotIndex];
-                            if (emptySlot != null) {
-                                emptySlot.SetItem(currentlyEquipped);
-                            }
+                    // Equipping from inventory when equipment slot already has an item
+                    // Put the currently equipped item back into the SOURCE slot (where we took the new item from)
+                    if (sourceSlotIndex >= 0 && sourceSlotIndex < slots.Count) {
+                        var sourceSlot = slots[sourceSlotIndex];
+                        if (sourceSlot != null) {
+                            sourceSlot.ClearItem();
+                            sourceSlot.SetItem(currentlyEquipped);
                         }
 
-                        inventoryController?.AddItemToSlot(currentlyEquipped, emptySlotIndex);
-                        inventoryController?.RemoveItemAtSlot(fromSlot.SlotIndex);
+                        // Update inventory data
+                        inventoryController?.RemoveItemAtSlot(sourceSlotIndex);
+                        inventoryController?.AddItemToSlot(currentlyEquipped, sourceSlotIndex);
 
-                        // Clear and set equipment
+                        // Update equipment
                         toEquipment.ClearItem();
                         toEquipment.RefreshVisualState();
 
@@ -736,14 +739,15 @@ public class DragDropController : MonoBehaviour
                         toEquipment.SetItem(itemToEquip);
                         toEquipment.RefreshVisualState();
 
-                        if (debugMode) Debug.Log($"Equipped {itemToEquip.itemData.itemName}, unequipped {currentlyEquipped.itemData.itemName} to inventory slot {emptySlotIndex}");
+                        if (debugMode) Debug.Log($"Swapped: Equipped {itemToEquip.itemData.itemName}, put {currentlyEquipped.itemData.itemName} back in slot {sourceSlotIndex}");
                     } else {
-                        if (debugMode) Debug.LogWarning("No empty inventory slots to unequip item!");
+                        if (debugMode) Debug.LogError($"Invalid source slot index: {sourceSlotIndex}");
                         toEquipment.VisualElement.RemoveFromClassList("inventorySlots--drop-target");
                         yield break;
                     }
                 }
             } else {
+                // Equipment slot is empty
                 if (_draggedFromEquipment != null) {
                     _draggedFromEquipment.ClearItem();
                     _draggedFromEquipment.RefreshVisualState();
@@ -758,7 +762,7 @@ public class DragDropController : MonoBehaviour
 
                     if (debugMode) Debug.Log($"Moved {itemToEquip.itemData.itemName} from {_draggedFromEquipment.SlotType} to {toEquipment.SlotType}");
                 } else {
-                    inventoryController?.RemoveItemAtSlot(fromSlot.SlotIndex);
+                    inventoryController?.RemoveItemAtSlot(sourceSlotIndex);
 
                     toEquipment.ClearItem();
                     toEquipment.RefreshVisualState();
@@ -767,7 +771,7 @@ public class DragDropController : MonoBehaviour
                     toEquipment.SetItem(itemToEquip);
                     toEquipment.RefreshVisualState();
 
-                    if (debugMode) Debug.Log($"Equipped {itemToEquip.itemData.itemName} in {toEquipment.SlotType} slot");
+                    if (debugMode) Debug.Log($"Equipped {itemToEquip.itemData.itemName} from slot {sourceSlotIndex} in {toEquipment.SlotType} slot");
                 }
             }
         }
