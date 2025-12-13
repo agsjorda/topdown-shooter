@@ -8381,7 +8381,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   poolSize: 20
   weaponPickup: {fileID: 6800708079760976525, guid: ad45c03789183a64f87156b53be9549c, type: 3}
-  armorPickup: {fileID: 0}
+  armorPickup: {fileID: 8245020478746777426, guid: 0286b2a462ca43948ad145d1d3e33e62, type: 3}
   ammoPickup: {fileID: 2716842780576957897, guid: 1e7602fd735f9af4cb614d55004107ed, type: 3}
   floatingText: {fileID: 2589478557298932302, guid: 12a85db372b43294d97145eda2751fa3, type: 3}
 --- !u!4 &1224560878
@@ -28666,6 +28666,7 @@ GameObject:
   - component: {fileID: 5175042669947933899}
   - component: {fileID: 6561349309554518888}
   - component: {fileID: 3891319841723574920}
+  - component: {fileID: 7286556238801304565}
   m_Layer: 0
   m_Name: Pickup_Armor - Cowboy Hat
   m_TagString: Untagged
@@ -28673,6 +28674,19 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &7286556238801304565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7286556238801304564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3b5283f7cc2dd549b293f89bc93c688, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PooledObject
+  originalPrefab: {fileID: 8245020478746777426, guid: 0286b2a462ca43948ad145d1d3e33e62, type: 3}
 --- !u!4 &7289990191555913609
 Transform:
   m_ObjectHideFlags: 0
@@ -30963,7 +30977,7 @@ MonoBehaviour:
   requireLookAt: 0
   maxLookAngle: 45
   armorData: {fileID: 11400000, guid: 4e21ae659b6957c41bab1896f9d5bba0, type: 2}
-  armorVisual: {fileID: 0}
+  armorVisual: {fileID: 8947321344670517956}
 --- !u!4 &8553889085488605854
 Transform:
   m_ObjectHideFlags: 0
