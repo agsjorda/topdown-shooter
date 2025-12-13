@@ -5,8 +5,8 @@ using UnityEngine.UIElements;
 public partial class Slot : VisualElement
 {
     private Image _icon;
-    private bool _hasItem;
-    private string _itemId = string.Empty;
+    protected bool _hasItem;
+    protected string _itemId = string.Empty;
     private int _slotIndex;
 
     public Image Icon {
