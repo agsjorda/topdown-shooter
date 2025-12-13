@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
+using System.Linq;
 
 /// Handles all visual feedback during drag operations (ghost, highlighting, etc.)
 /// Separates visual concerns from drag logic.
@@ -20,22 +21,14 @@ public class DragVisualHandler
     private VisualElement CreateDragGhost(VisualElement root)
     {
         // Remove existing ghost if any
-        var existingGhost = root.Q<VisualElement>("dragGhost");
-        existingGhost?.RemoveFromHierarchy();
+        root.Q<VisualElement>("dragGhost")?.RemoveFromHierarchy();
 
-        // Create new ghost
-        var ghost = new VisualElement {
-            name = "dragGhost",
-            pickingMode = PickingMode.Ignore
-        };
-
-        ghost.AddToClassList("drag-ghost");
-        ghost.style.position = Position.Absolute;
-        ghost.style.width = 128;
-        ghost.style.height = 128;
-
-        root.Add(ghost);
-        return ghost;
+        // Create new ghost with fluent API using extensions
+        return root.CreateChild("drag-ghost")
+            .WithName("dragGhost")
+            .WithPickingMode(PickingMode.Ignore)
+            .WithAbsolutePosition()
+            .WithSize(128, 128);
     }
     
     public void ShowGhost(Sprite icon, Vector2 position)
@@ -45,9 +38,11 @@ public class DragVisualHandler
         Texture2D texture = icon.texture;
         if (texture == null) return;
 
-        dragGhost.style.backgroundImage = new StyleBackground(texture);
-        dragGhost.AddToClassList("drag-ghost--visible");
-        dragGhost.BringToFront();
+        // Use fluent API for cleaner code
+        dragGhost
+            .WithBackgroundImage(texture)
+            .AddClass("drag-ghost--visible")
+            .BringToFront();
 
         if (highlightEmptySlots) HighlightEmptySlots();
 
@@ -64,51 +59,44 @@ public class DragVisualHandler
     
     public void UpdateAppearance(bool isValidDrop)
     {
-        dragGhost.RemoveFromClassList("drag-ghost--over-empty");
-        dragGhost.RemoveFromClassList("drag-ghost--over-occupied");
-        dragGhost.AddToClassList(isValidDrop ? "drag-ghost--over-empty" : "drag-ghost--over-occupied");
+        // Use extension to remove multiple classes at once, then conditionally add
+        dragGhost
+            .RemoveClass("drag-ghost--over-empty", "drag-ghost--over-occupied")
+            .AddClassIf(isValidDrop, "drag-ghost--over-empty", "drag-ghost--over-occupied");
     }
     
     public void HideGhost()
     {
-        if (dragGhost == null) return;
-
-        dragGhost.RemoveFromClassList("drag-ghost--visible");
-        dragGhost.RemoveFromClassList("drag-ghost--over-empty");
-        dragGhost.RemoveFromClassList("drag-ghost--over-occupied");
-        dragGhost.style.backgroundImage = null;
+        // Use null-conditional operator with fluent API
+        dragGhost?
+            .RemoveClass("drag-ghost--visible", "drag-ghost--over-empty", "drag-ghost--over-occupied")
+            .WithBackgroundImage(null);
 
         if (highlightEmptySlots) RemoveEmptySlotHighlighting();
     }
     
     public void AddDraggingClass(Slot slot)
     {
-        slot?.AddToClassList("inventorySlots--dragging");
+        slot?.AddClass("inventorySlots--dragging");
     }
     
     public void RemoveDraggingClass(Slot slot)
     {
-        slot?.RemoveFromClassList("inventorySlots--dragging");
+        slot?.RemoveClass("inventorySlots--dragging");
     }
     
     private void HighlightEmptySlots()
     {
-        if (inventorySlots == null) return;
-
-        foreach (var slot in inventorySlots) {
-            if (slot != null && !slot.HasItem) {
-                slot.AddToClassList("inventorySlots--empty-highlight");
-            }
-        }
+        // Use LINQ + batch extension for cleaner code
+        inventorySlots?
+            .Where(slot => slot != null && !slot.HasItem)
+            .AddClassToAll("inventorySlots--empty-highlight");
     }
     
     private void RemoveEmptySlotHighlighting()
     {
-        if (inventorySlots == null) return;
-
-        foreach (var slot in inventorySlots) {
-            slot?.RemoveFromClassList("inventorySlots--empty-highlight");
-        }
+        // Use batch extension to remove class from all slots
+        inventorySlots?.RemoveClassFromAll("inventorySlots--empty-highlight");
     }
     
     public void Cleanup()

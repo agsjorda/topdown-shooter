@@ -696,22 +696,17 @@ public class DragDropController : MonoBehaviour
     /// **FindEquipmentSlotAtPosition** - Find which equipment slot is at mouse position
     /// 
     /// Uses "worldBound" (the slot's screen rectangle) to check if mouse is inside.
-    /// Added padding (±20 pixels) makes it easier to drop - don't need pixel-perfect accuracy!
+    /// Added padding makes it easier to drop - don't need pixel-perfect accuracy!
+    /// Uses RectExtensions.Padded() for cleaner code.
     /// </summary>
     private EquipmentSlot FindEquipmentSlotAtPosition(Vector2 position)
     {
         foreach (var slot in equipmentSlots) {
             if (slot == null) continue;
 
-            var bounds = slot.worldBound;
-            
             // Add 20 pixel padding on all sides for easier dropping
-            var paddedBounds = new Rect(
-                bounds.x - 20,
-                bounds.y - 20,
-                bounds.width + 40,
-                bounds.height + 40
-            );
+            // Using extension method for cleaner code
+            var paddedBounds = slot.worldBound.Padded(20);
 
             if (paddedBounds.Contains(position)) return slot;
         }
@@ -722,6 +717,7 @@ public class DragDropController : MonoBehaviour
     /// <summary>
     /// **FindInventorySlotAtPosition** - Find which inventory slot is at mouse position
     /// Same as equipment but with smaller padding (10 pixels instead of 20)
+    /// Uses RectExtensions.Padded() for cleaner code.
     /// </summary>
     private Slot FindInventorySlotAtPosition(Vector2 position)
     {
@@ -730,15 +726,8 @@ public class DragDropController : MonoBehaviour
         foreach (var slot in inventorySlots) {
             if (slot == null) continue;
 
-            var bounds = slot.worldBound;
-            
-            // Add 10 pixel padding
-            var paddedBounds = new Rect(
-                bounds.x - 10,
-                bounds.y - 10,
-                bounds.width + 20,
-                bounds.height + 20
-            );
+            // Add 10 pixel padding using extension method
+            var paddedBounds = slot.worldBound.Padded(10);
 
             if (paddedBounds.Contains(position)) {
                 if (debugMode) Debug.Log($"[DragDrop] Found drop target slot at position {position}");
