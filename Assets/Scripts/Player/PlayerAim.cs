@@ -3,159 +3,219 @@ using UnityEngine;
 
 public class PlayerAim : MonoBehaviour
 {
+    [Header("References")]
     private Player player;
     private PlayerControls controls;
 
-    [Header("Aim Visual - Laser")]
-    [SerializeField] private LineRenderer aimLaser; //this is on the weapon holder object(child of player)
-
-
-    [Header("Aim Control")]
-    [SerializeField] private Transform aim;
-
-    [SerializeField] private bool isAimingPrecisely;
-    [SerializeField] private bool isLockingToTarget;
-
-    [Header("Camera Control")]
+    [Header("Aim Visuals")]
+    [SerializeField] private LineRenderer aimLaser;
+    [SerializeField] private Transform aimTransform;
     [SerializeField] private Transform cameraTarget;
+
+    [Header("Aim Settings")]
+    [SerializeField] private LayerMask aimLayerMask;
+    [SerializeField] private bool isAimingPrecisely = false;
+    [SerializeField] private bool isLockingToTarget = false;
+
+    [Header("Camera Settings")]
     [Range(0.2f, 1f)]
-    [SerializeField] private float minCameraDistance = .9f;
+    [SerializeField] private float minCameraDistance = 0.9f;
     [Range(0.5f, 3f)]
     [SerializeField] private float maxCameraDistance = 1.6f;
-    [Range(1f, 10f)]
-    //[SerializeField] private float cameraSensitivity = 3f;
+    [SerializeField] private float cameraFollowSmoothTime = 0.12f;
 
-    [Tooltip("Smooth time used by SmoothDamp. Lower = snappier following.")] //remove if change update camera position to Lerp
-    [SerializeField] private float cameraFollowSmoothTime = 0.12f; //remove if change update camera position to Lerp
-
-    [Space]
-
-    [SerializeField] private LayerMask aimLayerMask;
-
+    // Internal state
     private Vector2 mouseInput;
     private RaycastHit lastKnownMouseHit;
-    private Vector3 cameraVelocity;  //remove if change update camera position to Lerp
+    private Vector3 cameraVelocity;
+
+    #region Properties
+    public Transform Aim => aimTransform;
+    public bool CanAimPrecisely => isAimingPrecisely;
+    public bool IsLockingToTarget => isLockingToTarget;
+    #endregion
 
     private void Start()
     {
         player = GetComponent<Player>();
         controls = player.controls;
-        InitializeAimInput();
+        InitializeInput();
     }
 
     private void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.P))
-            isAimingPrecisely = !isAimingPrecisely;
-
-        if (Input.GetKeyDown(KeyCode.L))
-            isLockingToTarget = !isLockingToTarget;
-
+        HandleDebugInput();
         UpdateAimVisuals();
         UpdateAimPosition();
         UpdateCameraPosition();
     }
 
+    #region Input Handling
+    private void InitializeInput()
+    {
+        controls.Character.Aim.performed += ctx => mouseInput = ctx.ReadValue<Vector2>();
+        controls.Character.Aim.canceled += ctx => mouseInput = Vector2.zero;
+    }
+
+    private void HandleDebugInput()
+    {
+        // For debugging - remove in production
+        if (Input.GetKeyDown(KeyCode.P))
+            isAimingPrecisely = !isAimingPrecisely;
+
+        if (Input.GetKeyDown(KeyCode.L))
+            isLockingToTarget = !isLockingToTarget;
+    }
+    #endregion
+
+    #region Aim Visuals
     private void UpdateAimVisuals()
     {
+        bool shouldShowLaser = player.weapon?.IsWeaponReady ?? false;
+        aimLaser.enabled = shouldShowLaser;
 
-        aimLaser.enabled = player.weapon.IsWeaponReady();
+        if (!shouldShowLaser) return;
 
-        if (aimLaser.enabled == false)
-            return;
-
-        WeaponModel weaponModel = player.weaponVisuals.CurrentWeaponModel();
-
-        weaponModel.transform.LookAt(aim);
-        weaponModel.gunPoint.LookAt(aim);
-
-        Transform gunPoint = player.weapon.GunPoint();
-        Vector3 laserDirection = player.weapon.BulletDirection();
-
-        float laserTipLength = 0.5f;
-        float gunDistance = player.weapon.CurrentWeapon().gunDistance;
-
-        Vector3 endPoint = gunPoint.position + laserDirection * gunDistance;
-
-        if (Physics.Raycast(gunPoint.position, laserDirection, out RaycastHit hitInfo, gunDistance, aimLayerMask)) {
-            endPoint = hitInfo.point;
-            laserTipLength = 0;
-
-        }
-
-        aimLaser.SetPosition(0, gunPoint.position);
-        aimLaser.SetPosition(1, endPoint);
-        aimLaser.SetPosition(2, endPoint + laserDirection * laserTipLength);
+        UpdateWeaponAimDirection();
+        UpdateLaserRenderer();
     }
+
+    private void UpdateWeaponAimDirection()
+    {
+        WeaponModel weaponModel = player.weaponVisuals?.GetCurrentWeaponModel();
+        if (weaponModel == null) return;
+
+        // Make weapon and gun point look at aim
+        weaponModel.transform.LookAt(aimTransform);
+        weaponModel.gunPoint.LookAt(aimTransform);
+    }
+
+    private void UpdateLaserRenderer()
+    {
+        Transform gunPoint = player.weapon != null ? player.weapon.GunPoint() : null;
+        if (gunPoint == null) return;
+
+        // Fix CS1061: 'PlayerWeaponController' does not contain a definition for 'BulletDirection'
+        // Use gunPoint.forward directly, since BulletDirection() does not exist.
+        Vector3 laserDirection = gunPoint.forward;
+        float gunDistance = player.weapon != null && player.weapon.CurrentWeapon != null
+            ? player.weapon.CurrentWeapon.gunDistance
+            : 4f;
+
+        CalculateLaserEndPoints(gunPoint.position, laserDirection, gunDistance,
+            out Vector3 mainEndPoint, out float laserTipLength);
+
+        aimLaser.SetPositions(new Vector3[] {
+            gunPoint.position,
+            mainEndPoint,
+            mainEndPoint + laserDirection * laserTipLength
+        });
+    }
+
+    private void CalculateLaserEndPoints(Vector3 startPoint, Vector3 direction, float maxDistance,
+        out Vector3 endPoint, out float tipLength)
+    {
+        tipLength = 0.5f;
+
+        if (Physics.Raycast(startPoint, direction, out RaycastHit hit, maxDistance, aimLayerMask)) {
+            endPoint = hit.point;
+            tipLength = 0f;
+        } else {
+            endPoint = startPoint + direction * maxDistance;
+        }
+    }
+    #endregion
+
+    #region Aim Position
     private void UpdateAimPosition()
     {
-        Transform target = Target();
+        Transform target = GetCurrentTarget();
 
         if (target != null && isLockingToTarget) {
-            aim.position = target.position;
+            aimTransform.position = target.position;
             return;
         }
 
-        aim.position = GetMouseHitInfo().point;
-
-        if (!isAimingPrecisely)
-            aim.position = new Vector3(aim.position.x, transform.position.y + 1, aim.position.z); // Keep the aim at the player's height
+        aimTransform.position = CalculateAimPosition();
     }
 
-
-    public Transform Target()
+    private Vector3 CalculateAimPosition()
     {
-        Transform target = null;
-        var hitTransform = GetMouseHitInfo().transform;
-        if (hitTransform != null && hitTransform.GetComponent<Target>() != null)
-            target = hitTransform;
-        return target;
-    }
-    public Transform Aim() => aim;
-    public bool CanAimPrecisely() => isAimingPrecisely;
-    public RaycastHit GetMouseHitInfo()
-    {
-        Ray ray = Camera.main.ScreenPointToRay(mouseInput);
+        Vector3 mouseWorldPosition = GetMouseWorldPosition();
 
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, aimLayerMask)) {
-            lastKnownMouseHit = hitInfo;
-            return hitInfo;
+        if (!isAimingPrecisely) {
+            // Keep aim at player's height for non-precise aiming
+            mouseWorldPosition.y = transform.position.y + 1f;
         }
 
-        return lastKnownMouseHit; // Placeholder for actual mouse position logic
+        return mouseWorldPosition;
     }
 
-    #region Camera Region
+    public Transform GetCurrentTarget()
+    {
+        RaycastHit mouseHit = GetMouseRaycastHit();
+        Transform hitTransform = mouseHit.transform;
+
+        if (hitTransform != null && hitTransform.GetComponent<Target>() != null)
+            return hitTransform;
+
+        return null;
+    }
+
+    public RaycastHit GetMouseRaycastHit()
+    {
+        if (Camera.main == null) return lastKnownMouseHit;
+
+        Ray ray = Camera.main.ScreenPointToRay(mouseInput);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, aimLayerMask)) {
+            lastKnownMouseHit = hit;
+            return hit;
+        }
+
+        return lastKnownMouseHit;
+    }
+
+    private Vector3 GetMouseWorldPosition()
+    {
+        return GetMouseRaycastHit().point;
+    }
+    #endregion
+
+    #region Camera Control
     private void UpdateCameraPosition()
     {
-        //cameraTarget.position = Vector3.Lerp(cameraTarget.position, DesiredCameraPosition(), cameraSensitivity * Time.deltaTime);
-        cameraTarget.position = Vector3.SmoothDamp(cameraTarget.position, DesiredCameraPosition(), ref cameraVelocity, cameraFollowSmoothTime);
+        Vector3 targetPosition = CalculateCameraTargetPosition();
+        cameraTarget.position = Vector3.SmoothDamp(
+            cameraTarget.position,
+            targetPosition,
+            ref cameraVelocity,
+            cameraFollowSmoothTime
+        );
     }
 
-    private Vector3 DesiredCameraPosition()
+    private Vector3 CalculateCameraTargetPosition()
     {
+        Vector3 mouseWorldPos = GetMouseWorldPosition();
+        Vector3 aimDirection = (mouseWorldPos - transform.position).normalized;
 
-        float actualMaxCameraDistance = player.movement.moveInput.y < -.5f ? minCameraDistance : maxCameraDistance;
+        // Adjust max distance when moving backwards
+        float actualMaxDistance = player.movement?.moveInput.y < -0.5f ?
+            minCameraDistance : maxCameraDistance;
 
-        Vector3 desiredCameraPosition = GetMouseHitInfo().point;
-        Vector3 aimDirection = (desiredCameraPosition - transform.position).normalized;
+        float distanceToMouse = Vector3.Distance(transform.position, mouseWorldPos);
+        float clampedDistance = Mathf.Clamp(distanceToMouse, minCameraDistance, actualMaxDistance);
 
-        float distanceToMouse = Vector3.Distance(transform.position, desiredCameraPosition);
-        float clampedDistance = Mathf.Clamp(distanceToMouse, minCameraDistance, actualMaxCameraDistance);
+        Vector3 cameraPosition = transform.position + aimDirection * clampedDistance;
+        cameraPosition.y = transform.position.y + 1f; // Keep at player's height
 
-        desiredCameraPosition = transform.position + aimDirection * clampedDistance;
-        desiredCameraPosition.y = transform.position.y + 1; // Keep the aim at the player's height
-
-        return desiredCameraPosition;
+        return cameraPosition;
     }
-
     #endregion
-    private void InitializeAimInput()
-    {
-        controls.Character.Aim.performed += context => mouseInput = context.ReadValue<Vector2>();
-        controls.Character.Aim.canceled += context => mouseInput = Vector2.zero;
-    }
 
-
+    #region Public API
+    public void SetPreciseAiming(bool precise) => isAimingPrecisely = precise;
+    public void SetTargetLocking(bool locking) => isLockingToTarget = locking;
+    public Vector3 GetAimDirection() => (aimTransform.position - transform.position).normalized;
+    #endregion
 }

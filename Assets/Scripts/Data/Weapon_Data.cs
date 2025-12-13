@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Weapon Data", menuName = "Weapon System/Weapon Data")]
-public class Weapon_Data : ScriptableObject
+public class Weapon_Data : Item_DataSO
 {
     public string weaponName;
 
@@ -40,4 +40,3 @@ public class Weapon_Data : ScriptableObject
     public float cameraDistance = 6;
 
 }
-

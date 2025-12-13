@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6679e192d5720344bb4ba0a73f7bfde0, type: 3}
   m_Name: Weapon_ShotGun_D
   m_EditorClassIdentifier: Assembly-CSharp::Weapon_Data
+  _itemId: 54b15fa46638442e968789137a56f0b9
+  itemName: 
+  icon: {fileID: 21300000, guid: f49abfd2ca193974ea6c89b439d60796, type: 3}
+  description: 
+  itemType: 0
+  stackable: 0
+  maxStack: 99
   weaponName: Beretta k6
   bulletsInMagazine: 30
   magazineCapacity: 30

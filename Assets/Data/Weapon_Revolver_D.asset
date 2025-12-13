@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6679e192d5720344bb4ba0a73f7bfde0, type: 3}
   m_Name: Weapon_Revolver_D
   m_EditorClassIdentifier: Assembly-CSharp::Weapon_Data
+  _itemId: 0fc9e83d71ab49e5b485b17dc393d1e1
+  itemName: 
+  icon: {fileID: 21300000, guid: 9c356dfc1eb2472468c7e143d71d1794, type: 3}
+  description: 
+  itemType: 0
+  stackable: 0
+  maxStack: 99
   weaponName: 
   bulletsInMagazine: 12
   magazineCapacity: 12

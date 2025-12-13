@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6679e192d5720344bb4ba0a73f7bfde0, type: 3}
   m_Name: Weapon_Rifle_D
   m_EditorClassIdentifier: Assembly-CSharp::Weapon_Data
+  _itemId: e63538a9df404006bf4539b4a6b90b20
+  itemName: 
+  icon: {fileID: 21300000, guid: 37142958fbd6f81429ba21bc4d7f3dd1, type: 3}
+  description: 
+  itemType: 0
+  stackable: 0
+  maxStack: 99
   weaponName: Benelli M12
   bulletsInMagazine: 30
   magazineCapacity: 30

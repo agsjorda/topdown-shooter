@@ -4,153 +4,239 @@ using UnityEngine;
 
 public class PlayerWeaponController : MonoBehaviour
 {
-    private Player player;
-
     private const float REFERENCE_BULLET_SPEED = 20f;
 
-    [SerializeField] private Weapon_Data defaultWeaponData;
-    [SerializeField] private Weapon currentWeapon;
-    private bool weaponReady;
-    private bool isShooting;
+    [Header("References")]
+    private Player player;
 
-    [Header("Bullet Details")]
+    [Header("Weapon Settings")]
+    [SerializeField] private Weapon_Data defaultWeaponData;
+    [SerializeField] private int maxSlots = 4;
+    [SerializeField] private WeaponSlot[] weaponSlots;
+    [SerializeField] private int currentSlotIndex = 0;
+    [SerializeField] private Weapon currentWeapon;
+
+    [Header("Bullet Settings")]
     [SerializeField] private float bulletImpactForce = 100f;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private float bulletSpeed;
-
-    [SerializeField] private Transform weaponHolder;
-
-    [Header("Inventory")]
-    [SerializeField] private int maxSlots = 2;
-    [SerializeField] private List<Weapon> weaponSlots;
-
     [SerializeField] private GameObject weaponPickupPrefab;
+
+    [Header("State")]
+    private bool weaponReady = true;
+    private bool isShooting;
+
+    #region Properties
+    public Weapon CurrentWeapon => currentWeapon;
+    public int SlotCount => maxSlots;
+    public bool IsWeaponReady => weaponReady;
+    #endregion
 
     private void Start()
     {
         player = GetComponent<Player>();
+        InitializeWeaponSlots();
         AssignInputEvents();
-
         Invoke(nameof(EquipStartingWeapon), 0.1f);
     }
 
     private void Update()
     {
-        if (isShooting)
+        if (isShooting && weaponReady)
             Shoot();
-
     }
 
-
-    #region Slots Management - Equip, Drop, Pickup, Ready Weapon
+    #region Initialization
+    private void InitializeWeaponSlots()
+    {
+        weaponSlots = new WeaponSlot[maxSlots];
+        for (int i = 0; i < maxSlots; i++) {
+            weaponSlots[i] = new WeaponSlot { slotIndex = i };
+        }
+    }
 
     private void EquipStartingWeapon()
     {
-        weaponSlots[0] = new Weapon(defaultWeaponData);
-        EquipWeapon(0);
+        if (defaultWeaponData != null) {
+            AddWeaponToSlot(new Weapon(defaultWeaponData), 0);
+            EquipSlot(0);
+        }
+    }
+    #endregion
+
+    #region Slot Management
+    public bool AddWeaponToSlot(Weapon weapon, int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= maxSlots) return false;
+        if (weapon == null) return false;
+
+        weaponSlots[slotIndex].AssignWeapon(weapon);
+        return true;
     }
 
-    private void EquipWeapon(int i)
+    public bool EquipSlot(int slotIndex)
     {
-        if (i >= weaponSlots.Count)
-            return;
+        if (!IsValidSlot(slotIndex) || weaponSlots[slotIndex].IsEmpty)
+            return false;
 
+        // Set weapon not ready during equip
         SetWeaponReady(false);
 
-        currentWeapon = weaponSlots[i];
+        UnequipCurrentSlot();
+        currentSlotIndex = slotIndex;
+        currentWeapon = weaponSlots[slotIndex].weapon;
+        weaponSlots[slotIndex].isEquipped = true;
 
+        UpdateVisuals();
+
+        // Play equip animation
         player.weaponVisuals.PlayWeaponEquipAnimation();
 
-        CameraManager.instance.ChangeCameraDistance(currentWeapon.cameraDistance);
+        return true;
     }
 
+    private void UnequipCurrentSlot()
+    {
+        if (IsValidSlot(currentSlotIndex))
+            weaponSlots[currentSlotIndex].isEquipped = false;
+    }
+
+    private bool IsValidSlot(int index) => index >= 0 && index < maxSlots;
+
+    public void QuickSwitchWeapon()
+    {
+        for (int i = 1; i <= maxSlots; i++) {
+            int nextSlot = (currentSlotIndex + i) % maxSlots;
+            if (!weaponSlots[nextSlot].IsEmpty) {
+                EquipSlot(nextSlot);
+                return;
+            }
+        }
+    }
+    #endregion
+
+    #region Weapon Pickup/Drop
     public void PickupWeapon(Weapon newWeapon)
     {
-
-        if (WeaponInSlots(newWeapon.weaponType) != null) {
-            Debug.Log("Already have this weapon!");
-            WeaponInSlots(newWeapon.weaponType).totalReserveAmmo += newWeapon.bulletsInMagazine;
+        // Check for existing weapon of same type
+        Weapon existingWeapon = FindWeaponByType(newWeapon.weaponType);
+        if (existingWeapon != null) {
+            existingWeapon.totalReserveAmmo += newWeapon.bulletsInMagazine;
             return;
         }
 
-        if (weaponSlots.Count >= maxSlots && newWeapon.weaponType != currentWeapon.weaponType) {
-
-            int weaponIndex = weaponSlots.IndexOf(currentWeapon);
-
-            player.weaponVisuals.SwitchOffWeaponModels();
-            weaponSlots[weaponIndex] = newWeapon;
-
-            DropWeaponOnTheGround();
-
-            EquipWeapon(weaponIndex);
-            Debug.Log("Can't carry more than 2 weapons!");
+        // Find empty slot
+        int emptySlot = FindEmptySlot();
+        if (emptySlot != -1) {
+            AddWeaponToSlot(newWeapon, emptySlot);
+            player.weaponVisuals.UpdateBackupVisuals();
             return;
         }
 
-        weaponSlots.Add(newWeapon);
-        player.weaponVisuals.SwitchOnBackupWeaponModel();
-
+        // Send to inventory if slots full
+        SendToInventory(newWeapon);
     }
 
-    private void DropWeapon()
+    private int FindEmptySlot()
     {
-        if (hasHasOnlyOneWeapon())  // Can't drop last weapon
+        for (int i = 0; i < maxSlots; i++) {
+            if (weaponSlots[i].IsEmpty)
+                return i;
+        }
+        return -1;
+    }
+
+    private Weapon FindWeaponByType(WeaponType type)
+    {
+        foreach (var slot in weaponSlots) {
+            if (!slot.IsEmpty && slot.weapon.weaponType == type)
+                return slot.weapon;
+        }
+        return null;
+    }
+
+    private void SendToInventory(Weapon weapon)
+    {
+        var inventory = Object.FindFirstObjectByType<Inventory_Base>();
+        if (inventory != null && inventory.CanAddItem()) {
+            inventory.AddItem(new Inventory_Item(weapon.weaponData));
+        }
+    }
+
+    public void DropCurrentWeapon()
+    {
+        if (weaponSlots[currentSlotIndex].IsEmpty || GetEquippedWeaponCount() <= 1)
             return;
 
+        DropWeaponFromSlot(currentSlotIndex);
 
-        DropWeaponOnTheGround();
-
-        weaponSlots.Remove(currentWeapon);
-
-        EquipWeapon(0);
+        // Equip first available weapon
+        for (int i = 0; i < maxSlots; i++) {
+            if (!weaponSlots[i].IsEmpty) {
+                EquipSlot(i);
+                break;
+            }
+        }
     }
 
-    private void DropWeaponOnTheGround()
+    private void DropWeaponFromSlot(int slotIndex)
     {
+        if (!IsValidSlot(slotIndex) || weaponSlots[slotIndex].IsEmpty)
+            return;
+
+        Weapon weaponToDrop = weaponSlots[slotIndex].weapon;
+
+        // Create pickup
         GameObject droppedWeapon = ObjectPool.instance.GetObject(weaponPickupPrefab);
-        droppedWeapon.GetComponent<Pickup_Weapon>()?.SetupPickupWeapon(currentWeapon, transform);
+        var pickup = droppedWeapon.GetComponent<Pickup_Weapon>();
+        if (pickup != null)
+            pickup.SetupPickupWeapon(weaponToDrop, transform.position + Vector3.up * 0.75f);
+
+        weaponSlots[slotIndex].Clear();
     }
 
-    public void SetWeaponReady(bool ready) => weaponReady = ready;
-    public bool IsWeaponReady() => weaponReady;
+    private int GetEquippedWeaponCount()
+    {
+        int count = 0;
+        foreach (var slot in weaponSlots) {
+            if (!slot.IsEmpty) count++;
+        }
+        return count;
+    }
+
+    public bool HasOnlyOneWeapon() => GetEquippedWeaponCount() <= 1;
     #endregion
+
+    #region Shooting
+    private void Shoot()
+    {
+        if (currentWeapon == null || !currentWeapon.CanShoot() || !weaponReady)
+            return;
+
+        player.weaponVisuals.PlayFireAnimation();
+
+        if (currentWeapon.shootType == ShootType.Single)
+            isShooting = false;
+
+        if (currentWeapon.BurstActivated()) {
+            StartCoroutine(BurstFire());
+            return;
+        }
+
+        FireSingleBullet();
+        TriggerEnemyDodge();
+    }
 
     private IEnumerator BurstFire()
     {
         SetWeaponReady(false);
 
-        for (int i = 1; i <= currentWeapon.bulletsPerShot; i++) {
+        for (int i = 0; i < currentWeapon.bulletsPerShot; i++) {
             FireSingleBullet();
             yield return new WaitForSeconds(currentWeapon.burstFireDelay);
-
-            if (i >= currentWeapon.bulletsPerShot)
-                SetWeaponReady(true);
-        }
-    }
-
-    private void Shoot()
-    {
-
-        if (IsWeaponReady() == false)
-            return;
-
-        if (currentWeapon.CanShoot() == false)
-            return;
-
-        player.weaponVisuals.PlayFireAnimation();
-        Debug.Log("Pew Pew");
-
-        if (currentWeapon.shootType == ShootType.Single)
-            isShooting = false; // Prevent continuous shooting for single-shot weapons
-
-        if (currentWeapon.BurstActivated() == true) {
-            StartCoroutine(BurstFire());
-            return;
         }
 
-
-        FireSingleBullet();
-        TriggerEnemyDodge();
+        SetWeaponReady(true);
     }
 
     private void FireSingleBullet()
@@ -158,93 +244,152 @@ public class PlayerWeaponController : MonoBehaviour
         currentWeapon.bulletsInMagazine--;
 
         GameObject newBullet = ObjectPool.instance.GetObject(bulletPrefab);
+        if (newBullet == null) return;
 
-        newBullet.transform.position = GunPoint().position;
-        newBullet.transform.rotation = Quaternion.LookRotation(GunPoint().forward);
+        Transform gunPoint = player.weaponVisuals.GetCurrentWeaponModel()?.gunPoint;
+        if (gunPoint == null) return;
+
+        newBullet.transform.position = gunPoint.position;
+        newBullet.transform.rotation = Quaternion.LookRotation(gunPoint.forward);
 
         Rigidbody rbNewBullet = newBullet.GetComponent<Rigidbody>();
-
         Bullet bulletScript = newBullet.GetComponent<Bullet>();
-        bulletScript.BulletSetup(currentWeapon.gunDistance, bulletImpactForce);
 
-        Vector3 bulletsDirection = currentWeapon.ApplySpread(BulletDirection());
+        if (bulletScript != null)
+            bulletScript.BulletSetup(currentWeapon.gunDistance, bulletImpactForce);
 
-        rbNewBullet.mass = REFERENCE_BULLET_SPEED / bulletSpeed; // Adjust mass based on speed to keep momentum consistent
-        rbNewBullet.linearVelocity = bulletsDirection * bulletSpeed;
+        Vector3 bulletDirection = currentWeapon.ApplySpread(CalculateBulletDirection(gunPoint));
+
+        rbNewBullet.mass = REFERENCE_BULLET_SPEED / bulletSpeed;
+        rbNewBullet.linearVelocity = bulletDirection * bulletSpeed;
     }
 
-    private void Reload()
+    private Vector3 CalculateBulletDirection(Transform gunPoint)
     {
+        if (player.aim == null) return gunPoint.forward;
+
+        Transform aim = player.aim.Aim;
+        Vector3 direction = (aim.position - gunPoint.position).normalized;
+
+        if (!player.aim.CanAimPrecisely && player.aim.GetCurrentTarget() == null)
+            direction.y = 0;
+
+        return direction;
+    }
+    #endregion
+
+    #region Reloading
+    public void Reload()
+    {
+        if (currentWeapon == null || !currentWeapon.CanReload() || !weaponReady)
+            return;
+
         SetWeaponReady(false);
         player.weaponVisuals.PlayReloadAnimation();
     }
 
-    public Vector3 BulletDirection()
+    public void CompleteReload()
     {
-        Transform aim = player.aim.Aim();
+        if (currentWeapon != null)
+            currentWeapon.ReloadBullets();
+        SetWeaponReady(true);
+    }
+    #endregion
 
-        Vector3 direction = (aim.position - GunPoint().position).normalized;
+    #region Utility Methods
+    private void UpdateVisuals()
+    {
+        if (currentWeapon != null) {
+            // First update weapon models
+            player.weaponVisuals.UpdateWeaponVisuals(
+                currentWeapon.weaponType,
+                GetEquippedWeaponCount() > 1
+            );
 
-        if (player.aim.CanAimPrecisely() == false && player.aim.Target() == null)
-            direction.y = 0; // Keep the bullet level
-
-
-
-        return direction;
+            // Update camera distance
+            CameraManager.instance?.ChangeCameraDistance(currentWeapon.cameraDistance);
+        }
     }
 
-    public bool hasHasOnlyOneWeapon() => weaponSlots.Count <= 1;
+    public void SetWeaponReady(bool ready) => weaponReady = ready;
+
+    public WeaponModel GetCurrentWeaponModel()
+    {
+        return currentWeapon != null ?
+            player.weaponVisuals.GetWeaponModel(currentWeapon.weaponType, WeaponModelType.Primary) :
+            null;
+    }
+
+    public List<Weapon> GetAllWeapons()
+    {
+        List<Weapon> weapons = new List<Weapon>();
+        foreach (var slot in weaponSlots) {
+            if (!slot.IsEmpty)
+                weapons.Add(slot.weapon);
+        }
+        return weapons;
+    }
+
     public Weapon WeaponInSlots(WeaponType weaponType)
     {
-        foreach (Weapon weapon in weaponSlots) {
-            if (weapon.weaponType == weaponType) return weapon;
-        }
-
-        return null;
+        return FindWeaponByType(weaponType);
     }
 
-    public Weapon CurrentWeapon() => currentWeapon;
+    public Transform GunPoint() => player.weaponVisuals.GetCurrentWeaponModel()?.gunPoint;
 
-
-    public Transform GunPoint() => player.weaponVisuals.CurrentWeaponModel().gunPoint;
+    public Vector3 BulletDirection()
+    {
+        Transform gunPoint = GunPoint();
+        if (gunPoint == null) return Vector3.forward;
+        return CalculateBulletDirection(gunPoint);
+    }
 
     private void TriggerEnemyDodge()
     {
-        Vector3 rayOrigin = GunPoint().position;
-        Vector3 rayDirection = BulletDirection();
+        Transform gunPoint = GunPoint();
+        if (gunPoint == null) return;
+
+        Vector3 rayOrigin = gunPoint.position;
+        Vector3 rayDirection = CalculateBulletDirection(gunPoint);
 
         if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hitInfo, Mathf.Infinity)) {
-            Enemy_Melee enemy_melee = hitInfo.collider.GetComponentInParent<Enemy_Melee>();
-
-            if (enemy_melee != null) {
-                enemy_melee.ActivateDodgeRoll();
-            }
+            Enemy_Melee enemyMelee = hitInfo.collider.GetComponentInParent<Enemy_Melee>();
+            enemyMelee?.ActivateDodgeRoll();
         }
     }
+    #endregion
+
     #region Input Events
     private void AssignInputEvents()
     {
         PlayerControls controls = player.controls;
 
+        // Shooting
         controls.Character.Fire.performed += ctx => isShooting = true;
         controls.Character.Fire.canceled += ctx => isShooting = false;
 
-        controls.Character.EquipSlot1.performed += ctx => EquipWeapon(0);
-        controls.Character.EquipSlot2.performed += ctx => EquipWeapon(1);
-        controls.Character.EquipSlot3.performed += ctx => EquipWeapon(2);
-        controls.Character.EquipSlot4.performed += ctx => EquipWeapon(3);
-        controls.Character.EquipSlot5.performed += ctx => EquipWeapon(4);
-        controls.Character.DropCurrentWeapon.performed += ctx => DropWeapon();
+        // Quick slots (only enable if slot has weapon)
+        controls.Character.EquipSlot1.performed += ctx => { if (!weaponSlots[0].IsEmpty) EquipSlot(0); };
+        controls.Character.EquipSlot2.performed += ctx => { if (!weaponSlots[1].IsEmpty) EquipSlot(1); };
+        controls.Character.EquipSlot3.performed += ctx => { if (!weaponSlots[2].IsEmpty) EquipSlot(2); };
+        controls.Character.EquipSlot4.performed += ctx => { if (!weaponSlots[3].IsEmpty) EquipSlot(3); };
+        controls.Character.EquipSlot5.performed += ctx => { if (maxSlots > 4 && !weaponSlots[4].IsEmpty) EquipSlot(4); };
 
-        controls.Character.Reload.performed += ctx =>
+        // Quick switch
+        //controls.Character.QuickSwitchWeapon.performed += ctx => QuickSwitchWeapon();
+
+        // Drop weapon
+        controls.Character.DropCurrentWeapon.performed += ctx => DropCurrentWeapon();
+
+        // Reload
+        controls.Character.Reload.performed += ctx => Reload();
+
+        // Toggle burst mode
+        controls.Character.ToggleWeaponMode.performed += ctx =>
         {
-            if (currentWeapon.CanReload() && IsWeaponReady()) {
-                Reload();
-            }
+            if (currentWeapon != null)
+                currentWeapon.ToggleBurstMode();
         };
-
-        controls.Character.ToggleWeaponMode.performed += ctx => currentWeapon.ToggleBurstMode();
-
     }
     #endregion
 }

@@ -24,6 +24,7 @@ public class Item_DataSO : ScriptableObject
     public string itemName;
     public Sprite icon;
     [TextArea] public string description;
+    public ItemType itemType;
     public bool stackable = true;
     public int maxStack = 99;
 
