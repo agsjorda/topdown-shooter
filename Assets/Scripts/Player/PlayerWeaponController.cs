@@ -8,6 +8,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     [Header("References")]
     private Player player;
+    private UIManager uiManager; // Cache UIManager reference
 
     [Header("Weapon Settings")]
     [SerializeField] private Weapon_Data defaultWeaponData;
@@ -35,6 +36,7 @@ public class PlayerWeaponController : MonoBehaviour
     private void Start()
     {
         player = GetComponent<Player>();
+        uiManager = Object.FindFirstObjectByType<UIManager>(); // Cache on Start
         InitializeWeaponSlots();
         AssignInputEvents();
         Invoke(nameof(EquipStartingWeapon), 0.1f);
@@ -210,6 +212,11 @@ public class PlayerWeaponController : MonoBehaviour
     #region Shooting
     private void Shoot()
     {
+        // Don't allow shooting when inventory is open
+        if (uiManager != null && uiManager.IsInventoryOpen()) {
+            return;
+        }
+
         if (currentWeapon == null || !currentWeapon.CanShoot() || !weaponReady)
             return;
 

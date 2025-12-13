@@ -2,10 +2,8 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 
-/// <summary>
 /// Handles all visual feedback during drag operations (ghost, highlighting, etc.)
 /// Separates visual concerns from drag logic.
-/// </summary>
 public class DragVisualHandler
 {
     private readonly VisualElement dragGhost;

@@ -140,6 +140,12 @@ public class UIManager : MonoBehaviour
     public void HideHUD() => gameHUD?.Hide();
     public void ShowInventory() => inventoryUI?.Show();
     public void HideInventory() => inventoryUI?.Hide();
+    
+    /// <summary>
+    /// Check if the inventory UI is currently open/visible
+    /// Used to disable weapon firing and other gameplay actions
+    /// </summary>
+    public bool IsInventoryOpen() => inventoryUI?.IsVisible ?? false;
 
     private void ChangeHealth(float amount)
     {

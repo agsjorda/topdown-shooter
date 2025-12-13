@@ -61,6 +61,9 @@ public class DragDropController : MonoBehaviour
     // Visual handler shows the "ghost" image that follows your mouse
     private DragVisualHandler visualHandler;
     
+    // Double-click handler detects quick equip/unequip actions
+    private DoubleClickHandler doubleClickHandler;
+    
     // Cached references to slots (for performance - avoids constant lookups)
     private List<Slot> inventorySlots;
     private List<EquipmentSlot> equipmentSlots = new List<EquipmentSlot>();
@@ -84,6 +87,9 @@ public class DragDropController : MonoBehaviour
         
         // Create our state tracker
         dragState = new DragState();
+        
+        // Create double-click handler (0.3 second window for double-clicks)
+        doubleClickHandler = new DoubleClickHandler(0.3f);
     }
 
     /// <summary>
@@ -321,6 +327,8 @@ public class DragDropController : MonoBehaviour
     /// This is the START of a potential drag operation.
     /// We don't start dragging yet - user might just be clicking!
     /// We wait until they move the mouse a bit (see OnPointerMove)
+    /// 
+    /// **NEW: Also detects double-clicks for quick equip!**
     /// </summary>
     /// <param name="evt">Event data containing mouse position, button pressed, etc.</param>
     private void OnInventorySlotPointerDown(PointerDownEvent evt)
@@ -333,6 +341,16 @@ public class DragDropController : MonoBehaviour
         if (slot == null || !slot.HasItem) return;
 
         if (debugMode) Debug.Log($"[DragDrop] Pointer down on inventory slot {slot.SlotIndex}");
+
+        // Check for double-click BEFORE starting drag tracking
+        bool isDoubleClick = doubleClickHandler.RegisterClick(slot.SlotIndex, isEquipmentSlot: false);
+        
+        if (isDoubleClick) {
+            // Double-click detected! Quick equip the item
+            HandleQuickEquip(slot);
+            evt.StopPropagation();
+            return; // Don't start drag operation
+        }
 
         // Remember where drag started and what slot
         dragState.StartPosition = evt.position;
@@ -350,6 +368,8 @@ public class DragDropController : MonoBehaviour
     /// <summary>
     /// **OnEquipmentSlotPointerDown** - Called when mouse button pressed on equipment slot
     /// Same as inventory, but for equipment slots (weapon, armor, etc.)
+    /// 
+    /// **NEW: Also detects double-clicks for quick unequip!**
     /// </summary>
     private void OnEquipmentSlotPointerDown(PointerDownEvent evt)
     {
@@ -359,6 +379,16 @@ public class DragDropController : MonoBehaviour
         if (equipmentSlot == null) return;
 
         if (debugMode) Debug.Log($"[DragDrop] Pointer down on equipment slot: {equipmentSlot.SlotType}");
+
+        // Check for double-click BEFORE starting drag tracking
+        bool isDoubleClick = doubleClickHandler.RegisterClick(-1, isEquipmentSlot: true, equipmentSlot.SlotType);
+        
+        if (isDoubleClick && equipmentSlot.HasItem) {
+            // Double-click detected on equipped item! Quick unequip it
+            HandleQuickUnequip(equipmentSlot);
+            evt.StopPropagation();
+            return; // Don't start drag operation
+        }
 
         dragState.StartPosition = evt.position;
         dragState.SourceEquipmentSlot = equipmentSlot;
@@ -733,5 +763,84 @@ public class DragDropController : MonoBehaviour
     /// Returns null if dragging from equipment or not dragging at all
     /// </summary>
     public Slot GetDraggedSlot() => dragState?.SourceInventorySlot;
+    #endregion
+
+    #region Double-Click Handlers
+    /// <summary>
+    /// **HandleQuickEquip** - Double-clicked an inventory item, equip it automatically
+    /// 
+    /// **For Junior Developers:**
+    /// This creates a QuickEquipTransaction which:
+    /// 1. Finds the right equipment slot for the item
+    /// 2. If occupied, swaps items
+    /// 3. If empty, just equips
+    /// 
+    /// It's like a shortcut - no dragging needed!
+    /// </summary>
+    private void HandleQuickEquip(Slot slot)
+    {
+        if (slot == null || !slot.HasItem) return;
+
+        var item = inventoryController?.GetItemAtSlot(slot.SlotIndex);
+        if (item == null) return;
+
+        if (debugMode) Debug.Log($"[DragDrop] Quick equip: {item.itemData.itemName} from slot {slot.SlotIndex}");
+
+        // Create quick equip transaction
+        var transaction = new QuickEquipTransaction(
+            item,
+            slot.SlotIndex,
+            slot,
+            equipmentSlots,
+            inventorySlots,
+            inventoryController,
+            equipmentController,
+            debugMode
+        );
+
+        // Execute if valid
+        if (transaction.CanExecute()) {
+            StartCoroutine(ExecuteTransaction(transaction));
+        } else {
+            if (debugMode) Debug.Log($"[DragDrop] Cannot quick equip {item.itemData.itemName}");
+        }
+    }
+
+    /// <summary>
+    /// **HandleQuickUnequip** - Double-clicked an equipped item, unequip it automatically
+    /// 
+    /// **For Junior Developers:**
+    /// This creates a QuickUnequipTransaction which:
+    /// 1. Finds the first empty inventory slot
+    /// 2. Moves the equipped item there
+    /// 
+    /// If inventory is full, nothing happens (item stays equipped)
+    /// </summary>
+    private void HandleQuickUnequip(EquipmentSlot equipmentSlot)
+    {
+        if (equipmentSlot == null || !equipmentSlot.HasItem) return;
+
+        var item = equipmentSlot.GetEquippedItem();
+        if (item == null) return;
+
+        if (debugMode) Debug.Log($"[DragDrop] Quick unequip: {item.itemData.itemName} from {equipmentSlot.SlotType} slot");
+
+        // Create quick unequip transaction
+        var transaction = new QuickUnequipTransaction(
+            equipmentSlot,
+            item,
+            inventorySlots,
+            inventoryController,
+            equipmentController,
+            debugMode
+        );
+
+        // Execute if valid
+        if (transaction.CanExecute()) {
+            StartCoroutine(ExecuteTransaction(transaction));
+        } else {
+            if (debugMode) Debug.Log($"[DragDrop] Cannot quick unequip {item.itemData.itemName} (inventory full?)");
+        }
+    }
     #endregion
 }

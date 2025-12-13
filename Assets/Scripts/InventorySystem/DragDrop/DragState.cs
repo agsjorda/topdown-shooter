@@ -1,9 +1,7 @@
 using UnityEngine;
 
-/// <summary>
 /// Encapsulates the state of a drag operation.
 /// This makes drag state management cleaner and easier to reason about.
-/// </summary>
 public class DragState
 {
     public bool IsDragging { get; set; }
@@ -18,9 +16,7 @@ public class DragState
     public bool IsFromEquipment => SourceEquipmentSlot != null;
     public bool HasValidSource => IsFromInventory || IsFromEquipment;
     
-    /// <summary>
     /// Gets the item being dragged (works for both inventory and equipment sources)
-    /// </summary>
     public Inventory_Item GetDraggedItem(InventoryController inventoryController)
     {
         if (IsFromEquipment)
@@ -32,9 +28,7 @@ public class DragState
         return null;
     }
     
-    /// <summary>
     /// Resets the drag state to initial values
-    /// </summary>
     public void Reset()
     {
         IsDragging = false;
