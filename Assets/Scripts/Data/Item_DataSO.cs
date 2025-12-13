@@ -11,12 +11,16 @@ public class Item_DataSO : ScriptableObject
 
     public string itemId {
         get {
-#if UNITY_EDITOR
+            // Auto-generate ID if missing (works in editor and builds)
             if (string.IsNullOrEmpty(_itemId)) {
                 _itemId = Guid.NewGuid().ToString("N");
-                EditorUtility.SetDirty(this);
-            }
+#if UNITY_EDITOR
+                // Mark dirty only in editor to save the change
+                if (!Application.isPlaying) {
+                    EditorUtility.SetDirty(this);
+                }
 #endif
+            }
             return _itemId;
         }
     }
