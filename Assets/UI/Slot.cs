@@ -5,8 +5,9 @@ using UnityEngine.UIElements;
 public partial class Slot : VisualElement
 {
     private Image _icon;
-    private bool _hasItem;
-    private string _itemId = string.Empty;
+    protected bool _hasItem;
+    protected string _itemId = string.Empty;
+    private int _slotIndex;
 
     public Image Icon {
         get {
@@ -27,15 +28,22 @@ public partial class Slot : VisualElement
         }
     }
 
-    public int SlotIndex { get; private set; }
+    public int SlotIndex {
+        get => _slotIndex;
+        protected set => _slotIndex = value;
+    }
+
     public bool HasItem => _hasItem;
     public string ItemId => _itemId;
 
+    // NEW: Property to identify if this is an equipment slot
+    public virtual bool IsEquipmentSlot => false;
+
+    // NEW: Property for equipment type
+    public virtual EquipmentSlotType EquipmentType => EquipmentSlotType.Weapon;
+
     protected int slotSize = 100;
     protected float cellMargin = 8f;
-
-    // REMOVED: Event for drag start - we'll handle it differently
-    // public event Action<Vector2, Slot> OnBeginDrag;
 
     public Slot()
     {
@@ -44,8 +52,11 @@ public partial class Slot : VisualElement
         pickingMode = PickingMode.Position;
     }
 
-    // REMOVED: Method to trigger drag
-    // public void BeginDrag(Vector2 position) { }
+    // NEW: Method to check if item can be accepted
+    public virtual bool CanAcceptItem(Item_DataSO itemData)
+    {
+        return true; // Default: accept all items
+    }
 
     public virtual void SetItem(Inventory_Item item, int qty = 1)
     {
@@ -85,9 +96,6 @@ public partial class Slot : VisualElement
             Icon.style.display = DisplayStyle.None;
         }
     }
-
-    // REMOVED: Visual feedback during drag (handled in DragDropController)
-    // public void SetDragState(bool isDragging) { }
 
     public virtual void SetSlotIndex(int index) => SlotIndex = index;
 

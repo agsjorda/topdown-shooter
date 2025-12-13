@@ -24,6 +24,7 @@ public class Item_DataSO : ScriptableObject
     public string itemName;
     public Sprite icon;
     [TextArea] public string description;
+    public ItemType itemType;
     public bool stackable = true;
     public int maxStack = 99;
 
@@ -35,7 +36,8 @@ public class Item_DataSO : ScriptableObject
 
     private void OnValidate()
     {
-        if (string.IsNullOrEmpty(_itemId)) {
+        // Only run in Editor, not during Play Mode exit
+        if (!Application.isPlaying && string.IsNullOrEmpty(_itemId)) {
             _itemId = Guid.NewGuid().ToString("N");
             EditorUtility.SetDirty(this);
         }

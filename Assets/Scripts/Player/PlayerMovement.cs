@@ -1,6 +1,7 @@
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour
+{
 
     private Player player;
 
@@ -24,7 +25,8 @@ public class PlayerMovement : MonoBehaviour {
     private bool isRunning;
 
 
-    private void Start() {
+    private void Start()
+    {
         player = GetComponent<Player>();
 
         characterController = GetComponent<CharacterController>();
@@ -35,7 +37,8 @@ public class PlayerMovement : MonoBehaviour {
         AssignInputEvents();
     }
 
-    private void Update() {
+    private void Update()
+    {
         if (Input.GetKeyDown(KeyCode.Space) && characterController.isGrounded) {
             Jump();
         }
@@ -45,14 +48,16 @@ public class PlayerMovement : MonoBehaviour {
         ApplyRotation();
         AnimatorControllers();
     }
-    private void LateUpdate() {
+    private void LateUpdate()
+    {
         // Make sure the mesh follows the parent exactly
         if (meshTransform != null) {
             meshTransform.localPosition = Vector3.zero;
             meshTransform.localRotation = Quaternion.identity;
         }
     }
-    private void CalculateGravity() {
+    private void CalculateGravity()
+    {
         if (characterController.isGrounded) {
             // If grounded, reset vertical velocity to a small negative value to stay planted.
             // Only do this if we aren't moving upwards (i.e., not jumping this frame)
@@ -64,7 +69,8 @@ public class PlayerMovement : MonoBehaviour {
             verticalVelocity -= gravity * Time.deltaTime;
         }
     }
-    private void Jump() {
+    private void Jump()
+    {
         // Physics formula: v = sqrt(2 * gravity * jumpHeight)
         Debug.Log("Jump!");
         verticalVelocity = Mathf.Sqrt(2f * jumpHeight * gravity);
@@ -73,7 +79,8 @@ public class PlayerMovement : MonoBehaviour {
         // Optional: Trigger a jump animation if you have one
         // animator.SetTrigger("Jump");
     }
-    private void AnimatorControllers() {
+    private void AnimatorControllers()
+    {
         float xVelocity = Vector3.Dot(moveDirection, transform.right);
         float zVelocity = Vector3.Dot(moveDirection, transform.forward);
 
@@ -84,8 +91,11 @@ public class PlayerMovement : MonoBehaviour {
         animator.SetBool("isRunning", playRunAnimation);
     }
 
-    private void ApplyRotation() {
-        Vector3 lookingDirection = player.aim.GetMouseHitInfo().point - transform.position;
+    private void ApplyRotation()
+    {
+        // Use GetMouseRaycastHit() instead of GetMouseHitInfo()
+        RaycastHit mouseHit = player.aim.GetMouseRaycastHit();
+        Vector3 lookingDirection = mouseHit.point - transform.position;
         lookingDirection.y = 0; // Ignore vertical aiming
 
         if (lookingDirection.sqrMagnitude > 0.0001f) {
@@ -96,7 +106,8 @@ public class PlayerMovement : MonoBehaviour {
         // else: Do nothing, keep current rotation
     }
 
-    private void ApplyMovement() {
+    private void ApplyMovement()
+    {
         // 1. Create HORIZONTAL movement direction from input AND STORE IT IN moveDirection
         moveDirection = new Vector3(moveInput.x, 0, moveInput.y); // <-- This line is crucial for animations
                                                                   // Apply speed to horizontal movement
@@ -118,7 +129,8 @@ public class PlayerMovement : MonoBehaviour {
     //    }
     //}
 
-    private void AssignInputEvents() {
+    private void AssignInputEvents()
+    {
         controls = player.controls;
 
         controls.Character.Movement.performed += context => moveInput = context.ReadValue<Vector2>();
@@ -126,11 +138,13 @@ public class PlayerMovement : MonoBehaviour {
 
 
 
-        controls.Character.Run.performed += context => {
+        controls.Character.Run.performed += context =>
+        {
             isRunning = true;
             moveSpeed = runSpeed;
         };
-        controls.Character.Run.canceled += context => {
+        controls.Character.Run.canceled += context =>
+        {
             isRunning = false;
             moveSpeed = walkSpeed;
         };

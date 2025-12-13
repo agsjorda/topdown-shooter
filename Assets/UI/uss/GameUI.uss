@@ -118,8 +118,7 @@
     transition-duration: 0.3s;
 }
 
-
-
+/* ------------Inventory Tabs Styling------------- */
 .inventoryTab {
     background-color: rgba(0, 0, 0, 0);
     border-bottom-width: 2px;
@@ -165,58 +164,7 @@
     scale: 1.05 1.05;
 }
 
-.equipSlots {
-    flex-grow: 1;
-    position: absolute;
-    top: 224px;
-    left: 265px;
-    height: 200px;
-    width: 200px;
-    rotate: 45deg;
-    background-image: none;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-left-color: rgba(236, 226, 226, 0.56);
-    border-right-color: rgba(236, 226, 226, 0.56);
-    border-top-color: rgba(236, 226, 226, 0.56);
-    border-bottom-color: rgba(236, 226, 226, 0.56);
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-}
 
-.equipSlots:hover {
-    scale: 1.05 1.05 1.05;
-    border-left-color: rgb(248, 163, 46);
-    border-right-color: rgb(248, 163, 46);
-    border-top-color: rgb(248, 163, 46);
-    border-bottom-color: rgb(248, 163, 46);
-    border-top-width: 2px;
-    border-right-width: 2px;
-    border-bottom-width: 2px;
-    border-left-width: 2px;
-    background-color: rgba(34, 34, 34, 0.7);
-}
-
-.equipSlot-icon {
-    flex-grow: 1;
-    width: 100%;
-    height: auto;
-    background-image: url("project://database/Assets/UI/icons/crossed-swords.png?fileID=2800000&guid=3fed58a9305314544922e12c854af2d0&type=3#crossed-swords");
-    rotate: -45deg;
-    position: relative;
-    -unity-background-image-tint-color: rgb(178, 178, 178);
-    background-size: 100% 100%;
-    scale: 0.8 0.8;
-}
-
-.equipSlot-icon:hover {
-    scale: 0.9 0.9;
-}
 
 /* ------------Inventory Slots Styling------------- */
 .inventory-slots-container {
@@ -226,10 +174,11 @@
     align-items: flex-start;
     padding: 10px;
     gap: 8px;
-    border-left-color: rgb(102, 102, 102);
-    border-right-color: rgb(102, 102, 102);
-    border-top-color: rgb(102, 102, 102);
-    border-bottom-color: rgb(102, 102, 102);
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
     border-top-width: 10px;
     border-right-width: 10px;
     border-bottom-width: 10px;
@@ -240,28 +189,22 @@
     border-left-style: solid;
 }
 
-
 /* ===== EXISTING SLOT STYLES (Keep these) ===== */
 .inventorySlots {
     flex-shrink: 0;
-
     width: 250px;
     height: 250px;
-
     background-color: rgba(34, 34, 34, 0.4);
-
     border-left-width: 5px;
     border-right-width: 5px;
     border-top-width: 5px;
     border-bottom-width: 5px;
-
-    border-left-color: rgb(102, 102, 102);
-    border-right-color: rgb(102, 102, 102);
-    border-top-color: rgb(102, 102, 102);
-    border-bottom-color: rgb(102, 102, 102);
-
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
     border-radius: 5px;
-
     justify-content: center;
     align-items: center;
     display: flex;
@@ -273,23 +216,18 @@
     flex-grow: 1;
 }
 
-
 .inventorySlots:hover {
     scale: 1.02 1.02 1.02;
-
     border-left-color: rgb(248, 163, 46);
     border-right-color: rgb(248, 163, 46);
     border-top-color: rgb(248, 163, 46);
     border-bottom-color: rgb(248, 163, 46);
-
     border-top-width: 2px;
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 2px;
-
     background-color: rgba(34, 34, 34, 0.7);
 }
-
 
 /* ============================
    DRAG & DROP SLOT STATES
@@ -363,8 +301,6 @@
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
-    
-    /* Individual border properties */
     border-left-color: rgba(248, 163, 46, 0.7);
     border-right-color: rgba(248, 163, 46, 0.7);
     border-top-color: rgba(248, 163, 46, 0.7);
@@ -373,16 +309,13 @@
     border-right-width: 2px;
     border-bottom-width: 2px;
     border-left-width: 2px;
-    
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
     border-bottom-left-radius: 5px;
-    
     background-color: rgba(34, 34, 34, 0.8);
     z-index: 9999;
     -unity-background-scale-mode: scale-to-fit;
-
     transition-property: opacity, border-left-color, border-right-color, border-top-color, border-bottom-color, scale;
     transition-duration: 0.15s;
     transition-timing-function: ease-out;
@@ -407,4 +340,163 @@
     border-top-color: rgba(255, 100, 100, 0.7);
     border-bottom-color: rgba(255, 100, 100, 0.7);
     scale: 1.05 1.05;
+}
+
+/* ============================
+   EQUIPMENT SLOT STYLES
+   ============================ */
+.equipSlots {
+    flex-grow: 1;
+    position: absolute;
+    top: 224px;
+    left: 265px;
+    height: 200px;
+    width: 200px;
+    rotate: 45deg; /* This rotates the entire slot container */
+    background-image: none;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+/* Position variants for each slot */
+.equipSlots--weapon {
+    /* Default position */
+}
+
+.equipSlots--headgear {
+    top: 224px;
+    left: 1200px;
+}
+
+.equipSlots--armor {
+    top: 812px;
+    left: 265px;
+}
+
+.equipSlots--boots {
+    top: 812px;
+    left: 1200px;
+    height: 188px;
+    width: 192px;
+}
+
+.equipSlots:hover {
+    scale: 1.05 1.05 1.05;
+    border-left-color: rgb(248, 163, 46);
+    border-right-color: rgb(248, 163, 46);
+    border-top-color: rgb(248, 163, 46);
+    border-bottom-color: rgb(248, 163, 46);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    background-color: rgba(34, 34, 34, 0.7);
+}
+
+/* Base equipment slot icon styling - the actual equipment slot element */
+.equipSlot-icon {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    rotate: -45deg; /* This counter-rotates the default icon back to normal */
+    position: relative;
+    -unity-background-image-tint-color: rgb(178, 178, 178);
+    -unity-background-scale-mode: scale-to-fit;
+    background-size: 100% 100%;
+    scale: 0.8 0.8;
+    transition-property: scale;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+/* Icon variants - only set the background image */
+.equipSlot-icon--weapon {
+    background-image: url("project://database/Assets/UI/icons/pistol-gun.png?fileID=2800000&guid=67946d87233370d40a32743df378e812&type=3#pistol-gun");
+}
+
+.equipSlot-icon--headgear {
+    background-image: url("project://database/Assets/UI/icons/spartan-helmet.png?fileID=2800000&guid=b529bf87e379f584b8e09ca0590441e1&type=3#spartan-helmet");
+}
+
+.equipSlot-icon--armor {
+    background-image: url("project://database/Assets/UI/icons/lamellar.png?fileID=2800000&guid=5f54be2900ebead41911aaa3560779c6&type=3#lamellar");
+}
+
+.equipSlot-icon--boots {
+    background-image: url("project://database/Assets/UI/icons/boots.png?fileID=2800000&guid=b27836b0d8d48fe47affacaa720edbe1&type=3#boots");
+}
+
+.equipSlot-icon:hover {
+    scale: 0.9 0.9;
+}
+
+/* Equipment slot wrapper styling */
+.equipment-slot {
+    position: relative;
+}
+
+.equipment-slot--weapon {
+    border-left-color: rgba(229, 62, 62, 0.7) !important;
+    border-right-color: rgba(229, 62, 62, 0.7) !important;
+    border-top-color: rgba(229, 62, 62, 0.7) !important;
+    border-bottom-color: rgba(229, 62, 62, 0.7) !important;
+}
+
+.equipment-slot--armor {
+    border-left-color: rgba(49, 130, 206, 0.7) !important;
+    border-right-color: rgba(49, 130, 206, 0.7) !important;
+    border-top-color: rgba(49, 130, 206, 0.7) !important;
+    border-bottom-color: rgba(49, 130, 206, 0.7) !important;
+}
+
+.equipment-slot--headgear {
+    border-left-color: rgba(56, 161, 105, 0.7) !important;
+    border-right-color: rgba(56, 161, 105, 0.7) !important;
+    border-top-color: rgba(56, 161, 105, 0.7) !important;
+    border-bottom-color: rgba(56, 161, 105, 0.7) !important;
+}
+
+.equipment-slot--boots {
+    border-left-color: rgba(214, 158, 46, 0.7) !important;
+    border-right-color: rgba(214, 158, 46, 0.7) !important;
+    border-top-color: rgba(214, 158, 46, 0.7) !important;
+    border-bottom-color: rgba(214, 158, 46, 0.7) !important;
+}
+
+/* Equipment item icon - shown when slot has an item */
+/* NOTE: No rotation needed - parent (.equipSlot-icon) already has rotate: -45deg */
+.equipment-icon {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    -unity-background-scale-mode: scale-to-fit;
+    scale: 0.8 0.8;
+    display: none;
+}
+
+/* Equipment slot drop target */
+.equipment-slot.inventorySlots--drop-target {
+    border-left-color: rgb(0, 255, 100) !important;
+    border-right-color: rgb(0, 255, 100) !important;
+    border-top-color: rgb(0, 255, 100) !important;
+    border-bottom-color: rgb(0, 255, 100) !important;
+    border-top-width: 4px !important;
+    border-right-width: 4px !important;
+    border-bottom-width: 4px !important;
+    border-left-width: 4px !important;
+    background-color: rgba(0, 50, 0, 0.3) !important;
+    scale: 1.05 1.05 !important;
 }

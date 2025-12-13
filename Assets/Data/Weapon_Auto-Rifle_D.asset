@@ -12,6 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6679e192d5720344bb4ba0a73f7bfde0, type: 3}
   m_Name: Weapon_Auto-Rifle_D
   m_EditorClassIdentifier: Assembly-CSharp::Weapon_Data
+  _itemId: cc480c29662147ae8738a823fcd5ba0a
+  itemName: AR-2000
+  icon: {fileID: 21300000, guid: e2820d50dd8266544a3f90b40a701f91, type: 3}
+  description: 
+  itemType: 0
+  stackable: 0
+  maxStack: 99
   weaponName: AR-2000
   bulletsInMagazine: 100
   magazineCapacity: 100

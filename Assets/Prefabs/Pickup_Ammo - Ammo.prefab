@@ -48,21 +48,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupAmmo
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   ammoBoxType: 0
   smallBoxAmmo:
   - weaponType: 0
-    amount: 99
+    minAmount: 0
+    maxAmount: 0
   - weaponType: 1
-    amount: 99
+    minAmount: 0
+    maxAmount: 0
   - weaponType: 3
-    amount: 99
+    minAmount: 0
+    maxAmount: 0
   bigBoxAmmo:
   - weaponType: 2
-    amount: 99
+    minAmount: 0
+    maxAmount: 0
   - weaponType: 4
-    amount: 99
+    minAmount: 0
+    maxAmount: 0
   - weaponType: 3
-    amount: 99
+    minAmount: 0
+    maxAmount: 0
   boxModel:
   - {fileID: 8885671626417801377}
   - {fileID: 4707865980276406394}
@@ -104,7 +113,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1467039391249032029
 Transform:
   m_ObjectHideFlags: 0
@@ -175,6 +184,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &8885671626417801377
 GameObject:
@@ -264,4 +274,5 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
