@@ -47,7 +47,6 @@ GameObject:
   - component: {fileID: 4570342361169366251}
   - component: {fileID: 3507294631823151812}
   - component: {fileID: 5422275908038040173}
-  - component: {fileID: 8031210537761790582}
   m_Layer: 0
   m_Name: weap_shotgun
   m_TagString: Untagged
@@ -125,21 +124,8 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &8031210537761790582
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5492963040389093690}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BackupWeaponModel
-  weaponType: 3
-  hangType: 0
 --- !u!1 &5712345148155080542
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,7 +137,6 @@ GameObject:
   - component: {fileID: 7741634932107888952}
   - component: {fileID: 5777392952998454851}
   - component: {fileID: 8526446258819518537}
-  - component: {fileID: 4508485815547609369}
   m_Layer: 0
   m_Name: weap_rifle
   m_TagString: Untagged
@@ -229,21 +214,8 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4508485815547609369
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5712345148155080542}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BackupWeaponModel
-  weaponType: 4
-  hangType: 1
 --- !u!1 &6800708079760976525
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,13 +263,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
+  interactionRadius: 2
+  requireLookAt: 0
+  maxLookAngle: 45
   weaponData: {fileID: 11400000, guid: 1ea6c6e01927fcc459db9c0fd2a3370d, type: 2}
-  models:
-  - {fileID: 1274374569573686811}
-  - {fileID: 4303421056215898040}
-  - {fileID: 8031210537761790582}
-  - {fileID: 2831177227636205960}
-  - {fileID: 4508485815547609369}
+  weaponModels: []
 --- !u!65 &9028741447912280118
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -330,7 +300,6 @@ GameObject:
   - component: {fileID: 8174304600609601139}
   - component: {fileID: 5485776890514960378}
   - component: {fileID: 3063327338044402294}
-  - component: {fileID: 1274374569573686811}
   m_Layer: 0
   m_Name: weap_pistol
   m_TagString: Untagged
@@ -408,21 +377,8 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1274374569573686811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7275464346314359544}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BackupWeaponModel
-  weaponType: 0
-  hangType: 2
 --- !u!1 &7384009299635350661
 GameObject:
   m_ObjectHideFlags: 0
@@ -434,7 +390,6 @@ GameObject:
   - component: {fileID: 3564066194926247648}
   - component: {fileID: 2049461404557944646}
   - component: {fileID: 8512258968978745300}
-  - component: {fileID: 2831177227636205960}
   m_Layer: 0
   m_Name: weap_auto-rifle
   m_TagString: Untagged
@@ -512,21 +467,8 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &2831177227636205960
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7384009299635350661}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BackupWeaponModel
-  weaponType: 2
-  hangType: 1
 --- !u!1 &8680033387946740610
 GameObject:
   m_ObjectHideFlags: 0
@@ -538,7 +480,6 @@ GameObject:
   - component: {fileID: 5601057018994751428}
   - component: {fileID: 729678747368130729}
   - component: {fileID: 8339014649146488256}
-  - component: {fileID: 4303421056215898040}
   m_Layer: 0
   m_Name: weap_revolver
   m_TagString: Untagged
@@ -616,18 +557,5 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4303421056215898040
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8680033387946740610}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40f6fc5827ce26541a217382ce3e8dec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BackupWeaponModel
-  weaponType: 1
-  hangType: 2

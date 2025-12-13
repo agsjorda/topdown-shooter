@@ -92,7 +92,7 @@ public class DragDropController : MonoBehaviour
     {
         InitializeEquipmentSlot("equipSlotWeapon", EquipmentSlotType.Weapon);
         InitializeEquipmentSlot("equipSlotHeadgear", EquipmentSlotType.Headgear);
-        InitializeEquipmentSlot("equipSlotArmor", EquipmentSlotType.Armor);
+        InitializeEquipmentSlot("equipSlotArmor", EquipmentSlotType.Vest);
         InitializeEquipmentSlot("equipSlotBoots", EquipmentSlotType.Boots);
     }
 
@@ -891,25 +891,59 @@ public class DragDropController : MonoBehaviour
 
     private bool CanEquipItemInSlot(Slot sourceSlot, EquipmentSlot targetEquipment)
     {
-        if (sourceSlot == null || targetEquipment == null || !sourceSlot.HasItem) return false;
+        if (sourceSlot == null || targetEquipment == null || !sourceSlot.HasItem) {
+            if (debugMode) Debug.Log($"[DragDrop] CanEquipItemInSlot: Early return - sourceSlot={sourceSlot != null}, targetEquipment={targetEquipment != null}, hasItem={sourceSlot?.HasItem}");
+            return false;
+        }
 
         var inventoryItem = draggedFromEquipment != null
             ? draggedFromEquipment.GetEquippedItem()
             : inventoryController?.GetItemAtSlot(sourceSlot.SlotIndex);
 
-        if (inventoryItem?.itemData == null) return false;
+        if (inventoryItem?.itemData == null) {
+            if (debugMode) Debug.Log($"[DragDrop] CanEquipItemInSlot: inventoryItem or itemData is null");
+            return false;
+        }
 
-        return targetEquipment.CanAcceptItem(inventoryItem.itemData);
+        bool canAccept = targetEquipment.CanAcceptItem(inventoryItem.itemData);
+        
+        if (debugMode) {
+            string itemInfo = $"{inventoryItem.itemData.itemName} (Type: {inventoryItem.itemData.itemType}";
+            if (inventoryItem.itemData is Armor_Data armorData) {
+                itemInfo += $", ArmorType: {armorData.armorType}";
+            }
+            itemInfo += ")";
+            Debug.Log($"[DragDrop] CanEquipItemInSlot: {itemInfo} -> {targetEquipment.SlotType} = {canAccept}");
+        }
+
+        return canAccept;
     }
 
     private bool CanEquipItemInSlotFromEquipment(EquipmentSlot targetEquipment)
     {
-        if (targetEquipment == null || draggedFromEquipment == null) return false;
+        if (targetEquipment == null || draggedFromEquipment == null) {
+            if (debugMode) Debug.Log($"[DragDrop] CanEquipItemInSlotFromEquipment: targetEquipment={targetEquipment != null}, draggedFromEquipment={draggedFromEquipment != null}");
+            return false;
+        }
 
         var inventoryItem = draggedFromEquipment.GetEquippedItem();
-        if (inventoryItem?.itemData == null) return false;
+        if (inventoryItem?.itemData == null) {
+            if (debugMode) Debug.Log($"[DragDrop] CanEquipItemInSlotFromEquipment: inventoryItem or itemData is null");
+            return false;
+        }
 
-        return targetEquipment.CanAcceptItem(inventoryItem.itemData);
+        bool canAccept = targetEquipment.CanAcceptItem(inventoryItem.itemData);
+        
+        if (debugMode) {
+            string itemInfo = $"{inventoryItem.itemData.itemName} (Type: {inventoryItem.itemData.itemType}";
+            if (inventoryItem.itemData is Armor_Data armorData) {
+                itemInfo += $", ArmorType: {armorData.armorType}";
+            }
+            itemInfo += ")";
+            Debug.Log($"[DragDrop] CanEquipItemInSlotFromEquipment: {itemInfo} from {draggedFromEquipment.SlotType} -> {targetEquipment.SlotType} = {canAccept}");
+        }
+
+        return canAccept;
     }
 
     private void HighlightEmptySlots()

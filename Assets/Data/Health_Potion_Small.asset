@@ -16,6 +16,6 @@ MonoBehaviour:
   itemName: health potion
   icon: {fileID: 21300000, guid: 3c638adb5dfbbe64aa680b528ae4e2df, type: 3}
   description: Smal Health Potion
-  itemType: 0
+  itemType: 2
   stackable: 1
   maxStack: 99

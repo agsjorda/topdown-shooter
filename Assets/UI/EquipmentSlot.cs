@@ -72,17 +72,55 @@ public partial class EquipmentSlot : Slot
 
     public override bool CanAcceptItem(Item_DataSO itemData)
     {
-        if (itemData == null) return false;
+        if (itemData == null) {
+            Debug.Log($"[EquipmentSlot] CanAcceptItem({SlotType}): itemData is null");
+            return false;
+        }
+
+        Debug.Log($"[EquipmentSlot] CanAcceptItem({SlotType}): Checking {itemData.itemName} (Type: {itemData.itemType})");
 
         switch (SlotType) {
             case EquipmentSlotType.Weapon:
-                return itemData.itemType == ItemType.Weapon;
-            case EquipmentSlotType.Armor:
-                return itemData.itemType == ItemType.Armor;
+                bool weaponResult = itemData.itemType == ItemType.Weapon;
+                Debug.Log($"[EquipmentSlot] Weapon slot: {itemData.itemName} is weapon? {weaponResult}");
+                return weaponResult;
+                
             case EquipmentSlotType.Headgear:
-                return itemData.itemType == ItemType.Armor;
+            case EquipmentSlotType.Vest:
             case EquipmentSlotType.Boots:
-                return itemData.itemType == ItemType.Armor;
+                // Check if it's armor AND the ArmorType matches the slot
+                if (itemData.itemType != ItemType.Armor) {
+                    Debug.Log($"[EquipmentSlot] {SlotType} slot: {itemData.itemName} is not armor (type={itemData.itemType})");
+                    return false;
+                }
+                
+                if (itemData is Armor_Data armorData) {
+                    bool matches = DoesArmorTypeMatchSlot(armorData.armorType, SlotType);
+                    Debug.Log($"[EquipmentSlot] {SlotType} slot: {itemData.itemName} armor type={armorData.armorType}, matches={matches}");
+                    return matches;
+                }
+                
+                Debug.Log($"[EquipmentSlot] {SlotType} slot: {itemData.itemName} is not Armor_Data type!");
+                return false;
+                
+            default:
+                Debug.Log($"[EquipmentSlot] Unknown slot type: {SlotType}");
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Helper method to validate if an ArmorType can be equipped in a specific EquipmentSlotType
+    /// </summary>
+    private bool DoesArmorTypeMatchSlot(ArmorType armorType, EquipmentSlotType slotType)
+    {
+        switch (slotType) {
+            case EquipmentSlotType.Headgear:
+                return armorType == ArmorType.Headgear;
+            case EquipmentSlotType.Vest:
+                return armorType == ArmorType.Vest;
+            case EquipmentSlotType.Boots:
+                return armorType == ArmorType.Boots;
             default:
                 return false;
         }

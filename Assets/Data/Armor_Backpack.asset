@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d4c441967d836448a014fc62478f04b, type: 3}
+  m_Name: Armor_Backpack
+  m_EditorClassIdentifier: Assembly-CSharp::Armor_Data
+  _itemId: d3c4fbe8b4f24d0a8d7f102622d1f19c
+  itemName: Back Pack
+  icon: {fileID: 21300000, guid: ce38fb66df2ffc046a3570f3ceccbb75, type: 3}
+  description: 
+  itemType: 1
+  stackable: 0
+  maxStack: 99
+  armorType: 1
+  damageReduction: 0
+  bonusHealth: 0
+  maxDurability: 100
+  currentDurability: 100
+  armorModelPrefab: {fileID: 7919750326980988814, guid: 4b1c0b10232fc414ea953b15b52fc603, type: 3}
+  armorTintColor: {r: 1, g: 1, b: 1, a: 1}
