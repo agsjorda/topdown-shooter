@@ -29,27 +29,27 @@ public class ObjectPool : MonoBehaviour
     private void Start()
     {
         Debug.Log("[ObjectPool] Initializing pools...");
-        
+
         if (weaponPickup != null)
             InitializeNewPool(weaponPickup);
         else
             Debug.LogError("[ObjectPool] weaponPickup prefab is NULL!");
-            
+
         if (armorPickup != null)
             InitializeNewPool(armorPickup);
         else
             Debug.LogError("[ObjectPool] armorPickup prefab is NULL!");
-            
+
         if (ammoPickup != null)
             InitializeNewPool(ammoPickup);
         else
             Debug.LogError("[ObjectPool] ammoPickup prefab is NULL!");
-            
+
         if (floatingText != null)
             InitializeNewPool(floatingText);
         else
             Debug.LogError("[ObjectPool] floatingText prefab is NULL!");
-            
+
         Debug.Log("[ObjectPool] Pool initialization complete.");
     }
 
@@ -179,16 +179,16 @@ public class ObjectPool : MonoBehaviour
         if (prefab == null) return;
 
         Debug.Log($"[ObjectPool] Creating new object for prefab: {prefab.name}");
-        
+
         GameObject newObject = null;
-        
+
         try {
             newObject = Instantiate(prefab, transform);
         } catch (System.Exception e) {
             Debug.LogError($"[ObjectPool] Failed to instantiate prefab '{prefab.name}': {e.Message}");
             return;
         }
-        
+
         // Check for missing scripts
         var components = newObject.GetComponents<Component>();
         bool hasMissingScript = false;
@@ -198,14 +198,14 @@ public class ObjectPool : MonoBehaviour
                 Debug.LogError($"[ObjectPool] ⚠️ Missing script detected on prefab '{prefab.name}'! Check the prefab in the Project window and remove any missing script references.");
             }
         }
-        
+
         // If there are missing scripts, destroy the instance and skip pooling
         if (hasMissingScript) {
             Debug.LogWarning($"[ObjectPool] Skipping pool creation for '{prefab.name}' due to missing scripts. Fix the prefab first!");
             if (newObject != null) Destroy(newObject);
             return;
         }
-        
+
         var pooled = newObject.AddComponent<PooledObject>();
         pooled.originalPrefab = prefab;
         newObject.SetActive(false);

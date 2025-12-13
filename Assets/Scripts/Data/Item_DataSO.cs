@@ -36,7 +36,8 @@ public class Item_DataSO : ScriptableObject
 
     private void OnValidate()
     {
-        if (string.IsNullOrEmpty(_itemId)) {
+        // Only run in Editor, not during Play Mode exit
+        if (!Application.isPlaying && string.IsNullOrEmpty(_itemId)) {
             _itemId = Guid.NewGuid().ToString("N");
             EditorUtility.SetDirty(this);
         }
