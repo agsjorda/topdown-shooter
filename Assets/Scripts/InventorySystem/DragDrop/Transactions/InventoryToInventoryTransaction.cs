@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-/// <summary>
 /// Handles moving/swapping items within inventory slots
-/// </summary>
 public class InventoryToInventoryTransaction : DragDropTransaction
 {
     private readonly int fromIndex;

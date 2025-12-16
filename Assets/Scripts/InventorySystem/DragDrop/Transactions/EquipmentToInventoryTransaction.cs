@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-/// <summary>
 /// Handles unequipping an item from equipment slot to inventory
-/// </summary>
 public class EquipmentToInventoryTransaction : DragDropTransaction
 {
     private readonly EquipmentSlot sourceEquipment;

@@ -2,9 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-/// <summary>
 /// Handles equipping an item from inventory to an equipment slot
-/// </summary>
 public class InventoryToEquipmentTransaction : DragDropTransaction
 {
     private readonly Inventory_Item itemToEquip;

@@ -72,7 +72,7 @@ public class InventoryUIConfig : MonoBehaviour
     {
         targetDocument ??= GetComponent<UIDocument>();
         CacheContainers();
-        BuildOrUpdate();
+        BuildOrUpdateSlotsOnly();
         CacheValues();
     }
 
@@ -80,7 +80,7 @@ public class InventoryUIConfig : MonoBehaviour
     {
         if (!Application.isPlaying) {
             CacheContainers();
-            BuildOrUpdate();
+            BuildOrUpdateSlotsOnly();
             CacheValues();
         }
     }
@@ -90,7 +90,7 @@ public class InventoryUIConfig : MonoBehaviour
         if (!Application.isPlaying) return;
 
         if (HasLayoutChanged()) {
-            BuildOrUpdate();
+            BuildOrUpdateSlotsOnly();
             CacheValues();
         }
     }
@@ -98,7 +98,7 @@ public class InventoryUIConfig : MonoBehaviour
     public void RebuildUI()
     {
         CacheContainers();
-        BuildOrUpdate();
+        BuildOrUpdateSlotsOnly();
         CacheValues();
     }
 
@@ -148,53 +148,8 @@ public class InventoryUIConfig : MonoBehaviour
         }
     }
 
-    private void BuildOrUpdate()
-    {
-        var root = targetDocument?.rootVisualElement;
-        if (root == null) return;
-
-        BuildOrUpdateTabs(root);
-        BuildOrUpdateSlots(root);
-    }
-
-    private void BuildOrUpdateTabs(VisualElement root)
-    {
-        var tabButtonsContainer = root.Q<VisualElement>("tabButtonsContainer");
-        if (tabButtonsContainer == null) return;
-
-        InventoryTabElement.SetGlobalSize(tabWidthPx, tabHeightPx);
-        InventoryTabElement.SetGlobalIconSize(tabIconWidthPx, tabIconHeightPx);
-
-        tabButtonsContainer.Clear();
-
-        for (int i = 0; i < tabs.Count; i++) {
-            var def = tabs[i];
-            var tab = new InventoryTabElement();
-            tab.SetId(def.id);
-            tab.SetIcon(def.iconTexture, def.iconTint);
-            tab.SetLabel(def.label);
-            tab.SetActive(i == Mathf.Clamp(activeTabIndex, 0, Mathf.Max(0, tabs.Count - 1)));
-
-            int capturedIndex = i;
-            // FIXED: Check what Clicked event signature expects
-            // If it's Action<InventoryTabElement>, pass the tab parameter
-            tab.Clicked += (clickedTab) => SetActiveTab(tabButtonsContainer, capturedIndex);
-            tabButtonsContainer.Add(tab);
-        }
-    }
-
-    private void SetActiveTab(VisualElement tabButtonsContainer, int index)
-    {
-        activeTabIndex = Mathf.Clamp(index, 0, Mathf.Max(0, tabs.Count - 1));
-        int i = 0;
-        foreach (var child in tabButtonsContainer.Children()) {
-            if (child is InventoryTabElement tab)
-                tab.SetActive(i == activeTabIndex);
-            i++;
-        }
-    }
-
-    private void BuildOrUpdateSlots(VisualElement root)
+    // Only build slots, not tabs. TabFilterManager will handle tab UI and filtering.
+    private void BuildOrUpdateSlotsOnly()
     {
         if (_tabContentContainer == null || _slotsContainer == null)
             CacheContainers();
@@ -216,7 +171,7 @@ public class InventoryUIConfig : MonoBehaviour
             _createdSlots.Add(slot);
         }
 
-        root.MarkDirtyRepaint();
+        _tabContentContainer.MarkDirtyRepaint();
     }
     #endregion
 }

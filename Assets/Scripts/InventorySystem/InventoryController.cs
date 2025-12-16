@@ -31,46 +31,20 @@ public class InventoryController : MonoBehaviour
 
         inventory.OnInventoryChanged -= SyncInventory;
         inventory.OnInventoryChanged += SyncInventory;
-        SyncInventory();
+        // SyncInventory(); // Disabled: TabFilterManager handles slot population
     }
 
-    private void SyncInventory()
-    {
-        if (ui?.Slots == null || inventory?.itemList == null) return;
-
-        var slots = ui.Slots;
-
-        // Clear all slots first
-        for (int i = 0; i < slots.Count; i++)
-            slots[i].ClearItem();
-
-        // Fill slots with items - respect null items as empty slots
-        int maxSlotsToFill = Mathf.Min(slots.Count, inventory.maxInventorySize);
-        for (int i = 0; i < maxSlotsToFill; i++) {
-            if (i < inventory.itemList.Count) {
-                var item = inventory.itemList[i];
-                if (item != null) {
-                    slots[i].SetItem(item);
-                }
-                // If item is null, slot stays cleared
-            }
-            // Slots beyond itemList.Count remain cleared
-        }
-    }
+    // Disabled: Only TabFilterManager should update slots
+    private void SyncInventory() { }
 
     public void MoveItem(int fromIndex, int toIndex)
     {
         if (inventory == null) return;
-
-        // Use the new SmartMoveItem method
         inventory.SmartMoveItem(fromIndex, toIndex);
     }
 
-    // Add these methods to your existing InventoryController class:
-
     public Inventory_Item GetItemAtSlot(int slotIndex)
     {
-        // Return the item at the specified slot
         if (slotIndex >= 0 && slotIndex < inventory.itemList.Count) {
             return inventory.itemList[slotIndex];
         }
@@ -80,12 +54,9 @@ public class InventoryController : MonoBehaviour
     public bool AddItemToSlot(Inventory_Item item, int slotIndex)
     {
         if (slotIndex >= 0 && slotIndex < inventory.maxInventorySize) {
-            // Ensure list is large enough
             while (inventory.itemList.Count <= slotIndex) {
                 inventory.itemList.Add(null);
             }
-
-            // If slot is empty, place item there
             if (inventory.itemList[slotIndex] == null) {
                 inventory.itemList[slotIndex] = item;
                 inventory.NotifyInventoryChanged();
@@ -103,7 +74,6 @@ public class InventoryController : MonoBehaviour
         }
     }
 
-    // Keep SwapSlots for backward compatibility
     public void SwapSlots(int fromIndex, int toIndex)
     {
         if (inventory != null) {
