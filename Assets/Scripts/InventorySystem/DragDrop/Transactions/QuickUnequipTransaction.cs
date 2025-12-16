@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 /// **QuickUnequipTransaction** - Double-click to unequip item from equipment slot
 /// 
 /// What it does:
-/// - Finds first available inventory slot
+/// - Finds first available inventory slot (in the full inventory, not just visible slots)
 /// - Moves equipped item from equipment slot to inventory
 /// 
 /// This transaction is triggered by double-clicking an equipped item.
@@ -45,14 +45,26 @@ public class QuickUnequipTransaction : DragDropTransaction
             return false;
         }
 
-        targetInventoryIndex = FindFirstEmptyInventorySlot();
+        // Use the full inventory to find the first empty slot
+        var inventory = inventoryController?.Inventory;
+        if (inventory == null) {
+            LogError("No inventory available");
+            return false;
+        }
+        targetInventoryIndex = inventory.GetType().GetMethod("FindFirstEmptySlot", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+            .Invoke(inventory, null) as int? ?? -1;
 
         if (targetInventoryIndex < 0) {
             Log("No empty inventory slot available for unequipping");
             return false;
         }
 
-        targetInventorySlot = inventorySlots[targetInventoryIndex];
+        // Defensive: get the UI slot for highlight
+        if (targetInventoryIndex < inventorySlots.Count)
+            targetInventorySlot = inventorySlots[targetInventoryIndex];
+        else
+            targetInventorySlot = null;
+
         Log($"Quick unequip {equippedItem.itemData.itemName} from {sourceEquipmentSlot.SlotType} to slot {targetInventoryIndex}");
         return true;
     }
@@ -67,30 +79,16 @@ public class QuickUnequipTransaction : DragDropTransaction
         sourceEquipmentSlot.RefreshVisualState();
         equipmentController?.UnequipSlot(sourceEquipmentSlot.SlotType);
 
-        if (targetInventorySlot != null) {
-            targetInventorySlot.SetItem(equippedItem);
-        }
+        // Add to inventory at the correct slot
         inventoryController?.AddItemToSlot(equippedItem, targetInventoryIndex);
 
-        targetInventorySlot?.AddToClassList("inventorySlots--drop-target");
-        yield return null;
-        targetInventorySlot?.RemoveFromClassList("inventorySlots--drop-target");
+        if (targetInventorySlot != null) {
+            targetInventorySlot.SetItem(equippedItem);
+            targetInventorySlot.AddToClassList("inventorySlots--drop-target");
+            yield return null;
+            targetInventorySlot.RemoveFromClassList("inventorySlots--drop-target");
+        }
     }
 
     public override VisualElement GetTargetVisual() => targetInventorySlot;
-
-    /// Finds the first available inventory slot.
-    /// Returns the index of the first empty slot, or -1 if inventory is full.
-    private int FindFirstEmptyInventorySlot()
-    {
-        if (inventorySlots == null) return -1;
-
-        for (int i = 0; i < inventorySlots.Count; i++) {
-            if (inventorySlots[i] != null && !inventorySlots[i].HasItem) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
 }
