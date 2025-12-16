@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using InventorySystem;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -43,17 +44,20 @@ public class InventoryUIConfig : MonoBehaviour
     private VisualElement _tabContentContainer;
     private InventoryScrollElement _scrollWrapper;
     private VisualElement _slotsContainer;
-    private readonly List<Slot> _createdSlots = new List<Slot>();
+    private readonly List<SlotView> _createdSlots = new List<SlotView>();
 
-    public List<Slot> Slots => _createdSlots;
+    // MVVM: ViewModel property (set externally or via inspector)
+    public InventoryViewModel ViewModel { get; set; }
+
+    public List<SlotView> Slots => _createdSlots;
     public int CreatedSlotCount => _createdSlots.Count;
 
-    public Slot GetSlot(int index)
+    public SlotView GetSlot(int index)
     {
         return (index >= 0 && index < _createdSlots.Count) ? _createdSlots[index] : null;
     }
 
-    public bool TryGetSlot(int index, out Slot slot)
+    public bool TryGetSlot(int index, out SlotView slot)
     {
         if (index >= 0 && index < _createdSlots.Count) {
             slot = _createdSlots[index];
@@ -66,6 +70,16 @@ public class InventoryUIConfig : MonoBehaviour
     void Awake()
     {
         targetDocument ??= GetComponent<UIDocument>();
+        // Ensure InventoryViewModel is assigned
+        if (ViewModel == null) {
+            var inventoryBase = Object.FindFirstObjectByType<InventoryModel>();
+            if (inventoryBase != null) {
+                ViewModel = new InventoryViewModel(inventoryBase);
+                Debug.Log("[InventoryUIConfig] InventoryViewModel auto-created from InventoryModel");
+            } else {
+                Debug.LogError("[InventoryUIConfig] No InventoryModel found in scene. InventoryViewModel cannot be created.");
+            }
+        }
     }
 
     void OnEnable()
@@ -162,7 +176,7 @@ public class InventoryUIConfig : MonoBehaviour
         _createdSlots.Capacity = slotCount;
 
         for (int i = 0; i < slotCount; i++) {
-            var slot = new Slot();
+            var slot = new SlotView();
             slot.SetSlotIndex(i);
             slot.SetSlotSize(slotSize);
             slot.SetCellMargin(cellMargin);

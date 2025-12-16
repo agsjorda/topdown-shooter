@@ -1,22 +1,23 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
+using InventorySystem;
 
 /// Base class for all drag/drop transactions.
 /// Each transaction type (inventory-to-inventory, inventory-to-equipment, etc.) inherits from this.
 /// This uses the Strategy pattern to eliminate duplicate transaction code.
 public abstract class DragDropTransaction
 {
-    protected readonly InventoryController inventoryController;
+    protected readonly InventoryViewModel inventoryViewModel;
     protected readonly EquipmentController equipmentController;
     protected readonly bool debugMode;
     
     protected DragDropTransaction(
-        InventoryController inventoryController,
+        InventoryViewModel inventoryViewModel,
         EquipmentController equipmentController,
         bool debugMode = false)
     {
-        this.inventoryController = inventoryController;
+        this.inventoryViewModel = inventoryViewModel;
         this.equipmentController = equipmentController;
         this.debugMode = debugMode;
     }

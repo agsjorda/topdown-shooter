@@ -8,12 +8,12 @@ public class EquipmentController : MonoBehaviour
     public class EquippedItem
     {
         public EquipmentSlotType slotType;
-        public Inventory_Item item;
+        public InventoryItem item;
     }
 
     public List<EquippedItem> equippedItems = new List<EquippedItem>();
 
-    public void EquipItem(Inventory_Item item, EquipmentSlotType slotType)
+    public void EquipItem(InventoryItem item, EquipmentSlotType slotType)
     {
         if (item == null || item.itemData == null) return;
 
@@ -38,14 +38,14 @@ public class EquipmentController : MonoBehaviour
         }
     }
 
-    public Inventory_Item GetEquippedItem(EquipmentSlotType slotType)
+    public InventoryItem GetEquippedItem(EquipmentSlotType slotType)
     {
         var equipped = equippedItems.Find(x => x.slotType == slotType);
         return equipped?.item;
     }
 
     // NEW: Helper method for InventoryController
-    public bool AddItemToSlot(Inventory_Item item, int slotIndex)
+    public bool AddItemToSlot(InventoryItem item, int slotIndex)
     {
         // This is a placeholder - you'll need to implement this based on your inventory system
         Debug.Log($"Would add item {item.itemData.itemName} to inventory slot {slotIndex}");

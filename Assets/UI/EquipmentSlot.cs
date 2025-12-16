@@ -2,19 +2,19 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 [UxmlElement]
-public partial class EquipmentSlot : Slot
+public partial class EquipmentSlotView : SlotView
 {
     private VisualElement _equipmentIcon;
     private Texture2D _originalBackgroundTexture;
     private Sprite _originalBackgroundSprite;
 
     public EquipmentSlotType SlotType { get; private set; }
-    public Inventory_Item CurrentItem { get; private set; }
+    public InventoryItem CurrentItem { get; private set; }
 
     public override bool IsEquipmentSlot => true;
     public override EquipmentSlotType EquipmentType => SlotType;
 
-    public EquipmentSlot() : base()
+    public EquipmentSlotView() : base()
     {
         // Remove inventory slot class, we use equipment slot classes
         RemoveFromClassList("inventorySlots");
@@ -73,38 +73,38 @@ public partial class EquipmentSlot : Slot
     public override bool CanAcceptItem(Item_DataSO itemData)
     {
         if (itemData == null) {
-            Debug.Log($"[EquipmentSlot] CanAcceptItem({SlotType}): itemData is null");
+            Debug.Log($"[EquipmentSlotView] CanAcceptItem({SlotType}): itemData is null");
             return false;
         }
 
-        Debug.Log($"[EquipmentSlot] CanAcceptItem({SlotType}): Checking {itemData.itemName} (Type: {itemData.itemType})");
+        Debug.Log($"[EquipmentSlotView] CanAcceptItem({SlotType}): Checking {itemData.itemName} (Type: {itemData.itemType})");
 
         switch (SlotType) {
             case EquipmentSlotType.Weapon:
                 bool weaponResult = itemData.itemType == ItemType.Weapon;
-                Debug.Log($"[EquipmentSlot] Weapon slot: {itemData.itemName} is weapon? {weaponResult}");
+                Debug.Log($"[EquipmentSlotView] Weapon slot: {itemData.itemName} is weapon? {weaponResult}");
                 return weaponResult;
-                
+
             case EquipmentSlotType.Headgear:
             case EquipmentSlotType.Vest:
             case EquipmentSlotType.Boots:
                 // Check if it's armor AND the ArmorType matches the slot
                 if (itemData.itemType != ItemType.Armor) {
-                    Debug.Log($"[EquipmentSlot] {SlotType} slot: {itemData.itemName} is not armor (type={itemData.itemType})");
+                    Debug.Log($"[EquipmentSlotView] {SlotType} slot: {itemData.itemName} is not armor (type={itemData.itemType})");
                     return false;
                 }
-                
+
                 if (itemData is Armor_Data armorData) {
                     bool matches = DoesArmorTypeMatchSlot(armorData.armorType, SlotType);
-                    Debug.Log($"[EquipmentSlot] {SlotType} slot: {itemData.itemName} armor type={armorData.armorType}, matches={matches}");
+                    Debug.Log($"[EquipmentSlotView] {SlotType} slot: {itemData.itemName} armor type={armorData.armorType}, matches={matches}");
                     return matches;
                 }
-                
-                Debug.Log($"[EquipmentSlot] {SlotType} slot: {itemData.itemName} is not Armor_Data type!");
+
+                Debug.Log($"[EquipmentSlotView] {SlotType} slot: {itemData.itemName} is not Armor_Data type!");
                 return false;
-                
+
             default:
-                Debug.Log($"[EquipmentSlot] Unknown slot type: {SlotType}");
+                Debug.Log($"[EquipmentSlotView] Unknown slot type: {SlotType}");
                 return false;
         }
     }
@@ -126,7 +126,7 @@ public partial class EquipmentSlot : Slot
         }
     }
 
-    public override void SetItem(Inventory_Item item, int qty = 1)
+    public override void SetItem(InventoryItem item, int qty = 1)
     {
         if (item == null || item.itemData == null) {
             ClearItem();
@@ -171,7 +171,7 @@ public partial class EquipmentSlot : Slot
         RemoveFromClassList("has-item");
     }
 
-    public Inventory_Item GetEquippedItem()
+    public InventoryItem GetEquippedItem()
     {
         return CurrentItem;
     }

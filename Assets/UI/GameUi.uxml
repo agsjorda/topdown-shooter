@@ -29,16 +29,16 @@
                 <ui:VisualElement name="characterPreview-container" style="flex-grow: 1; align-items: center; display: flex; align-self: auto; justify-content: center; flex-direction: column; width: 45%; height: 100%;">
                     <ui:VisualElement name="playerPreview" style="flex-grow: 0; width: 90%; background-color: rgba(34, 34, 34, 0); background-image: url(&quot;project://database/Assets/Textures/playerPreview_renderTexture.renderTexture?fileID=8400000&amp;guid=d2ac92518687b3f4a907aeba90d08cd3&amp;type=2#playerPreview_renderTexture&quot;); -unity-background-scale-mode: stretch-to-fill; -unity-background-image-tint-color: rgb(255, 255, 255); height: 90%; flex-shrink: 0;"/>
                     <ui:VisualElement class="equipSlots equipSlots--weapon">
-                        <EquipmentSlot name="equipSlotWeapon" class="equipSlot-icon equipSlot-icon--weapon"/>
+                        <EquipmentSlotView name="equipSlotWeapon" class="equipSlot-icon equipSlot-icon--weapon"/>
                     </ui:VisualElement>
                     <ui:VisualElement class="equipSlots equipSlots--headgear">
-                        <EquipmentSlot name="equipSlotHeadgear" class="equipSlot-icon equipSlot-icon--headgear"/>
+                        <EquipmentSlotView name="equipSlotHeadgear" class="equipSlot-icon equipSlot-icon--headgear"/>
                     </ui:VisualElement>
                     <ui:VisualElement class="equipSlots equipSlots--armor">
-                        <EquipmentSlot name="equipSlotArmor" class="equipSlot-icon equipSlot-icon--armor"/>
+                        <EquipmentSlotView name="equipSlotArmor" class="equipSlot-icon equipSlot-icon--armor"/>
                     </ui:VisualElement>
                     <ui:VisualElement class="equipSlots equipSlots--boots">
-                        <EquipmentSlot name="equipSlotBoots" class="equipSlot-icon equipSlot-icon--boots"/>
+                        <EquipmentSlotView name="equipSlotBoots" class="equipSlot-icon equipSlot-icon--boots"/>
                     </ui:VisualElement>
                 </ui:VisualElement>
                 <ui:VisualElement name="inventory-container" style="flex-grow: 1; align-items: center; flex-shrink: 1; width: 55%; margin-top: 0; margin-right: 0; margin-bottom: 0; margin-left: 0; flex-wrap: wrap; height: 100%;">

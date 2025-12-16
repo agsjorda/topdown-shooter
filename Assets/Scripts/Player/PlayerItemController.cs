@@ -10,7 +10,7 @@ public class PlayerItemController : MonoBehaviour
     }
 
     // Update is called once per frame
-    public void PickupItem(Inventory_Item newItem)
+    public void PickupItem(InventoryItem newItem)
     {
         Debug.Log("Picked up item: " + newItem.itemData.name);
     }

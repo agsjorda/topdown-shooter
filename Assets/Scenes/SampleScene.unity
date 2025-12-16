@@ -2708,7 +2708,6 @@ GameObject:
   - component: {fileID: 474115370}
   - component: {fileID: 474115375}
   - component: {fileID: 474115371}
-  - component: {fileID: 474115372}
   - component: {fileID: 474115374}
   - component: {fileID: 474115373}
   m_Layer: 5
@@ -2820,20 +2819,6 @@ MonoBehaviour:
   tabHeightPx: 200
   tabIconWidthPx: 200
   tabIconHeightPx: 200
---- !u!114 &474115372
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 474115367}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3380962fb42b53146994ee87521886de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InventoryController
-  inventory: {fileID: 1553978697}
-  ui: {fileID: 474115371}
 --- !u!114 &474115373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2846,7 +2831,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2accd89df0ea0f4eaddfbc07ad471ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragDropController
-  inventoryController: {fileID: 474115372}
   equipmentController: {fileID: 474115374}
   uiDocument: {fileID: 474115368}
   dragThreshold: 5
@@ -2877,7 +2861,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0c7c246da2d58244a832434580e2362, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TabFilterManager
-  inventory: {fileID: 1553978697}
   uiConfig: {fileID: 474115371}
   enableTabFiltering: 1
   defaultTabId: all

@@ -1,3 +1,4 @@
+using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,10 +9,10 @@ public static class TransactionFactory
     /// Creates the appropriate transaction based on drag source and drop target
     public static DragDropTransaction CreateTransaction(
         DragState dragState,
-        Slot targetInventorySlot,
-        EquipmentSlot targetEquipmentSlot,
-        List<Slot> inventorySlots,
-        InventoryController inventoryController,
+        SlotView targetInventorySlot,
+        EquipmentSlotView targetEquipmentSlot,
+        List<SlotView> inventorySlots,
+        InventoryViewModel inventoryViewModel,
         EquipmentController equipmentController,
         bool debugMode = false)
     {
@@ -19,69 +20,64 @@ public static class TransactionFactory
         bool fromEquipment = dragState.IsFromEquipment;
         bool toInventory = targetInventorySlot != null;
         bool toEquipment = targetEquipmentSlot != null;
-        
-        if (fromInventory && toInventory)
-        {
+
+        if (fromInventory && toInventory) {
             int fromIndex = dragState.SourceInventorySlot.SlotIndex;
             int toIndex = inventorySlots.IndexOf(targetInventorySlot);
-            
+
             return new InventoryToInventoryTransaction(
                 fromIndex,
                 toIndex,
                 targetInventorySlot,
-                inventoryController,
+                inventoryViewModel,
                 equipmentController,
                 debugMode
             );
         }
-        
-        if (fromInventory && toEquipment)
-        {
-            var item = inventoryController?.GetItemAtSlot(dragState.SourceInventorySlot.SlotIndex);
+
+        if (fromInventory && toEquipment) {
+            var item = inventoryViewModel?.GetItemAt(dragState.SourceInventorySlot.SlotIndex);
             int sourceIndex = dragState.SourceInventorySlot.SlotIndex;
-            
+
             return new InventoryToEquipmentTransaction(
                 item,
                 sourceIndex,
                 targetEquipmentSlot,
                 inventorySlots,
-                inventoryController,
+                inventoryViewModel,
                 equipmentController,
                 debugMode
             );
         }
-        
-        if (fromEquipment && toInventory)
-        {
+
+        if (fromEquipment && toInventory) {
             int targetIndex = inventorySlots.IndexOf(targetInventorySlot);
-            
+
             return new EquipmentToInventoryTransaction(
                 dragState.SourceEquipmentSlot,
                 targetIndex,
                 targetInventorySlot,
                 inventorySlots,
-                inventoryController,
+                inventoryViewModel,
                 equipmentController,
                 debugMode
             );
         }
-        
-        if (fromEquipment && toEquipment)
-        {
+
+        if (fromEquipment && toEquipment) {
             return new EquipmentToEquipmentTransaction(
                 dragState.SourceEquipmentSlot,
                 targetEquipmentSlot,
-                inventoryController,
+                inventoryViewModel,
                 equipmentController,
                 debugMode
             );
         }
-        
-        if (debugMode)
-        {
+
+        if (debugMode) {
             Debug.LogWarning($"[TransactionFactory] Cannot create transaction: fromInventory={fromInventory}, fromEquipment={fromEquipment}, toInventory={toInventory}, toEquipment={toEquipment}");
         }
-        
+
         return null;
     }
 }

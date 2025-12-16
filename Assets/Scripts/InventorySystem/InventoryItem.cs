@@ -1,12 +1,13 @@
 [System.Serializable]
-public class Inventory_Item
+public class InventoryItem
 {
     public Item_DataSO itemData;
 
-    public Inventory_Item(Item_DataSO data)
+    public InventoryItem(Item_DataSO data)
     {
         this.itemData = data;
     }
 }
+
 
 

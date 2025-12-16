@@ -159,9 +159,9 @@ public class PlayerWeaponController : MonoBehaviour
 
     private void SendToInventory(Weapon weapon)
     {
-        var inventory = Object.FindFirstObjectByType<Inventory_Base>();
+        var inventory = Object.FindFirstObjectByType<InventoryModel>();
         if (inventory != null && inventory.CanAddItem()) {
-            inventory.AddItem(new Inventory_Item(weapon.weaponData));
+            inventory.AddItem(new InventoryItem(weapon.weaponData));
         }
     }
 

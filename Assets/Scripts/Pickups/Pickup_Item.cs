@@ -1,3 +1,4 @@
+using InventorySystem;
 using UnityEngine;
 
 public class Pickup_Item : Interactable
@@ -6,8 +7,9 @@ public class Pickup_Item : Interactable
     [SerializeField] private Item_DataSO itemData;
 
     private SpriteRenderer spriteRenderer;
-    private Inventory_Item inventoryItem;
-    private Inventory_Base playerInventory;
+    private InventoryItem inventoryItem;
+    [SerializeField] private InventoryViewModel inventoryViewModel; // Use ViewModel for MVVM
+    private InventoryModel playerInventory; // Only for ViewModel creation if needed
 
     protected override void Awake()
     {
@@ -31,7 +33,7 @@ public class Pickup_Item : Interactable
     private void InitializePickup()
     {
         if (itemData != null) {
-            inventoryItem = new Inventory_Item(itemData);
+            inventoryItem = new InventoryItem(itemData);
             UpdateVisuals();
         }
     }
@@ -49,19 +51,16 @@ public class Pickup_Item : Interactable
     #region Interaction
     public override void Interaction()
     {
-        if (playerInventory == null) {
-            playerInventory = Object.FindFirstObjectByType<Inventory_Base>();
-            if (playerInventory == null) {
-                Debug.LogError($"{name}: No Inventory_Base found in scene!");
-                return;
-            }
+        EnsureViewModel();
+        if (inventoryViewModel == null) {
+            Debug.LogError($"{name}: No InventoryViewModel found or created!");
+            return;
         }
 
         Debug.Log($"Attempting to add {inventoryItem.itemData.itemName} to inventory");
 
-        // Fix: Inventory_Base.AddItem returns void, not bool. Use CanAddItem() to check before adding.
-        if (playerInventory.CanAddItem()) {
-            playerInventory.AddItem(inventoryItem);
+        if (inventoryViewModel.CanAddItem()) {
+            inventoryViewModel.AddItem(inventoryItem);
             DestroyPickup();
         } else {
             Debug.LogWarning("Failed to add item - inventory might be full");
@@ -81,12 +80,18 @@ public class Pickup_Item : Interactable
     {
         if (!base.CanInteract(playerTransform))
             return false;
+        EnsureViewModel();
+        return inventoryViewModel != null && inventoryViewModel.CanAddItem();
+    }
 
-        // Additional check: ensure inventory exists and has space
-        if (playerInventory == null)
-            playerInventory = Object.FindFirstObjectByType<Inventory_Base>();
-
-        return playerInventory != null && playerInventory.CanAddItem();
+    private void EnsureViewModel()
+    {
+        if (inventoryViewModel == null) {
+            playerInventory = Object.FindFirstObjectByType<InventoryModel>();
+            if (playerInventory != null) {
+                inventoryViewModel = new InventoryViewModel(playerInventory);
+            }
+        }
     }
     #endregion
 

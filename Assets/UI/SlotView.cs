@@ -2,7 +2,7 @@
 using UnityEngine.UIElements;
 
 [UxmlElement]
-public partial class Slot : VisualElement
+public partial class SlotView : VisualElement
 {
     private Image _icon;
     protected bool _hasItem;
@@ -45,7 +45,7 @@ public partial class Slot : VisualElement
     protected int slotSize = 100;
     protected float cellMargin = 8f;
 
-    public Slot()
+    public SlotView()
     {
         AddToClassList("inventorySlots");
         focusable = true;
@@ -58,7 +58,7 @@ public partial class Slot : VisualElement
         return true; // Default: accept all items
     }
 
-    public virtual void SetItem(Inventory_Item item, int qty = 1)
+    public virtual void SetItem(InventoryItem item, int qty = 1)
     {
         if (item == null || item.itemData == null) {
             ClearItem();

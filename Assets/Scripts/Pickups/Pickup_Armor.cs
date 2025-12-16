@@ -6,7 +6,7 @@ public class Pickup_Armor : Interactable
     [SerializeField] private Armor_Data armorData;
     [SerializeField] private GameObject armorVisual;
 
-    private Inventory_Item armorItem;
+    private InventoryItem armorItem;
     private Material defaultMaterial;
 
     protected override void Awake()
@@ -14,7 +14,7 @@ public class Pickup_Armor : Interactable
         base.Awake();
 
         if (armorData != null && armorItem == null)
-            armorItem = new Inventory_Item(armorData);
+            armorItem = new InventoryItem(armorData);
 
         SetupVisuals();
     }
@@ -32,16 +32,16 @@ public class Pickup_Armor : Interactable
     public void SetupPickupArmor(Armor_Data armor, Vector3 position)
     {
         armorData = armor;
-        armorItem = new Inventory_Item(armorData);
+        armorItem = new InventoryItem(armorData);
         transform.position = position;
 
         SetupVisuals();
     }
 
-    public void SetupPickupArmorFromItem(Inventory_Item item, Vector3 position)
+    public void SetupPickupArmorFromItem(InventoryItem item, Vector3 position)
     {
         if (item == null || item.itemData == null) return;
-        
+
         armorData = item.itemData as Armor_Data;
         if (armorData == null) {
             Debug.LogWarning($"Pickup_Armor: Item {item.itemData.itemName} is not armor data!");
@@ -107,9 +107,9 @@ public class Pickup_Armor : Interactable
     public override void Interaction()
     {
         // Find inventory
-        Inventory_Base inventory = Object.FindFirstObjectByType<Inventory_Base>();
+        InventoryModel inventory = Object.FindFirstObjectByType<InventoryModel>();
         if (inventory == null) {
-            Debug.LogWarning($"{name}: No Inventory_Base found");
+            Debug.LogWarning($"{name}: No InventoryModel found");
             return;
         }
 
@@ -171,12 +171,12 @@ public class Pickup_Armor : Interactable
                     break;
             }
             Gizmos.DrawIcon(transform.position + Vector3.up * 0.5f, "d_PreMatCube", true);
-            
+
             // Draw armor type label
-            #if UNITY_EDITOR
-            UnityEditor.Handles.Label(transform.position + Vector3.up * 0.75f, 
+#if UNITY_EDITOR
+            UnityEditor.Handles.Label(transform.position + Vector3.up * 0.75f,
                 $"{armorData.armorType}\n{armorData.itemName}");
-            #endif
+#endif
         }
     }
     #endregion

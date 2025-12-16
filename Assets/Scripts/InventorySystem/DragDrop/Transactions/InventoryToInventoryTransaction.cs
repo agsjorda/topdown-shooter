@@ -1,53 +1,66 @@
+using InventorySystem;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-/// Handles moving/swapping items within inventory slots
+/// <summary>
+/// Handles moving or swapping items within inventory slots using the ViewModel.
+/// </summary>
 public class InventoryToInventoryTransaction : DragDropTransaction
 {
     private readonly int fromIndex;
     private readonly int toIndex;
-    private readonly Slot targetSlot;
-    
+    private readonly SlotView targetSlot;
+
     public InventoryToInventoryTransaction(
         int fromIndex,
         int toIndex,
-        Slot targetSlot,
-        InventoryController inventoryController,
+        SlotView targetSlot,
+        InventoryViewModel inventoryViewModel,
         EquipmentController equipmentController,
         bool debugMode = false)
-        : base(inventoryController, equipmentController, debugMode)
+        : base(inventoryViewModel, equipmentController, debugMode)
     {
         this.fromIndex = fromIndex;
         this.toIndex = toIndex;
         this.targetSlot = targetSlot;
     }
-    
+
+    /// <inheritdoc/>
     public override bool CanExecute()
     {
         if (fromIndex == toIndex) {
             Log("Source and target are the same slot");
             return false;
         }
-        
-        if (inventoryController == null) {
-            LogError("InventoryController is null");
+        if (inventoryViewModel == null) {
+            LogError("InventoryViewModel is null");
             return false;
         }
-        
+        if (!inventoryViewModel.IsValidSlotIndex(fromIndex) || !inventoryViewModel.IsValidSlotIndex(toIndex)) {
+            LogError($"Invalid slot index: from {fromIndex}, to {toIndex}");
+            return false;
+        }
         return true;
     }
-    
+
+    /// <inheritdoc/>
     public override IEnumerator Execute()
     {
         yield return null; // Wait one frame for visual feedback
-        
-        string action = targetSlot?.HasItem ?? false ? "swapping with" : "moving to empty";
-        Log($"Inventory move from slot {fromIndex} to slot {toIndex} ({action})");
-        
-        inventoryController.MoveItem(fromIndex, toIndex);
+
+        var fromItem = inventoryViewModel.GetItemAt(fromIndex);
+        var toItem = inventoryViewModel.GetItemAt(toIndex);
+        if (fromItem != null && toItem != null) {
+            Log($"Inventory swap between slot {fromIndex} and slot {toIndex}");
+            inventoryViewModel.SwapItems(fromIndex, toIndex);
+        } else {
+            Log($"Inventory move from slot {fromIndex} to slot {toIndex} (moving to empty)");
+            inventoryViewModel.MoveItem(fromIndex, toIndex);
+        }
+        // Only update visuals on the slot
         targetSlot?.RemoveFromClassList("inventorySlots--drop-target");
     }
-    
-    public override VisualElement GetTargetVisual() => targetSlot;
+
+    /// <inheritdoc/>
+    public override VisualElement GetTargetVisual() => targetSlot as VisualElement;
 }

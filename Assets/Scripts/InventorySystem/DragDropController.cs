@@ -1,35 +1,17 @@
-﻿using System.Collections;
+﻿using InventorySystem;
+using InventorySystem.DragDrop.Transactions;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-/// **DragDropController** - Main controller for inventory drag and drop functionality.
-/// 
-/// It uses a modular architecture with helper classes to keep the code organized:
-/// - DragState: Tracks what's being dragged and from where
-/// - DragVisualHandler: Manages the visual ghost that follows your mouse
-/// - TransactionFactory: Creates the right type of operation (move/swap/equip/unequip)
-/// - Transaction classes: Execute specific drag/drop operations
-/// 
-/// Think of this like a game of moving chess pieces:
-/// 1. Player clicks on a piece (PointerDown)
-/// 2. Player drags the piece (PointerMove)
-/// 3. Player releases the piece (PointerUp)
-/// 4. We check if the move is valid
-/// 5. We execute the move (transaction)
-/// 
-/// **Architecture Benefits:**
-/// - Easy to understand: Each class does ONE thing
-/// - Easy to test: Can test each transaction type separately
-/// - Easy to extend: Want a new slot type? Just add it to InitializeEquipmentSlots!
-/// - Easy to debug: Clear separation makes finding bugs easier
 [DisallowMultipleComponent]
 public class DragDropController : MonoBehaviour
 {
     #region Serialized Fields (Inspector-visible settings)
     [Header("References")]
-    [Tooltip("Controls the inventory UI and data")]
-    [SerializeField] private InventoryController inventoryController;
+    [Tooltip("Controls the inventory ViewModel and data")]
+    [SerializeField] private InventoryViewModel inventoryViewModel;
 
     [Tooltip("Controls equipped items (weapon, armor, etc.)")]
     [SerializeField] private EquipmentController equipmentController;
@@ -59,8 +41,8 @@ public class DragDropController : MonoBehaviour
     private DoubleClickHandler doubleClickHandler;
 
     // Cached references to slots (for performance - avoids constant lookups)
-    private List<Slot> inventorySlots;
-    private List<EquipmentSlot> equipmentSlots = new List<EquipmentSlot>();
+    private List<SlotView> inventorySlots;
+    private List<EquipmentSlotView> equipmentSlots = new List<EquipmentSlotView>();
 
     // Flag to ensure we only initialize once
     private bool isInitialized;
@@ -71,12 +53,22 @@ public class DragDropController : MonoBehaviour
     /// This happens BEFORE Start, good for setting up references.
     private void Awake()
     {
-        inventoryController ??= GetComponent<InventoryController>();
         equipmentController ??= GetComponent<EquipmentController>();
         uiDocument ??= GetComponent<UIDocument>();
 
         dragState = new DragState();
         doubleClickHandler = new DoubleClickHandler(0.3f);
+
+        // Ensure InventoryViewModel is assigned
+        if (inventoryViewModel == null) {
+            var inventoryBase = Object.FindFirstObjectByType<InventoryModel>();
+            if (inventoryBase != null) {
+                inventoryViewModel = new InventoryViewModel(inventoryBase);
+                if (debugMode) Debug.Log("[DragDrop] InventoryViewModel auto-created from InventoryModel");
+            } else if (debugMode) {
+                Debug.LogError("[DragDrop] No InventoryModel found in scene. InventoryViewModel cannot be created.");
+            }
+        }
     }
 
     /// Called when the GameObject becomes active.
@@ -112,19 +104,20 @@ public class DragDropController : MonoBehaviour
         // Wait up to 60 frames (about 1 second) for inventory slots to be ready
         int maxWait = 60;
         int waited = 0;
-        while (inventoryController?.Slots == null && waited < maxWait) {
+        while ((inventoryViewModel == null || inventoryViewModel.Items == null) && waited < maxWait) {
             yield return null; // Wait one frame
             waited++;
         }
 
         // If slots still aren't ready after waiting, something's wrong!
-        if (inventoryController?.Slots == null) {
-            if (debugMode) Debug.LogError("[DragDrop] Inventory slots not found");
+        if (inventoryViewModel == null || inventoryViewModel.Items == null) {
+            if (debugMode) Debug.LogError("[DragDrop] InventoryViewModel or Items not found");
             yield break; // Exit coroutine early
         }
 
-        // Cache the slots (storing them now is faster than looking them up every frame)
-        inventorySlots = new List<Slot>(inventoryController.Slots);
+        // Assume slots are created by InventoryUIConfig and available via UI
+        var uiConfig = Object.FindFirstObjectByType<InventoryUIConfig>();
+        inventorySlots = uiConfig != null ? new List<SlotView>(uiConfig.Slots) : new List<SlotView>();
         equipmentSlots.Clear();
 
         // Set up equipment slots (weapon, headgear, vest, boots)
@@ -168,7 +161,7 @@ public class DragDropController : MonoBehaviour
         if (uiDocument?.rootVisualElement == null) return;
 
         // Q<T>() is like GameObject.Find but for UI Elements
-        var equipmentSlot = uiDocument.rootVisualElement.Q<EquipmentSlot>(slotName);
+        var equipmentSlot = uiDocument.rootVisualElement.Q<EquipmentSlotView>(slotName);
 
         if (equipmentSlot != null) {
             // Safety check: remove if already in list (prevents duplicates)
@@ -298,7 +291,7 @@ public class DragDropController : MonoBehaviour
         if (evt.button != 0 || dragState.IsDragging) return;
 
         // Get the actual Slot component (might click on child element)
-        var slot = evt.target as Slot ?? GetSlotFromParent(evt.target as VisualElement);
+        var slot = evt.target as SlotView ?? GetSlotFromParent(evt.target as VisualElement);
         if (slot == null || !slot.HasItem) return;
 
         if (debugMode) Debug.Log($"[DragDrop] Pointer down on inventory slot {slot.SlotIndex}");
@@ -418,27 +411,21 @@ public class DragDropController : MonoBehaviour
     private void StartDrag(Vector2 position)
     {
         dragState.IsDragging = true;
-
-        // Get the item being dragged
-        var draggedItem = dragState.GetDraggedItem(inventoryController);
+        // Use GetDraggedItem for both inventory and equipment
+        var draggedItem = dragState.GetDraggedItem(inventoryViewModel);
         if (draggedItem == null) {
             ResetDrag();
             return;
         }
-
         if (debugMode) {
             string source = dragState.IsFromInventory
                 ? $"inventory slot {dragState.SourceInventorySlot.SlotIndex}"
                 : $"equipment slot {dragState.SourceEquipmentSlot.SlotType}";
             Debug.Log($"[DragDrop] Starting drag from {source}");
         }
-
-        // Add "dragging" visual effect to source slot
         if (dragState.IsFromInventory) {
             visualHandler?.AddDraggingClass(dragState.SourceInventorySlot);
         }
-
-        // Show the ghost image (item icon following mouse)
         visualHandler?.ShowGhost(draggedItem.itemData.icon, position);
     }
 
@@ -509,16 +496,15 @@ public class DragDropController : MonoBehaviour
             return;
         }
 
-        // Create the appropriate transaction using the Factory pattern
-        // The factory looks at source + target and creates the right transaction type
+        // Use ViewModel for inventory operations
         var transaction = TransactionFactory.CreateTransaction(
-            dragState,              // What we're dragging (source)
-            targetInventory,        // Where we're dropping (inventory)
-            targetEquipment,        // Where we're dropping (equipment)
-            inventorySlots,         // All inventory slots (for swapping)
-            inventoryController,    // To modify inventory data
-            equipmentController,    // To modify equipment data
-            debugMode              // Debug logging
+            dragState,
+            targetInventory,
+            targetEquipment,
+            inventorySlots,
+            inventoryViewModel,
+            equipmentController,
+            debugMode
         );
 
         // Can we execute this transaction?
@@ -539,6 +525,7 @@ public class DragDropController : MonoBehaviour
     private IEnumerator ExecuteTransaction(DragDropTransaction transaction)
     {
         yield return transaction.Execute();
+        ResetDrag(); // Always reset drag state after transaction
     }
     #endregion
 
@@ -553,34 +540,28 @@ public class DragDropController : MonoBehaviour
     /// - Can't drop on the same slot you're dragging from
     /// - Equipment slots validate item types (e.g., only armor in armor slot)
     /// - Inventory slots always accept items (will swap if occupied)
-    private bool ValidateDropTarget(Slot targetInventory, EquipmentSlot targetEquipment)
+    private bool ValidateDropTarget(SlotView targetInventory, EquipmentSlotView targetEquipment)
     {
+        // Allow equipment to inventory drag
+        if (targetInventory != null && dragState.IsFromEquipment) {
+            return true;
+        }
         // Validating equipment slot
         if (targetEquipment != null) {
-            var draggedItem = dragState.GetDraggedItem(inventoryController);
+            var draggedItem = dragState.GetDraggedItem(inventoryViewModel);
             if (draggedItem == null) return false;
-
-            // Can't drop on same equipment slot we're dragging from
             if (dragState.IsFromEquipment && dragState.SourceEquipmentSlot == targetEquipment) {
                 return false;
             }
-
-            // Does the equipment slot accept this item type?
-            // (e.g., only Armor items in armor slot, only Weapons in weapon slot)
             return targetEquipment.CanAcceptItem(draggedItem.itemData);
         }
-
         // Validating inventory slot
         if (targetInventory != null) {
-            // Can't drop on same inventory slot we're dragging from
             if (dragState.IsFromInventory && dragState.SourceInventorySlot == targetInventory) {
                 return false;
             }
-
-            // Inventory always accepts items (will swap if occupied)
             return true;
         }
-
         return false;
     }
     #endregion
@@ -590,10 +571,10 @@ public class DragDropController : MonoBehaviour
     /// 
     /// Sometimes you click on a child element (like an icon) instead of the slot itself.
     /// This walks up the parent chain to find the actual Slot component.
-    private Slot GetSlotFromParent(VisualElement element)
+    private SlotView GetSlotFromParent(VisualElement element)
     {
         while (element != null) {
-            if (element is Slot slot) return slot;
+            if (element is SlotView slot) return slot;
             element = element.parent;
         }
         return null;
@@ -601,14 +582,14 @@ public class DragDropController : MonoBehaviour
 
     /// Find EquipmentSlot by walking up UI hierarchy.
     /// Same as GetSlotFromParent but for equipment slots.
-    private EquipmentSlot GetEquipmentSlotFromTarget(VisualElement element)
+    private EquipmentSlotView GetEquipmentSlotFromTarget(VisualElement element)
     {
         if (element == null) return null;
-        if (element is EquipmentSlot slot) return slot;
+        if (element is EquipmentSlotView slot) return slot;
 
         var parent = element.parent;
         while (parent != null) {
-            if (parent is EquipmentSlot parentSlot) return parentSlot;
+            if (parent is EquipmentSlotView parentSlot) return parentSlot;
             parent = parent.parent;
         }
 
@@ -619,7 +600,7 @@ public class DragDropController : MonoBehaviour
     /// 
     /// Uses worldBound (the slot's screen rectangle) to check if mouse is inside.
     /// Added padding makes it easier to drop - don't need pixel-perfect accuracy!
-    private EquipmentSlot FindEquipmentSlotAtPosition(Vector2 position)
+    private EquipmentSlotView FindEquipmentSlotAtPosition(Vector2 position)
     {
         foreach (var slot in equipmentSlots) {
             if (slot == null) continue;
@@ -636,7 +617,7 @@ public class DragDropController : MonoBehaviour
 
     /// Find which inventory slot is at mouse position.
     /// Same as equipment but with smaller padding (10 pixels instead of 20).
-    private Slot FindInventorySlotAtPosition(Vector2 position)
+    private SlotView FindInventorySlotAtPosition(Vector2 position)
     {
         if (inventorySlots == null) return null;
 
@@ -664,7 +645,7 @@ public class DragDropController : MonoBehaviour
 
     /// Get the inventory slot being dragged (if any).
     /// Returns null if dragging from equipment or not dragging at all.
-    public Slot GetDraggedSlot() => dragState?.SourceInventorySlot;
+    public SlotView GetDraggedSlot() => dragState?.SourceInventorySlot;
     #endregion
 
     #region Double-Click Handlers
@@ -676,11 +657,11 @@ public class DragDropController : MonoBehaviour
     /// 3. If empty, just equips
     /// 
     /// It's like a shortcut - no dragging needed!
-    private void HandleQuickEquip(Slot slot)
+    private void HandleQuickEquip(SlotView slot)
     {
         if (slot == null || !slot.HasItem) return;
 
-        var item = inventoryController?.GetItemAtSlot(slot.SlotIndex);
+        var item = inventoryViewModel != null ? inventoryViewModel.GetItemAt(slot.SlotIndex) : null;
         if (item == null) return;
 
         if (debugMode) Debug.Log($"[DragDrop] Quick equip: {item.itemData.itemName} from slot {slot.SlotIndex}");
@@ -691,7 +672,7 @@ public class DragDropController : MonoBehaviour
             slot,
             equipmentSlots,
             inventorySlots,
-            inventoryController,
+            inventoryViewModel,
             equipmentController,
             debugMode
         );
@@ -710,7 +691,7 @@ public class DragDropController : MonoBehaviour
     /// 2. Moves the equipped item there
     /// 
     /// If inventory is full, nothing happens (item stays equipped).
-    private void HandleQuickUnequip(EquipmentSlot equipmentSlot)
+    private void HandleQuickUnequip(EquipmentSlotView equipmentSlot)
     {
         if (equipmentSlot == null || !equipmentSlot.HasItem) return;
 
@@ -723,7 +704,7 @@ public class DragDropController : MonoBehaviour
             equipmentSlot,
             item,
             inventorySlots,
-            inventoryController,
+            inventoryViewModel,
             equipmentController,
             debugMode
         );

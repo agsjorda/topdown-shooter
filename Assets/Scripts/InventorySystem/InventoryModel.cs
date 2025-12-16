@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Inventory_Base : MonoBehaviour
+public class InventoryModel : MonoBehaviour
 {
     public event Action OnInventoryChanged;
 
     public int maxInventorySize = 24;
     //Item list can contain nulls representing empty slots
-    public List<Inventory_Item> itemList = new List<Inventory_Item>();
+    public List<InventoryItem> itemList = new List<InventoryItem>();
 
     public bool CanAddItem() => itemList.Count < maxInventorySize;
 
-    public void AddItem(Inventory_Item itemToAdd)
+    public void AddItem(InventoryItem itemToAdd)
     {
         if (itemToAdd == null) {
             Debug.LogError("Cannot add null item");
@@ -39,6 +39,20 @@ public class Inventory_Base : MonoBehaviour
         Debug.Log($"Added item to slot {emptySlotIndex}: {itemToAdd.itemData.itemName}");
     }
 
+    // NEW: Set item at a specific slot index (for drag/drop direct assignment)
+    public void SetItemAt(int index, InventoryItem item)
+    {
+        if (index >= 0 && index < maxInventorySize)
+        {
+            // Expand the list to the index if it's out of current bounds
+            while (itemList.Count <= index)
+                itemList.Add(null);
+
+            itemList[index] = item;
+            NotifyInventoryChanged();
+        }
+    }
+
     // NEW: Find first empty slot (null or beyond list)
     private int FindFirstEmptySlot()
     {
@@ -59,7 +73,7 @@ public class Inventory_Base : MonoBehaviour
     }
 
     // NEW: Insert item at specific slot
-    private void InsertAtSlot(int slotIndex, Inventory_Item item)
+    private void InsertAtSlot(int slotIndex, InventoryItem item)
     {
         if (slotIndex < 0 || slotIndex >= maxInventorySize) {
             Debug.LogError($"Invalid slot index: {slotIndex}");

@@ -1,77 +1,86 @@
+using InventorySystem;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 
-/// Handles equipping an item from inventory to an equipment slot
+/// <summary>
+/// Handles equipping an inventory item to an equipment slot. Uses ViewModel/Controller for state changes.
+/// </summary>
 public class InventoryToEquipmentTransaction : DragDropTransaction
 {
-    private readonly Inventory_Item itemToEquip;
+    private readonly InventoryItem itemToEquip;
     private readonly int sourceSlotIndex;
-    private readonly EquipmentSlot targetEquipment;
-    private readonly List<Slot> inventorySlots;
-    
+    private readonly EquipmentSlotView targetEquipment;
+    private readonly List<SlotView> inventorySlots;
+
+    /// <summary>
+    /// Handles equipping an inventory item to an equipment slot. Uses ViewModel/Controller for state changes.
+    /// </summary>
+    /// <param name="itemToEquip">The inventory item to equip.</param>
+    /// <param name="sourceSlotIndex">The index of the source slot in the inventory.</param>
+    /// <param name="targetEquipment">The target equipment slot.</param>
+    /// <param name="inventorySlots">The list of inventory slots.</param>
+    /// <param name="inventoryViewModel">The inventory view model.</param>
+    /// <param name="equipmentController">The equipment controller.</param>
+    /// <param name="debugMode">Whether to enable debug mode.</param>
     public InventoryToEquipmentTransaction(
-        Inventory_Item itemToEquip,
+        InventoryItem itemToEquip,
         int sourceSlotIndex,
-        EquipmentSlot targetEquipment,
-        List<Slot> inventorySlots,
-        InventoryController inventoryController,
+        EquipmentSlotView targetEquipment,
+        List<SlotView> inventorySlots,
+        InventoryViewModel inventoryViewModel,
         EquipmentController equipmentController,
         bool debugMode = false)
-        : base(inventoryController, equipmentController, debugMode)
+        : base(inventoryViewModel, equipmentController, debugMode)
     {
         this.itemToEquip = itemToEquip;
         this.sourceSlotIndex = sourceSlotIndex;
         this.targetEquipment = targetEquipment;
         this.inventorySlots = inventorySlots;
     }
-    
+
+    /// <inheritdoc/>
     public override bool CanExecute()
     {
         if (itemToEquip == null || targetEquipment == null) {
             LogError("Item or target equipment is null");
             return false;
         }
-        
+        if (!inventoryViewModel.IsValidSlotIndex(sourceSlotIndex)) {
+            LogError($"Invalid inventory slot index: {sourceSlotIndex}");
+            return false;
+        }
         if (!targetEquipment.CanAcceptItem(itemToEquip.itemData)) {
             Log($"Equipment slot {targetEquipment.SlotType} cannot accept {itemToEquip.itemData.itemName}");
             return false;
         }
-        
         return true;
     }
-    
+
+    /// <inheritdoc/>
     public override IEnumerator Execute()
     {
         yield return null;
-        
-        var currentlyEquipped = equipmentController?.GetEquippedItem(targetEquipment.SlotType);
-        
+        var currentlyEquipped = equipmentController != null ? equipmentController.GetEquippedItem(targetEquipment.SlotType) : null;
         if (currentlyEquipped != null) {
-            // Swap: equipped item goes to inventory, inventory item gets equipped
             Log($"Swapping: Equipping {itemToEquip.itemData.itemName}, returning {currentlyEquipped.itemData.itemName} to slot {sourceSlotIndex}");
-            
-            var sourceSlot = inventorySlots[sourceSlotIndex];
-            sourceSlot.ClearItem();
-            sourceSlot.SetItem(currentlyEquipped);
-            
-            inventoryController?.RemoveItemAtSlot(sourceSlotIndex);
-            inventoryController?.AddItemToSlot(currentlyEquipped, sourceSlotIndex);
+            inventoryViewModel.RemoveItemAt(sourceSlotIndex);
+            inventoryViewModel.SetItemAt(sourceSlotIndex, currentlyEquipped);
         } else {
-            // Simple equip: remove from inventory
             Log($"Equipping {itemToEquip.itemData.itemName} from slot {sourceSlotIndex}");
-            inventoryController?.RemoveItemAtSlot(sourceSlotIndex);
+            inventoryViewModel.RemoveItemAt(sourceSlotIndex);
         }
-        
-        // Equip the new item
+        // Equipment state change
         targetEquipment.ClearItem();
         targetEquipment.RefreshVisualState();
-        equipmentController?.EquipItem(itemToEquip, targetEquipment.SlotType);
+        if (equipmentController != null) {
+            equipmentController.EquipItem(itemToEquip, targetEquipment.SlotType);
+        }
         targetEquipment.SetItem(itemToEquip);
         targetEquipment.RefreshVisualState();
-        
         targetEquipment?.RemoveFromClassList("inventorySlots--drop-target");
     }
-    
-    public override VisualElement GetTargetVisual() => targetEquipment;
+
+    /// <inheritdoc/>
+    public override VisualElement GetTargetVisual() => targetEquipment as VisualElement;
 }

@@ -1,23 +1,23 @@
-using UnityEngine;
-using UnityEngine.UIElements;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using UnityEngine.UIElements;
 
 /// Handles all visual feedback during drag operations (ghost, highlighting, etc.)
 /// Separates visual concerns from drag logic.
 public class DragVisualHandler
 {
     private readonly VisualElement dragGhost;
-    private readonly List<Slot> inventorySlots;
+    private readonly List<SlotView> inventorySlots;
     private readonly bool highlightEmptySlots;
-    
-    public DragVisualHandler(VisualElement root, List<Slot> inventorySlots, bool highlightEmptySlots)
+
+    public DragVisualHandler(VisualElement root, List<SlotView> inventorySlots, bool highlightEmptySlots)
     {
         this.inventorySlots = inventorySlots;
         this.highlightEmptySlots = highlightEmptySlots;
         this.dragGhost = CreateDragGhost(root);
     }
-    
+
     private VisualElement CreateDragGhost(VisualElement root)
     {
         // Remove existing ghost if any
@@ -30,7 +30,7 @@ public class DragVisualHandler
             .WithAbsolutePosition()
             .WithSize(128, 128);
     }
-    
+
     public void ShowGhost(Sprite icon, Vector2 position)
     {
         if (dragGhost == null || icon == null) return;
@@ -48,7 +48,7 @@ public class DragVisualHandler
 
         UpdatePosition(position);
     }
-    
+
     public void UpdatePosition(Vector2 position)
     {
         if (dragGhost == null) return;
@@ -56,7 +56,7 @@ public class DragVisualHandler
         dragGhost.style.left = position.x - (dragGhost.resolvedStyle.width / 2);
         dragGhost.style.top = position.y - (dragGhost.resolvedStyle.height / 2);
     }
-    
+
     public void UpdateAppearance(bool isValidDrop)
     {
         // Use extension to remove multiple classes at once, then conditionally add
@@ -64,7 +64,7 @@ public class DragVisualHandler
             .RemoveClass("drag-ghost--over-empty", "drag-ghost--over-occupied")
             .AddClassIf(isValidDrop, "drag-ghost--over-empty", "drag-ghost--over-occupied");
     }
-    
+
     public void HideGhost()
     {
         // Use null-conditional operator with fluent API
@@ -74,17 +74,17 @@ public class DragVisualHandler
 
         if (highlightEmptySlots) RemoveEmptySlotHighlighting();
     }
-    
-    public void AddDraggingClass(Slot slot)
+
+    public void AddDraggingClass(SlotView slot)
     {
         slot?.AddClass("inventorySlots--dragging");
     }
-    
-    public void RemoveDraggingClass(Slot slot)
+
+    public void RemoveDraggingClass(SlotView slot)
     {
         slot?.RemoveClass("inventorySlots--dragging");
     }
-    
+
     private void HighlightEmptySlots()
     {
         // Use LINQ + batch extension for cleaner code
@@ -92,13 +92,13 @@ public class DragVisualHandler
             .Where(slot => slot != null && !slot.HasItem)
             .AddClassToAll("inventorySlots--empty-highlight");
     }
-    
+
     private void RemoveEmptySlotHighlighting()
     {
         // Use batch extension to remove class from all slots
         inventorySlots?.RemoveClassFromAll("inventorySlots--empty-highlight");
     }
-    
+
     public void Cleanup()
     {
         if (dragGhost?.parent != null) {

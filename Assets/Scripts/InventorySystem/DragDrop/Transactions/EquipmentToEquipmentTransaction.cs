@@ -1,19 +1,19 @@
 using System.Collections;
 using UnityEngine.UIElements;
+using InventorySystem;
 
-/// Handles moving/swapping items between equipment slots
 public class EquipmentToEquipmentTransaction : DragDropTransaction
 {
-    private readonly EquipmentSlot sourceEquipment;
-    private readonly EquipmentSlot targetEquipment;
+    private readonly EquipmentSlotView sourceEquipment;
+    private readonly EquipmentSlotView targetEquipment;
     
     public EquipmentToEquipmentTransaction(
-        EquipmentSlot sourceEquipment,
-        EquipmentSlot targetEquipment,
-        InventoryController inventoryController,
+        EquipmentSlotView sourceEquipment,
+        EquipmentSlotView targetEquipment,
+        InventoryViewModel inventoryViewModel,
         EquipmentController equipmentController,
         bool debugMode = false)
-        : base(inventoryController, equipmentController, debugMode)
+        : base(inventoryViewModel, equipmentController, debugMode)
     {
         this.sourceEquipment = sourceEquipment;
         this.targetEquipment = targetEquipment;
@@ -88,5 +88,5 @@ public class EquipmentToEquipmentTransaction : DragDropTransaction
         targetEquipment?.RemoveFromClassList("inventorySlots--drop-target");
     }
     
-    public override VisualElement GetTargetVisual() => targetEquipment;
+    public override VisualElement GetTargetVisual() => targetEquipment as VisualElement;
 }
