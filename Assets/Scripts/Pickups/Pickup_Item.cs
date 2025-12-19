@@ -1,4 +1,3 @@
-using InventorySystem;
 using UnityEngine;
 
 public class Pickup_Item : Interactable

@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InventoryModel : MonoBehaviour
+public class InventoryModel : MonoBehaviour, IInventory
 {
     public event Action OnInventoryChanged;
 
     public int maxInventorySize = 24;
     //Item list can contain nulls representing empty slots
     public List<InventoryItem> itemList = new List<InventoryItem>();
+
+    public IReadOnlyList<InventoryItem> Items => itemList;
+    public int MaxInventorySize => maxInventorySize;
 
     public bool CanAddItem() => itemList.Count < maxInventorySize;
 
@@ -39,54 +42,16 @@ public class InventoryModel : MonoBehaviour
         Debug.Log($"Added item to slot {emptySlotIndex}: {itemToAdd.itemData.itemName}");
     }
 
-    // NEW: Set item at a specific slot index (for drag/drop direct assignment)
-    public void SetItemAt(int index, InventoryItem item)
+    public void RemoveItemAt(int index)
     {
-        if (index >= 0 && index < maxInventorySize)
-        {
-            // Expand the list to the index if it's out of current bounds
-            while (itemList.Count <= index)
-                itemList.Add(null);
-
-            itemList[index] = item;
-            NotifyInventoryChanged();
-        }
+        if (!IsValidSlotIndex(index)) return;
+        itemList[index] = null;
+        NotifyInventoryChanged();
     }
 
-    // NEW: Find first empty slot (null or beyond list)
-    private int FindFirstEmptySlot()
+    public void MoveItem(int fromIndex, int toIndex)
     {
-        // Check existing slots for null (empty)
-        for (int i = 0; i < itemList.Count; i++) {
-            if (itemList[i] == null) {
-                return i;
-            }
-        }
-
-        // If no null slots but we have space, return the next index
-        if (itemList.Count < maxInventorySize) {
-            return itemList.Count;
-        }
-
-        // No empty slots available
-        return -1;
-    }
-
-    // NEW: Insert item at specific slot
-    private void InsertAtSlot(int slotIndex, InventoryItem item)
-    {
-        if (slotIndex < 0 || slotIndex >= maxInventorySize) {
-            Debug.LogError($"Invalid slot index: {slotIndex}");
-            return;
-        }
-
-        // If slot is beyond current list size, expand list
-        while (itemList.Count <= slotIndex) {
-            itemList.Add(null);
-        }
-
-        // Place item at the slot
-        itemList[slotIndex] = item;
+        SmartMoveItem(fromIndex, toIndex);
     }
 
     public void SwapItems(int indexA, int indexB)
@@ -101,35 +66,72 @@ public class InventoryModel : MonoBehaviour
         NotifyInventoryChanged();
     }
 
-    // Keep your existing SmartMoveItem method
+    public InventoryItem GetItemAt(int index)
+    {
+        if (index < 0 || index >= maxInventorySize)
+            return null;
+        while (itemList.Count <= index)
+            itemList.Add(null);
+        return itemList[index];
+    }
+
+    public void SetItemAt(int index, InventoryItem item)
+    {
+        if (index >= 0 && index < maxInventorySize) {
+            while (itemList.Count <= index)
+                itemList.Add(null);
+            itemList[index] = item;
+            NotifyInventoryChanged();
+        }
+    }
+
+    public bool IsValidSlotIndex(int index)
+    {
+        return index >= 0 && index < maxInventorySize;
+    }
+
+    private int FindFirstEmptySlot()
+    {
+        for (int i = 0; i < itemList.Count; i++) {
+            if (itemList[i] == null) {
+                return i;
+            }
+        }
+        if (itemList.Count < maxInventorySize) {
+            return itemList.Count;
+        }
+        return -1;
+    }
+
+    private void InsertAtSlot(int slotIndex, InventoryItem item)
+    {
+        if (slotIndex < 0 || slotIndex >= maxInventorySize) {
+            Debug.LogError($"Invalid slot index: {slotIndex}");
+            return;
+        }
+        while (itemList.Count <= slotIndex) {
+            itemList.Add(null);
+        }
+        itemList[slotIndex] = item;
+    }
+
     public void SmartMoveItem(int fromIndex, int toIndex)
     {
         if (itemList == null || fromIndex == toIndex) return;
-
-        // Ensure indices are valid
         if (fromIndex < 0 || fromIndex >= itemList.Count) return;
         if (toIndex < 0 || toIndex >= maxInventorySize) return;
-
-        // Expand list if needed
         while (itemList.Count <= toIndex) {
             itemList.Add(null);
         }
-
         var itemToMove = itemList[fromIndex];
-
-        // Check what's at target position
         var targetItem = itemList[toIndex];
-
         if (targetItem == null) {
-            // Target is empty - simple move
             itemList[fromIndex] = null;
             itemList[toIndex] = itemToMove;
         } else {
-            // Target has item - swap
             itemList[fromIndex] = targetItem;
             itemList[toIndex] = itemToMove;
         }
-
         NotifyInventoryChanged();
         Debug.Log($"Smart move: {fromIndex} -> {toIndex}");
     }

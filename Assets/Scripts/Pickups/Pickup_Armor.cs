@@ -1,5 +1,6 @@
 using UnityEngine;
 
+
 public class Pickup_Armor : Interactable
 {
     [Header("Armor Data")]
