@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 
+// Fix for CS0104: Explicitly reference UnityEngine.Object to avoid ambiguity
 public class TabFilterManager : MonoBehaviour
 {
     [Header("References")]
@@ -20,7 +21,7 @@ public class TabFilterManager : MonoBehaviour
     {
         // Ensure InventoryViewModel is assigned
         if (inventoryViewModel == null) {
-            var inventoryBase = Object.FindFirstObjectByType<InventoryModel>();
+            var inventoryBase = UnityEngine.Object.FindFirstObjectByType<InventoryModel>();
             if (inventoryBase != null) {
                 inventoryViewModel = new InventoryViewModel(inventoryBase);
                 Debug.Log("[TabFilterManager] InventoryViewModel auto-created from Inventory_Base");
@@ -109,7 +110,7 @@ public class TabFilterManager : MonoBehaviour
         RefreshDisplayForCurrentTab();
     }
 
-    private void RefreshFilteredItems()
+    public void RefreshFilteredItems()
     {
         if (inventoryViewModel == null) return;
         _filteredItems.Clear();
@@ -148,25 +149,40 @@ public class TabFilterManager : MonoBehaviour
         return null;
     }
 
-    private void RefreshDisplayForCurrentTab()
+    public void RefreshDisplayForCurrentTab()
     {
         if (!enableTabFiltering || inventoryViewModel == null || uiConfig?.Slots == null) return;
         var slots = uiConfig.Slots;
-        int maxSlotsToFill = Mathf.Min(slots.Count, inventoryViewModel.MaxInventorySize);
+        var items = inventoryViewModel.Items;
+        string currentTab = _currentTabId;
+
         for (int i = 0; i < slots.Count; i++)
-            slots[i].ClearItem();
-        for (int i = 0; i < maxSlotsToFill; i++) {
-            InventoryItem item = (i < inventoryViewModel.Items.Count) ? inventoryViewModel.Items[i] : null;
-            if (item != null) {
-                if (_currentTabId == "all") {
-                    slots[i].SetItem(item);
-                } else {
-                    string tabId = GetTabIdForItem(item);
-                    if (!string.IsNullOrEmpty(tabId) && tabId == _currentTabId) {
-                        slots[i].SetItem(item);
-                    }
-                }
+        {
+            if (i < items.Count && items[i] != null)
+            {
+                string tabId = GetTabIdForItem(items[i]);
+                if (currentTab == "all" || (tabId != null && tabId == currentTab))
+                    slots[i].SetItem(items[i]);
+                else
+                    slots[i].ClearItem();
+            }
+            else
+            {
+                slots[i].ClearItem();
             }
         }
+    }
+
+    public List<InventoryItem> GetFilteredItemsForCurrentTab()
+    {
+        if (_filteredItems.TryGetValue(_currentTabId, out var items))
+            return items;
+        return new List<InventoryItem>();
+    }
+
+    public void RefreshAndRebuildUI()
+    {
+        RefreshFilteredItems();
+        RefreshDisplayForCurrentTab();
     }
 }

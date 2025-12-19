@@ -67,6 +67,9 @@ public class InventoryUIConfig : MonoBehaviour
         return false;
     }
 
+    // Added reference to TabFilterManager
+    public TabFilterManager TabFilterManager { get; set; }
+
     void Awake()
     {
         targetDocument ??= GetComponent<UIDocument>();
@@ -114,6 +117,11 @@ public class InventoryUIConfig : MonoBehaviour
         CacheContainers();
         BuildOrUpdateSlotsOnly();
         CacheValues();
+        // Only let TabFilterManager handle slot filling to ensure correct filtering
+        if (TabFilterManager != null)
+        {
+            TabFilterManager.RefreshDisplayForCurrentTab();
+        }
     }
 
     #region Private Methods

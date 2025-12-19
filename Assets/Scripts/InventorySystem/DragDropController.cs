@@ -46,6 +46,9 @@ public class DragDropController : MonoBehaviour
 
     // Flag to ensure we only initialize once
     private bool isInitialized;
+
+    // Add reference to InventoryUIConfig for tab filtering and UI updates
+    private InventoryUIConfig uiConfig;
     #endregion
 
     #region Unity Lifecycle Methods
@@ -116,7 +119,7 @@ public class DragDropController : MonoBehaviour
         }
 
         // Assume slots are created by InventoryUIConfig and available via UI
-        var uiConfig = Object.FindFirstObjectByType<InventoryUIConfig>();
+        uiConfig = Object.FindFirstObjectByType<InventoryUIConfig>();
         inventorySlots = uiConfig != null ? new List<SlotView>(uiConfig.Slots) : new List<SlotView>();
         equipmentSlots.Clear();
 
@@ -526,6 +529,11 @@ public class DragDropController : MonoBehaviour
     {
         yield return transaction.Execute();
         ResetDrag(); // Always reset drag state after transaction
+        // Ensure tab filtering and UI update after inventory change
+        if (uiConfig != null && uiConfig.TabFilterManager != null) {
+            uiConfig.TabFilterManager.RefreshFilteredItems();
+            uiConfig.RebuildUI();
+        }
     }
     #endregion
 
@@ -681,6 +689,9 @@ public class DragDropController : MonoBehaviour
             StartCoroutine(ExecuteTransaction(transaction));
         } else {
             if (debugMode) Debug.Log($"[DragDrop] Cannot quick equip {item.itemData.itemName}");
+            // Still refresh UI to ensure correct filtering
+            if (uiConfig != null && uiConfig.TabFilterManager != null)
+                uiConfig.TabFilterManager.RefreshAndRebuildUI();
         }
     }
 
@@ -713,6 +724,11 @@ public class DragDropController : MonoBehaviour
             StartCoroutine(ExecuteTransaction(transaction));
         } else {
             if (debugMode) Debug.Log($"[DragDrop] Cannot quick unequip {item.itemData.itemName} (inventory full?)");
+            // Ensure filter and UI are refreshed in the correct order
+            if (uiConfig != null && uiConfig.TabFilterManager != null) {
+                uiConfig.TabFilterManager.RefreshFilteredItems();
+                uiConfig.RebuildUI();
+            }
         }
     }
     #endregion
