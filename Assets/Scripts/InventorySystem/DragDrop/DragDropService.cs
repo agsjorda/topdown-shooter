@@ -19,18 +19,21 @@ public class DragDropService
     private List<SlotView> inventorySlots;
     private List<EquipmentSlotView> equipmentSlots;
     private bool debugMode;
+    private readonly DragVisualHandler dragVisualHandler;
 
     public DragDropService(
         InventoryViewModel inventoryViewModel,
         EquipmentController equipmentController,
         List<SlotView> inventorySlots,
         List<EquipmentSlotView> equipmentSlots,
+        DragVisualHandler dragVisualHandler,
         bool debugMode = false)
     {
         this.inventoryViewModel = inventoryViewModel;
         this.equipmentController = equipmentController;
         this.inventorySlots = inventorySlots;
         this.equipmentSlots = equipmentSlots;
+        this.dragVisualHandler = dragVisualHandler;
         this.debugMode = debugMode;
         dragState = new DragState();
     }
@@ -56,21 +59,16 @@ public class DragDropService
         OnDragUpdated?.Invoke(position);
     }
 
-    public void EndDrag()
+    private void CleanupDragVisualsAndState()
     {
-        // Remove dragging/empty-highlight classes from the source slot if present
-        if (dragState.SourceInventorySlot != null)
-        {
-            dragState.SourceInventorySlot.RemoveFromClassList("inventorySlots--dragging");
-            dragState.SourceInventorySlot.RemoveFromClassList("inventorySlots--empty-highlight");
-        }
-        if (dragState.SourceEquipmentSlot != null)
-        {
-            dragState.SourceEquipmentSlot.RemoveFromClassList("inventorySlots--dragging");
-            dragState.SourceEquipmentSlot.RemoveFromClassList("inventorySlots--empty-highlight");
-        }
+        dragVisualHandler?.CleanupDragVisuals(dragState.SourceInventorySlot, dragState.SourceEquipmentSlot);
         dragState.Reset();
         OnDragEnded?.Invoke();
+    }
+
+    public void EndDrag()
+    {
+        CleanupDragVisualsAndState();
     }
 
     public void HandleDrop(Vector2 dropPosition, InventoryUIConfig uiConfig)
@@ -126,18 +124,6 @@ public class DragDropService
 
     public void ResetDrag()
     {
-        // Remove dragging/empty-highlight classes from the source slot if present
-        if (dragState.SourceInventorySlot != null)
-        {
-            dragState.SourceInventorySlot.RemoveFromClassList("inventorySlots--dragging");
-            dragState.SourceInventorySlot.RemoveFromClassList("inventorySlots--empty-highlight");
-        }
-        if (dragState.SourceEquipmentSlot != null)
-        {
-            dragState.SourceEquipmentSlot.RemoveFromClassList("inventorySlots--dragging");
-            dragState.SourceEquipmentSlot.RemoveFromClassList("inventorySlots--empty-highlight");
-        }
-        dragState.Reset();
-        OnDragEnded?.Invoke();
+        CleanupDragVisualsAndState();
     }
 }

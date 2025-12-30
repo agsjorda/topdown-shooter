@@ -105,4 +105,20 @@ public class DragVisualHandler
             dragGhost.RemoveFromHierarchy();
         }
     }
+
+    /// Cleans up all drag-related visuals for a given source slot (inventory or equipment)
+    public void CleanupDragVisuals(SlotView sourceInventorySlot = null, EquipmentSlotView sourceEquipmentSlot = null)
+    {
+        if (sourceInventorySlot != null)
+        {
+            sourceInventorySlot.RemoveFromClassList("inventorySlots--dragging");
+            sourceInventorySlot.RemoveFromClassList("inventorySlots--empty-highlight");
+        }
+        if (sourceEquipmentSlot != null)
+        {
+            sourceEquipmentSlot.RemoveFromClassList("inventorySlots--dragging");
+            sourceEquipmentSlot.RemoveFromClassList("inventorySlots--empty-highlight");
+        }
+        HideGhost();
+    }
 }

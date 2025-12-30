@@ -98,6 +98,7 @@ public class DragDropController : MonoBehaviour
             equipmentController,
             inventorySlots,
             equipmentSlots,
+            visualHandler,
             debugMode
         );
         RegisterEventHandlers();
