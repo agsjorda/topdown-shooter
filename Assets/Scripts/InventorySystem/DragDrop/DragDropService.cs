@@ -58,6 +58,17 @@ public class DragDropService
 
     public void EndDrag()
     {
+        // Remove dragging/empty-highlight classes from the source slot if present
+        if (dragState.SourceInventorySlot != null)
+        {
+            dragState.SourceInventorySlot.RemoveFromClassList("inventorySlots--dragging");
+            dragState.SourceInventorySlot.RemoveFromClassList("inventorySlots--empty-highlight");
+        }
+        if (dragState.SourceEquipmentSlot != null)
+        {
+            dragState.SourceEquipmentSlot.RemoveFromClassList("inventorySlots--dragging");
+            dragState.SourceEquipmentSlot.RemoveFromClassList("inventorySlots--empty-highlight");
+        }
         dragState.Reset();
         OnDragEnded?.Invoke();
     }
@@ -115,6 +126,17 @@ public class DragDropService
 
     public void ResetDrag()
     {
+        // Remove dragging/empty-highlight classes from the source slot if present
+        if (dragState.SourceInventorySlot != null)
+        {
+            dragState.SourceInventorySlot.RemoveFromClassList("inventorySlots--dragging");
+            dragState.SourceInventorySlot.RemoveFromClassList("inventorySlots--empty-highlight");
+        }
+        if (dragState.SourceEquipmentSlot != null)
+        {
+            dragState.SourceEquipmentSlot.RemoveFromClassList("inventorySlots--dragging");
+            dragState.SourceEquipmentSlot.RemoveFromClassList("inventorySlots--empty-highlight");
+        }
         dragState.Reset();
         OnDragEnded?.Invoke();
     }
