@@ -1,8 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using InventorySystem;
 
+/// <summary>
+/// Default implementation of IEquipmentSystem for managing equipped items.
+/// Handles equipping, unequipping, and tracking equipped items across different slot types.
+/// </summary>
 [DisallowMultipleComponent]
-public class EquipmentController : MonoBehaviour
+public class EquipmentController : MonoBehaviour, IEquipmentSystem
 {
     [System.Serializable]
     public class EquippedItem

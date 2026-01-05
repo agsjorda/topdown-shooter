@@ -44,13 +44,14 @@ public class DragDropController : MonoBehaviour
         equipmentController ??= GetComponent<EquipmentController>();
         uiDocument ??= GetComponent<UIDocument>();
         doubleClickHandler = new DoubleClickHandler(0.3f);
+        
+        // Use InventoryService instead of FindFirstObjectByType
         if (inventoryViewModel == null) {
-            var inventoryBase = Object.FindFirstObjectByType<InventoryModel>();
-            if (inventoryBase != null) {
-                inventoryViewModel = new InventoryViewModel(inventoryBase);
-                if (debugMode) Debug.Log("[DragDrop] InventoryViewModel auto-created from InventoryModel");
+            inventoryViewModel = InventoryService.GetPlayerInventoryViewModel();
+            if (inventoryViewModel != null) {
+                if (debugMode) Debug.Log("[DragDrop] InventoryViewModel obtained from InventoryService");
             } else if (debugMode) {
-                Debug.LogError("[DragDrop] No InventoryModel found in scene. InventoryViewModel cannot be created.");
+                Debug.LogError("[DragDrop] No InventoryModel found via InventoryService.");
             }
         }
     }
@@ -93,9 +94,12 @@ public class DragDropController : MonoBehaviour
             inventorySlots,
             highlightEmptySlots
         );
+        
+        // Use IEquipmentSystem interface
+        IEquipmentSystem equipmentSystem = equipmentController;
         dragDropService = new DragDropService(
             inventoryViewModel,
-            equipmentController,
+            equipmentSystem,
             inventorySlots,
             equipmentSlots,
             visualHandler,
@@ -230,44 +234,91 @@ public class DragDropController : MonoBehaviour
         }
     }
 
+    // Shared handler for pointer down events
+    private void HandleSlotPointerDown<TSlot>(PointerDownEvent evt, TSlot slot, bool isEquipmentSlot)
+        where TSlot : VisualElement
+    {
+        if (evt.button != 0 || dragDropService.DragState.IsDragging || slot == null) return;
+        if (isEquipmentSlot && slot is EquipmentSlotView equipmentSlot)
+        {
+            if (debugMode) Debug.Log($"[DragDrop] Pointer down on equipment slot: {equipmentSlot.SlotType}");
+            bool isDoubleClick = doubleClickHandler.RegisterClick(-1, isEquipmentSlot: true, equipmentSlot.SlotType);
+            if (isDoubleClick && equipmentSlot.HasItem) {
+                HandleQuickUnequip(equipmentSlot);
+                evt.StopPropagation();
+                return;
+            }
+            dragDropService.DragState.StartPosition = evt.position;
+            dragDropService.DragState.SourceEquipmentSlot = equipmentSlot;
+            dragDropService.DragState.SourceInventorySlot = null;
+            equipmentSlot.CapturePointer(evt.pointerId);
+        }
+        else if (!isEquipmentSlot && slot is SlotView inventorySlot && inventorySlot.HasItem)
+        {
+            if (debugMode) Debug.Log($"[DragDrop] Pointer down on inventory slot {inventorySlot.SlotIndex}");
+            bool isDoubleClick = doubleClickHandler.RegisterClick(inventorySlot.SlotIndex, isEquipmentSlot: false);
+            if (isDoubleClick) {
+                HandleQuickEquip(inventorySlot);
+                evt.StopPropagation();
+                return;
+            }
+            dragDropService.DragState.StartPosition = evt.position;
+            dragDropService.DragState.SourceInventorySlot = inventorySlot;
+            dragDropService.DragState.SourceEquipmentSlot = null;
+            inventorySlot.CapturePointer(evt.pointerId);
+        }
+        evt.StopPropagation();
+    }
+
+    // Shared handler for pointer up events
+    private void HandleSlotPointerUp<TSlot>(PointerUpEvent evt, TSlot slot, bool isEquipmentSlot)
+        where TSlot : VisualElement
+    {
+        if (slot == null) return;
+        if (isEquipmentSlot && slot is EquipmentSlotView equipmentSlot)
+        {
+            if (dragDropService.DragState.SourceEquipmentSlot != null && equipmentSlot.HasPointerCapture(evt.pointerId)) {
+                if (dragDropService.DragState.IsDragging) dragDropService.HandleDrop(evt.position, uiConfig);
+                equipmentSlot.ReleasePointer(evt.pointerId);
+                dragDropService.EndDrag();
+            }
+        }
+        else if (!isEquipmentSlot && slot is SlotView inventorySlot)
+        {
+            if (dragDropService.DragState.SourceInventorySlot != null && inventorySlot.HasPointerCapture(evt.pointerId)) {
+                if (dragDropService.DragState.IsDragging) dragDropService.HandleDrop(evt.position, uiConfig);
+                inventorySlot.ReleasePointer(evt.pointerId);
+                dragDropService.EndDrag();
+            }
+        }
+    }
+
     // Handle pointer down on inventory slot
     private void OnInventorySlotPointerDown(PointerDownEvent evt)
     {
-        if (evt.button != 0 || dragDropService.DragState.IsDragging) return;
         var slot = evt.target as SlotView ?? GetSlotFromParent(evt.target as VisualElement);
-        if (slot == null || !slot.HasItem) return;
-        if (debugMode) Debug.Log($"[DragDrop] Pointer down on inventory slot {slot.SlotIndex}");
-        bool isDoubleClick = doubleClickHandler.RegisterClick(slot.SlotIndex, isEquipmentSlot: false);
-        if (isDoubleClick) {
-            HandleQuickEquip(slot);
-            evt.StopPropagation();
-            return;
-        }
-        dragDropService.DragState.StartPosition = evt.position;
-        dragDropService.DragState.SourceInventorySlot = slot;
-        dragDropService.DragState.SourceEquipmentSlot = null;
-        slot.CapturePointer(evt.pointerId);
-        evt.StopPropagation();
+        HandleSlotPointerDown(evt, slot, false);
     }
 
     // Handle pointer down on equipment slot
     private void OnEquipmentSlotPointerDown(PointerDownEvent evt)
     {
-        if (evt.button != 0 || dragDropService.DragState.IsDragging) return;
         var equipmentSlot = GetEquipmentSlotFromTarget(evt.target as VisualElement);
-        if (equipmentSlot == null) return;
-        if (debugMode) Debug.Log($"[DragDrop] Pointer down on equipment slot: {equipmentSlot.SlotType}");
-        bool isDoubleClick = doubleClickHandler.RegisterClick(-1, isEquipmentSlot: true, equipmentSlot.SlotType);
-        if (isDoubleClick && equipmentSlot.HasItem) {
-            HandleQuickUnequip(equipmentSlot);
-            evt.StopPropagation();
-            return;
-        }
-        dragDropService.DragState.StartPosition = evt.position;
-        dragDropService.DragState.SourceEquipmentSlot = equipmentSlot;
-        dragDropService.DragState.SourceInventorySlot = null;
-        equipmentSlot.CapturePointer(evt.pointerId);
-        evt.StopPropagation();
+        HandleSlotPointerDown(evt, equipmentSlot, true);
+    }
+
+    // Handle pointer up on inventory slot
+    private void OnInventorySlotPointerUp(PointerUpEvent evt)
+    {
+        var slot = evt.target as SlotView ?? GetSlotFromParent(evt.target as VisualElement);
+        HandleSlotPointerUp(evt, slot, false);
+    }
+
+    // Handle pointer up on equipment slot
+    private void OnEquipmentSlotPointerUp(PointerUpEvent evt)
+    {
+        var equipmentSlot = GetEquipmentSlotFromTarget(evt.target as VisualElement);
+        HandleSlotPointerUp(evt, equipmentSlot, true);
     }
 
     // Handle pointer move for drag operation
@@ -281,26 +332,6 @@ public class DragDropController : MonoBehaviour
         if (dragDropService.DragState.IsDragging && visualHandler != null) {
             dragDropService.UpdateDrag(evt.position);
             evt.StopPropagation();
-        }
-    }
-
-    // Handle pointer up on inventory slot
-    private void OnInventorySlotPointerUp(PointerUpEvent evt)
-    {
-        if (dragDropService.DragState.SourceInventorySlot != null && dragDropService.DragState.SourceInventorySlot.HasPointerCapture(evt.pointerId)) {
-            if (dragDropService.DragState.IsDragging) dragDropService.HandleDrop(evt.position, uiConfig);
-            dragDropService.DragState.SourceInventorySlot.ReleasePointer(evt.pointerId);
-            dragDropService.EndDrag();
-        }
-    }
-
-    // Handle pointer up on equipment slot
-    private void OnEquipmentSlotPointerUp(PointerUpEvent evt)
-    {
-        if (dragDropService.DragState.SourceEquipmentSlot != null && dragDropService.DragState.SourceEquipmentSlot.HasPointerCapture(evt.pointerId)) {
-            if (dragDropService.DragState.IsDragging) dragDropService.HandleDrop(evt.position, uiConfig);
-            dragDropService.DragState.SourceEquipmentSlot.ReleasePointer(evt.pointerId);
-            dragDropService.EndDrag();
         }
     }
 
@@ -338,6 +369,8 @@ public class DragDropController : MonoBehaviour
         var item = inventoryViewModel != null ? inventoryViewModel.GetItemAt(slot.SlotIndex) : null;
         if (item == null) return;
         if (debugMode) Debug.Log($"[DragDrop] Quick equip: {item.itemData.itemName} from slot {slot.SlotIndex}");
+        
+        IEquipmentSystem equipmentSystem = equipmentController;
         var transaction = new QuickEquipTransaction(
             item,
             slot.SlotIndex,
@@ -345,7 +378,7 @@ public class DragDropController : MonoBehaviour
             equipmentSlots,
             inventorySlots,
             inventoryViewModel,
-            equipmentController,
+            equipmentSystem,
             debugMode
         );
         if (transaction.CanExecute()) {
@@ -364,12 +397,14 @@ public class DragDropController : MonoBehaviour
         var item = equipmentSlot.GetEquippedItem();
         if (item == null) return;
         if (debugMode) Debug.Log($"[DragDrop] Quick unequip: {item.itemData.itemName} from {equipmentSlot.SlotType} slot");
+        
+        IEquipmentSystem equipmentSystem = equipmentController;
         var transaction = new QuickUnequipTransaction(
             equipmentSlot,
             item,
             inventorySlots,
             inventoryViewModel,
-            equipmentController,
+            equipmentSystem,
             debugMode
         );
         if (transaction.CanExecute()) {

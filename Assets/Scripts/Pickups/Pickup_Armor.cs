@@ -1,6 +1,10 @@
 using UnityEngine;
+using InventorySystem;
 
-
+/// <summary>
+/// Handles armor pickups that can be added to the player's inventory.
+/// Uses InventoryService for centralized inventory access.
+/// </summary>
 public class Pickup_Armor : Interactable
 {
     [Header("Armor Data")]
@@ -30,6 +34,9 @@ public class Pickup_Armor : Interactable
     }
 
     #region Setup Methods
+    /// <summary>
+    /// Sets up the armor pickup with specific armor data and position.
+    /// </summary>
     public void SetupPickupArmor(Armor_Data armor, Vector3 position)
     {
         armorData = armor;
@@ -39,6 +46,9 @@ public class Pickup_Armor : Interactable
         SetupVisuals();
     }
 
+    /// <summary>
+    /// Sets up the armor pickup from an existing inventory item.
+    /// </summary>
     public void SetupPickupArmorFromItem(InventoryItem item, Vector3 position)
     {
         if (item == null || item.itemData == null) return;
@@ -107,10 +117,9 @@ public class Pickup_Armor : Interactable
     #region Interaction
     public override void Interaction()
     {
-        // Find inventory
-        InventoryModel inventory = Object.FindFirstObjectByType<InventoryModel>();
+        var inventory = InventoryService.GetPlayerInventory();
         if (inventory == null) {
-            Debug.LogWarning($"{name}: No InventoryModel found");
+            Debug.LogWarning($"{name}: No inventory found via InventoryService");
             return;
         }
 

@@ -19,9 +19,9 @@ public class EquipmentToInventoryTransaction : DragDropTransaction
         SlotView targetSlot,
         List<SlotView> inventorySlots,
         InventoryViewModel inventoryViewModel,
-        EquipmentController equipmentController,
+        IEquipmentSystem equipmentSystem,
         bool debugMode = false)
-        : base(inventoryViewModel, equipmentController, debugMode)
+        : base(inventoryViewModel, equipmentSystem, debugMode)
     {
         this.sourceEquipment = sourceEquipment;
         this.targetSlotIndex = targetSlotIndex;
@@ -65,8 +65,8 @@ public class EquipmentToInventoryTransaction : DragDropTransaction
             inventoryViewModel.SetItemAt(targetSlotIndex, equippedItem);
             sourceEquipment.ClearItem();
             sourceEquipment.RefreshVisualState();
-            equipmentController?.UnequipSlot(sourceEquipment.SlotType);
-            equipmentController?.EquipItem(inventoryItemInSlot, sourceEquipment.SlotType);
+            equipmentSystem?.UnequipSlot(sourceEquipment.SlotType);
+            equipmentSystem?.EquipItem(inventoryItemInSlot, sourceEquipment.SlotType);
             sourceEquipment.SetItem(inventoryItemInSlot);
             sourceEquipment.RefreshVisualState();
         } else {
@@ -74,7 +74,7 @@ public class EquipmentToInventoryTransaction : DragDropTransaction
             Log($"Unequipping {equippedItem.itemData.itemName} to inventory slot {targetSlotIndex}");
             sourceEquipment.ClearItem();
             sourceEquipment.RefreshVisualState();
-            equipmentController?.UnequipSlot(sourceEquipment.SlotType);
+            equipmentSystem?.UnequipSlot(sourceEquipment.SlotType);
             inventoryViewModel.SetItemAt(targetSlotIndex, equippedItem);
         }
         targetSlot?.RemoveFromClassList("inventorySlots--drop-target");

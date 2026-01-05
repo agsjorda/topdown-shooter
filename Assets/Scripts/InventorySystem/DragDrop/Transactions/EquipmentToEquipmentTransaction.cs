@@ -11,9 +11,9 @@ public class EquipmentToEquipmentTransaction : DragDropTransaction
         EquipmentSlotView sourceEquipment,
         EquipmentSlotView targetEquipment,
         InventoryViewModel inventoryViewModel,
-        EquipmentController equipmentController,
+        IEquipmentSystem equipmentSystem,
         bool debugMode = false)
-        : base(inventoryViewModel, equipmentController, debugMode)
+        : base(inventoryViewModel, equipmentSystem, debugMode)
     {
         this.sourceEquipment = sourceEquipment;
         this.targetEquipment = targetEquipment;
@@ -50,7 +50,7 @@ public class EquipmentToEquipmentTransaction : DragDropTransaction
         yield return null;
         
         var itemToMove = sourceEquipment.GetEquippedItem();
-        var currentlyEquipped = equipmentController?.GetEquippedItem(targetEquipment.SlotType);
+        var currentlyEquipped = equipmentSystem?.GetEquippedItem(targetEquipment.SlotType);
         
         if (currentlyEquipped != null) {
             Log($"Swapping {itemToMove.itemData.itemName} with {currentlyEquipped.itemData.itemName} between equipment slots");
@@ -60,14 +60,14 @@ public class EquipmentToEquipmentTransaction : DragDropTransaction
             targetEquipment.ClearItem();
             targetEquipment.RefreshVisualState();
             
-            equipmentController?.UnequipSlot(sourceEquipment.SlotType);
-            equipmentController?.UnequipSlot(targetEquipment.SlotType);
+            equipmentSystem?.UnequipSlot(sourceEquipment.SlotType);
+            equipmentSystem?.UnequipSlot(targetEquipment.SlotType);
             
-            equipmentController?.EquipItem(itemToMove, targetEquipment.SlotType);
+            equipmentSystem?.EquipItem(itemToMove, targetEquipment.SlotType);
             targetEquipment.SetItem(itemToMove);
             targetEquipment.RefreshVisualState();
             
-            equipmentController?.EquipItem(currentlyEquipped, sourceEquipment.SlotType);
+            equipmentSystem?.EquipItem(currentlyEquipped, sourceEquipment.SlotType);
             sourceEquipment.SetItem(currentlyEquipped);
             sourceEquipment.RefreshVisualState();
         } else {
@@ -75,12 +75,12 @@ public class EquipmentToEquipmentTransaction : DragDropTransaction
             
             sourceEquipment.ClearItem();
             sourceEquipment.RefreshVisualState();
-            equipmentController?.UnequipSlot(sourceEquipment.SlotType);
+            equipmentSystem?.UnequipSlot(sourceEquipment.SlotType);
             
             targetEquipment.ClearItem();
             targetEquipment.RefreshVisualState();
             
-            equipmentController?.EquipItem(itemToMove, targetEquipment.SlotType);
+            equipmentSystem?.EquipItem(itemToMove, targetEquipment.SlotType);
             targetEquipment.SetItem(itemToMove);
             targetEquipment.RefreshVisualState();
         }

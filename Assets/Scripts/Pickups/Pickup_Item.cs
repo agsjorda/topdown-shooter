@@ -1,5 +1,10 @@
 using UnityEngine;
+using InventorySystem;
 
+/// <summary>
+/// Handles item pickups that can be added to the player's inventory.
+/// Uses InventoryService for centralized inventory access.
+/// </summary>
 public class Pickup_Item : Interactable
 {
     [Header("Item Data")]
@@ -7,8 +12,6 @@ public class Pickup_Item : Interactable
 
     private SpriteRenderer spriteRenderer;
     private InventoryItem inventoryItem;
-    [SerializeField] private InventoryViewModel inventoryViewModel; // Use ViewModel for MVVM
-    private InventoryModel playerInventory; // Only for ViewModel creation if needed
 
     protected override void Awake()
     {
@@ -50,19 +53,19 @@ public class Pickup_Item : Interactable
     #region Interaction
     public override void Interaction()
     {
-        EnsureViewModel();
-        if (inventoryViewModel == null) {
-            Debug.LogError($"{name}: No InventoryViewModel found or created!");
+        var inventory = InventoryService.GetPlayerInventory();
+        if (inventory == null) {
+            Debug.LogError($"{name}: No player inventory found via InventoryService!");
             return;
         }
 
         Debug.Log($"Attempting to add {inventoryItem.itemData.itemName} to inventory");
 
-        if (inventoryViewModel.CanAddItem()) {
-            inventoryViewModel.AddItem(inventoryItem);
+        if (inventory.CanAddItem()) {
+            inventory.AddItem(inventoryItem);
             DestroyPickup();
         } else {
-            Debug.LogWarning("Failed to add item - inventory might be full");
+            Debug.LogWarning("Failed to add item - inventory is full");
         }
     }
 
@@ -79,18 +82,9 @@ public class Pickup_Item : Interactable
     {
         if (!base.CanInteract(playerTransform))
             return false;
-        EnsureViewModel();
-        return inventoryViewModel != null && inventoryViewModel.CanAddItem();
-    }
-
-    private void EnsureViewModel()
-    {
-        if (inventoryViewModel == null) {
-            playerInventory = Object.FindFirstObjectByType<InventoryModel>();
-            if (playerInventory != null) {
-                inventoryViewModel = new InventoryViewModel(playerInventory);
-            }
-        }
+        
+        var inventory = InventoryService.GetPlayerInventory();
+        return inventory != null && inventory.CanAddItem();
     }
     #endregion
 

@@ -24,7 +24,7 @@ public class QuickEquipTransaction : DragDropTransaction
     /// <param name="equipmentSlots"></param>
     /// <param name="inventorySlots"></param>
     /// <param name="inventoryViewModel"></param>
-    /// <param name="equipmentController"></param>
+    /// <param name="equipmentSystem"></param>
     /// <param name="debugMode"></param>
     public QuickEquipTransaction(
         InventoryItem itemToEquip,
@@ -33,9 +33,9 @@ public class QuickEquipTransaction : DragDropTransaction
         List<EquipmentSlotView> equipmentSlots,
         List<SlotView> inventorySlots,
         InventoryViewModel inventoryViewModel,
-        EquipmentController equipmentController,
+        IEquipmentSystem equipmentSystem,
         bool debugMode = false)
-        : base(inventoryViewModel, equipmentController, debugMode)
+        : base(inventoryViewModel, equipmentSystem, debugMode)
     {
         this.itemToEquip = itemToEquip;
         this.sourceSlotIndex = sourceSlotIndex;
@@ -72,7 +72,7 @@ public class QuickEquipTransaction : DragDropTransaction
     public override IEnumerator Execute()
     {
         yield return null;
-        var currentlyEquipped = equipmentController?.GetEquippedItem(targetEquipmentSlot.SlotType);
+        var currentlyEquipped = equipmentSystem?.GetEquippedItem(targetEquipmentSlot.SlotType);
         if (currentlyEquipped != null) {
             Log($"Swapping: Equipping {itemToEquip.itemData.itemName}, returning {currentlyEquipped.itemData.itemName} to slot {sourceSlotIndex}");
             inventoryViewModel.RemoveItemAt(sourceSlotIndex);
@@ -83,7 +83,7 @@ public class QuickEquipTransaction : DragDropTransaction
         }
         targetEquipmentSlot.ClearItem();
         targetEquipmentSlot.RefreshVisualState();
-        equipmentController?.EquipItem(itemToEquip, targetEquipmentSlot.SlotType);
+        equipmentSystem?.EquipItem(itemToEquip, targetEquipmentSlot.SlotType);
         targetEquipmentSlot.SetItem(itemToEquip);
         targetEquipmentSlot.RefreshVisualState();
         targetEquipmentSlot?.AddToClassList("inventorySlots--drop-target");

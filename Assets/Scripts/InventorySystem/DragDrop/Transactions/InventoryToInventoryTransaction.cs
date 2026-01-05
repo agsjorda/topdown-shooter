@@ -1,6 +1,6 @@
-using InventorySystem;
 using System.Collections;
 using UnityEngine.UIElements;
+using InventorySystem;
 
 /// <summary>
 /// Handles moving or swapping items within inventory slots using the ViewModel.
@@ -16,9 +16,9 @@ public class InventoryToInventoryTransaction : DragDropTransaction
         int toIndex,
         SlotView targetSlot,
         InventoryViewModel inventoryViewModel,
-        EquipmentController equipmentController,
+        IEquipmentSystem equipmentSystem,
         bool debugMode = false)
-        : base(inventoryViewModel, equipmentController, debugMode)
+        : base(inventoryViewModel, equipmentSystem, debugMode)
     {
         this.fromIndex = fromIndex;
         this.toIndex = toIndex;

@@ -1,5 +1,10 @@
 using UnityEngine;
+using InventorySystem;
 
+/// <summary>
+/// Handles weapon pickups that can be picked up by the player.
+/// Weapon pickups add to the player's weapon inventory managed by PlayerWeaponController.
+/// </summary>
 public class Pickup_Weapon : Interactable
 {
     [Header("Weapon Data")]
@@ -31,6 +36,10 @@ public class Pickup_Weapon : Interactable
     }
 
     #region Setup Methods
+    /// <summary>
+    /// Sets up the weapon pickup with specific weapon data and position.
+    /// Used when dropping weapons from inventory.
+    /// </summary>
     public void SetupPickupWeapon(Weapon weaponToDrop, Vector3 position)
     {
         weapon = weaponToDrop;
@@ -101,13 +110,14 @@ public class Pickup_Weapon : Interactable
     #region Interaction
     public override void Interaction()
     {
+        // Note: PlayerWeaponController is game-specific and not part of the inventory system
+        // Consider creating an IWeaponSystem interface for better modularity
         PlayerWeaponController weaponController = Object.FindFirstObjectByType<PlayerWeaponController>();
         if (weaponController == null) {
             Debug.LogWarning($"{name}: No PlayerWeaponController found");
             return;
         }
 
-        // PickupWeapon returns void, so just call it and then return to pool
         weaponController.PickupWeapon(weapon);
         ReturnToPool();
     }

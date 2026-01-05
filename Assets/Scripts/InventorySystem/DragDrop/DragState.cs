@@ -1,4 +1,3 @@
-using InventorySystem;
 using UnityEngine;
 
 /// Encapsulates the state of a drag operation.

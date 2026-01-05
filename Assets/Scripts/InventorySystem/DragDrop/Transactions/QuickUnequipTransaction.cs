@@ -21,9 +21,9 @@ namespace InventorySystem.DragDrop.Transactions
             InventoryItem equippedItem,
             List<SlotView> inventorySlots,
             InventoryViewModel inventoryViewModel,
-            EquipmentController equipmentController,
+            IEquipmentSystem equipmentSystem,
             bool debugMode = false)
-            : base(inventoryViewModel, equipmentController, debugMode)
+            : base(inventoryViewModel, equipmentSystem, debugMode)
         {
             this.sourceEquipmentSlot = sourceEquipmentSlot;
             this.equippedItem = equippedItem;
@@ -68,7 +68,7 @@ namespace InventorySystem.DragDrop.Transactions
             Log($"Unequipping {equippedItem.itemData.itemName} from {sourceEquipmentSlot.SlotType} to inventory slot {targetInventoryIndex}");
             sourceEquipmentSlot.ClearItem();
             sourceEquipmentSlot.RefreshVisualState();
-            equipmentController?.UnequipSlot(sourceEquipmentSlot.SlotType);
+            equipmentSystem?.UnequipSlot(sourceEquipmentSlot.SlotType);
             inventoryViewModel.SetItemAt(targetInventoryIndex, equippedItem);
             if (targetInventorySlot != null) {
                 targetInventorySlot.SetItem(equippedItem);

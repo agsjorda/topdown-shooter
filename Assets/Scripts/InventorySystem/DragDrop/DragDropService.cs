@@ -5,6 +5,10 @@ using InventorySystem;
 using InventorySystem.DragDrop.Transactions;
 using UnityEngine;
 
+/// <summary>
+/// Service for managing drag-and-drop operations in the inventory system.
+/// Handles drag state, position tracking, and transaction creation.
+/// </summary>
 public class DragDropService
 {
     public event Action<Vector2, InventoryItem> OnDragStarted;
@@ -15,7 +19,7 @@ public class DragDropService
 
     private DragState dragState;
     private InventoryViewModel inventoryViewModel;
-    private EquipmentController equipmentController;
+    private IEquipmentSystem equipmentSystem;
     private List<SlotView> inventorySlots;
     private List<EquipmentSlotView> equipmentSlots;
     private bool debugMode;
@@ -23,14 +27,14 @@ public class DragDropService
 
     public DragDropService(
         InventoryViewModel inventoryViewModel,
-        EquipmentController equipmentController,
+        IEquipmentSystem equipmentSystem,
         List<SlotView> inventorySlots,
         List<EquipmentSlotView> equipmentSlots,
         DragVisualHandler dragVisualHandler,
         bool debugMode = false)
     {
         this.inventoryViewModel = inventoryViewModel;
-        this.equipmentController = equipmentController;
+        this.equipmentSystem = equipmentSystem;
         this.inventorySlots = inventorySlots;
         this.equipmentSlots = equipmentSlots;
         this.dragVisualHandler = dragVisualHandler;
@@ -87,7 +91,7 @@ public class DragDropService
             targetEquipment,
             inventorySlots,
             inventoryViewModel,
-            equipmentController,
+            equipmentSystem,
             debugMode
         );
         if (transaction != null && transaction.CanExecute())

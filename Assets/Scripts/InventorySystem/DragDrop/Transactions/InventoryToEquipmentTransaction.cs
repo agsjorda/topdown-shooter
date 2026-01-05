@@ -21,7 +21,7 @@ public class InventoryToEquipmentTransaction : DragDropTransaction
     /// <param name="targetEquipment">The target equipment slot.</param>
     /// <param name="inventorySlots">The list of inventory slots.</param>
     /// <param name="inventoryViewModel">The inventory view model.</param>
-    /// <param name="equipmentController">The equipment controller.</param>
+    /// <param name="equipmentSystem">The equipment system.</param>
     /// <param name="debugMode">Whether to enable debug mode.</param>
     public InventoryToEquipmentTransaction(
         InventoryItem itemToEquip,
@@ -29,9 +29,9 @@ public class InventoryToEquipmentTransaction : DragDropTransaction
         EquipmentSlotView targetEquipment,
         List<SlotView> inventorySlots,
         InventoryViewModel inventoryViewModel,
-        EquipmentController equipmentController,
+        IEquipmentSystem equipmentSystem,
         bool debugMode = false)
-        : base(inventoryViewModel, equipmentController, debugMode)
+        : base(inventoryViewModel, equipmentSystem, debugMode)
     {
         this.itemToEquip = itemToEquip;
         this.sourceSlotIndex = sourceSlotIndex;
@@ -61,7 +61,7 @@ public class InventoryToEquipmentTransaction : DragDropTransaction
     public override IEnumerator Execute()
     {
         yield return null;
-        var currentlyEquipped = equipmentController != null ? equipmentController.GetEquippedItem(targetEquipment.SlotType) : null;
+        var currentlyEquipped = equipmentSystem != null ? equipmentSystem.GetEquippedItem(targetEquipment.SlotType) : null;
         if (currentlyEquipped != null) {
             Log($"Swapping: Equipping {itemToEquip.itemData.itemName}, returning {currentlyEquipped.itemData.itemName} to slot {sourceSlotIndex}");
             inventoryViewModel.RemoveItemAt(sourceSlotIndex);
@@ -73,8 +73,8 @@ public class InventoryToEquipmentTransaction : DragDropTransaction
         // Equipment state change
         targetEquipment.ClearItem();
         targetEquipment.RefreshVisualState();
-        if (equipmentController != null) {
-            equipmentController.EquipItem(itemToEquip, targetEquipment.SlotType);
+        if (equipmentSystem != null) {
+            equipmentSystem.EquipItem(itemToEquip, targetEquipment.SlotType);
         }
         targetEquipment.SetItem(itemToEquip);
         targetEquipment.RefreshVisualState();

@@ -2,18 +2,30 @@ using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
 /// Factory for creating the appropriate DragDropTransaction based on drag/drop context.
 /// This centralizes transaction creation logic and makes it easy to add new transaction types.
+/// </summary>
 public static class TransactionFactory
 {
-    /// Creates the appropriate transaction based on drag source and drop target
+    /// <summary>
+    /// Creates the appropriate transaction based on drag source and drop target.
+    /// </summary>
+    /// <param name="dragState">The current drag state</param>
+    /// <param name="targetInventorySlot">Target inventory slot (if dropping to inventory)</param>
+    /// <param name="targetEquipmentSlot">Target equipment slot (if dropping to equipment)</param>
+    /// <param name="inventorySlots">List of all inventory slots</param>
+    /// <param name="inventoryViewModel">The inventory view model</param>
+    /// <param name="equipmentSystem">The equipment system interface</param>
+    /// <param name="debugMode">Enable debug logging</param>
+    /// <returns>The appropriate transaction or null if invalid</returns>
     public static DragDropTransaction CreateTransaction(
         DragState dragState,
         SlotView targetInventorySlot,
         EquipmentSlotView targetEquipmentSlot,
         List<SlotView> inventorySlots,
         InventoryViewModel inventoryViewModel,
-        EquipmentController equipmentController,
+        IEquipmentSystem equipmentSystem,
         bool debugMode = false)
     {
         bool fromInventory = dragState.IsFromInventory;
@@ -30,7 +42,7 @@ public static class TransactionFactory
                 toIndex,
                 targetInventorySlot,
                 inventoryViewModel,
-                equipmentController,
+                equipmentSystem,
                 debugMode
             );
         }
@@ -45,7 +57,7 @@ public static class TransactionFactory
                 targetEquipmentSlot,
                 inventorySlots,
                 inventoryViewModel,
-                equipmentController,
+                equipmentSystem,
                 debugMode
             );
         }
@@ -59,7 +71,7 @@ public static class TransactionFactory
                 targetInventorySlot,
                 inventorySlots,
                 inventoryViewModel,
-                equipmentController,
+                equipmentSystem,
                 debugMode
             );
         }
@@ -69,7 +81,7 @@ public static class TransactionFactory
                 dragState.SourceEquipmentSlot,
                 targetEquipmentSlot,
                 inventoryViewModel,
-                equipmentController,
+                equipmentSystem,
                 debugMode
             );
         }

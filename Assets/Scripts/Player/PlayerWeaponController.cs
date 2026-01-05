@@ -1,7 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using InventorySystem;
 
+/// <summary>
+/// Manages player weapon slots, switching, shooting, and reload mechanics.
+/// </summary>
 public class PlayerWeaponController : MonoBehaviour
 {
     private const float REFERENCE_BULLET_SPEED = 20f;
@@ -157,11 +161,17 @@ public class PlayerWeaponController : MonoBehaviour
         return null;
     }
 
+    /// <summary>
+    /// Attempts to add a weapon to the player's inventory when weapon slots are full.
+    /// </summary>
     private void SendToInventory(Weapon weapon)
     {
-        var inventory = Object.FindFirstObjectByType<InventoryModel>();
+        var inventory = InventoryService.GetPlayerInventory();
         if (inventory != null && inventory.CanAddItem()) {
             inventory.AddItem(new InventoryItem(weapon.weaponData));
+            Debug.Log($"Weapon {weapon.weaponData.itemName} added to inventory (weapon slots full)");
+        } else {
+            Debug.LogWarning($"Cannot add weapon to inventory - inventory is full or not found");
         }
     }
 
