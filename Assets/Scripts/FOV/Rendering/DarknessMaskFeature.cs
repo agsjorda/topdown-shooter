@@ -8,7 +8,6 @@ public class DarknessMaskFeature : ScriptableRendererFeature
     class DarknessMaskPass : ScriptableRenderPass
     {
         public Material darknessMat;
-        private RTHandle m_CameraColorTarget;
 
         // Modern implementation using RenderGraph (Unity 2022+)
         public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
@@ -36,21 +35,6 @@ public class DarknessMaskFeature : ScriptableRendererFeature
                     Blitter.BlitTexture(context.cmd, data.cameraColorTarget, new Vector4(1, 1, 0, 0), data.material, 0);
                 });
             }
-        }
-
-        // Legacy fallback for older Unity versions
-        [System.Obsolete("This rendering path is for compatibility mode only (Render Graph is recommended). Execute will be removed in a future version.")]
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
-        {
-            if (darknessMat == null) return;
-
-            CommandBuffer cmd = CommandBufferPool.Get("DarknessMaskPass");
-            
-            RTHandle cameraColorTarget = renderingData.cameraData.renderer.cameraColorTargetHandle;
-            Blitter.BlitCameraTexture(cmd, cameraColorTarget, cameraColorTarget, darknessMat, 0);
-            
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
         }
 
         private class PassData

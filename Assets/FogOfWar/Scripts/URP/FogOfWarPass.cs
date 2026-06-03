@@ -47,20 +47,17 @@ namespace FOW
 
         #region COMPATIBILITY MODE
 
+#if !UNITY_6000_0_OR_NEWER
         private RenderTargetIdentifier source;
         private RenderTargetIdentifier destination;
         private static readonly int temporaryRTId = Shader.PropertyToID("_FowTempRT");
         private static readonly int kBlitTexturePropertyId = Shader.PropertyToID("_BlitTexture");
         private static readonly int kBlitScaleBiasPropertyId = Shader.PropertyToID("_BlitScaleBias");
 
-#if UNITY_6000_0_OR_NEWER
-        [Obsolete]
-#endif
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
             instance = this;
             RenderTextureDescriptor blitTargetDescriptor = renderingData.cameraData.cameraTargetDescriptor;
-            //blitTargetDescriptor.depthBufferBits = 0;
 
             var renderer = renderingData.cameraData.renderer;
 
@@ -74,16 +71,10 @@ namespace FOW
             destination = new RenderTargetIdentifier(temporaryRTId);
         }
 
-#if UNITY_6000_0_OR_NEWER
-        [Obsolete]
-#endif
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             if (FogOfWarWorld.instance == null || !FogOfWarWorld.instance.enabled || !EffectEnabled)
-            {
-                //Debug.Log("returning");
                 return;
-            }
             if (renderingData.cameraData.camera.GetUniversalAdditionalCameraData().renderType == CameraRenderType.Overlay)
                 return;
 
@@ -93,7 +84,6 @@ namespace FOW
             SetShaderProperties(renderingData.cameraData.camera);
 
             cmd.SetGlobalTexture(kBlitTexturePropertyId, source);
-            // This uniform needs to be set for user materials with shaders relying on core Blit.hlsl to work as expected
             cmd.SetGlobalVector(kBlitScaleBiasPropertyId, new Vector4(1, 1, 0, 0));
 
             cmd.Blit(source, destination, FogOfWarWorld.instance.FogOfWarMaterial, 0);
@@ -108,6 +98,7 @@ namespace FOW
             if (temporaryRTId != -1)
                 cmd.ReleaseTemporaryRT(temporaryRTId);
         }
+#endif
         #endregion
 
         #region RENDER GRAPH

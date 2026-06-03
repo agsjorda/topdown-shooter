@@ -56,5 +56,6 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "topdown-shooter.sln"
+    "dotnet.defaultSolution": "topdown-shooter.slnx",
+    "dotnet.preferCSharpExtension": true
 }
