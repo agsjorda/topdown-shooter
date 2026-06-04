@@ -29,7 +29,8 @@ public class Bullet : MonoBehaviour
 
         bulletDisabled = false;
         cd.enabled = true;
-        meshRenderer.enabled = true;
+        if (!TryGetComponent<FOW.FogOfWarHider>(out _))
+            meshRenderer.enabled = true;
         trailRenderer.time = 0.25f;
         startPosition = transform.position;
         this.flyDistance = flyDistance + .5f; //.5f is a length of the tip of the aim laser (check method UpdateAimVisuals in PlayerAim.cs)
