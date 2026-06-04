@@ -2,14 +2,22 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: PartialHider2D
   m_Shader: {fileID: 4800000, guid: d653c3ae35610f446a530593ede77e7c, type: 3}
-  m_ShaderKeywords: HARD IS_2D SAMPLE_REALTIME USE_WORLD_BOUNDS
+  m_ValidKeywords:
+  - FOW_SOFT
+  - FOW_USE_SPATIAL_HASHING
+  - FOW_USE_TEXTURE_BLUR
+  m_InvalidKeywords:
+  - INNER_SOFTEN
+  - FOW_IS_2D
+  - FOW_SAMPLE_TEXTURE
+  - FOW_USE_WORLD_BOUNDS
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -67,6 +75,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - PixelSnap: 0
     - _BumpScale: 1

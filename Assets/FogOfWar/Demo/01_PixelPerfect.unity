@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -410,11 +409,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
---- !u!1 &131462855
+--- !u!1 &168773107
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -422,88 +417,103 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 131462857}
-  - component: {fileID: 131462856}
+  - component: {fileID: 168773108}
+  - component: {fileID: 168773110}
+  - component: {fileID: 168773109}
   m_Layer: 0
-  m_Name: SecurityCamera
+  m_Name: New Text (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 0
---- !u!114 &131462856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 131462855}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ViewRadius: 12
-  SoftenDistance: 3
-  ViewAngle: 40
-  UnobscuredRadius: -3
-  Opacity: 1
-  AddCorners: 0
-  RevealHiderInFadeOutZonePercentage: 0.5
-  EyeOffset: 0
-  ShaderEyeOffset: 0
-  VisionHeight: 6.41
-  VisionHeightSoftenDistance: 1.5
-  SampleHidersAtRevealerHeight: 1
-  CalculateHidersAtHiderHeight: 0
-  ObstacleMask:
-    serializedVersion: 2
-    m_Bits: 1
-  StartRevealerAsStatic: 1
-  StaticRevealer: 0
-  MaxHidersSampledPerFrame: 50
-  QualityPreset: 5
-  RaycastResolution: 0.5
-  NumExtraIterations: 3
-  NumExtraRaysOnIteration: 3
-  ResolveEdge: 1
-  MaxEdgeResolveIterations: 7
-  MaxAcceptableEdgeAngleDifference: 0.005
-  EdgeDstThreshold: 0.1
-  DoubleHitMaxAngleDelta: 15
-  FogOfWarID: 0
-  IndexID: 0
-  NumberOfPoints: 0
-  Angles: []
-  Radii: []
-  AreHits: 
-  DebugMode: 0
-  DrawInitialRays: 0
-  SegmentTest: 0
-  DrawExpectedNextPoints: 0
-  DrawIteritiveRays: 0
-  DrawEdgeResolveRays: 0
-  DrawExtraCastLines: 0
-  DrawHiderSamples: 0
-  DebugLogHiderBlockerName: 0
---- !u!4 &131462857
+--- !u!4 &168773108
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 131462855}
-  m_LocalRotation: {x: -0, y: 0.62728363, z: -0, w: 0.77879095}
-  m_LocalPosition: {x: -25.050001, y: 4.99, z: 1.0688213}
+  m_GameObject: {fileID: 168773107}
+  m_LocalRotation: {x: 0, y: -0.9942448, z: -0, w: 0.107131824}
+  m_LocalPosition: {x: 0.2045595, y: -1.42, z: 0.47431013}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1438156585}
-  - {fileID: 1959563995}
-  - {fileID: 1641218926}
-  m_Father: {fileID: 0}
-  m_RootOrder: 7
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children: []
+  m_Father: {fileID: 1845010529}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!102 &168773109
+TextMesh:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 168773107}
+  m_Text: 'This Camera Requires "Enable Minimum Distance To Revealers"
+
+    On the
+    Fog Of War World component.
+
+    With this enabled, the revealers "Unobscured
+    Radius"
+
+    will accept negative values.'
+  m_OffsetZ: 0
+  m_CharacterSize: 0.3
+  m_LineSpacing: 1
+  m_Anchor: 1
+  m_Alignment: 1
+  m_TabSize: 4
+  m_FontSize: 0
+  m_FontStyle: 0
+  m_RichText: 1
+  m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Color:
+    serializedVersion: 2
+    rgba: 4294967295
+--- !u!23 &168773110
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 168773107}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &210947987
 GameObject:
   m_ObjectHideFlags: 0
@@ -726,10 +736,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!4 &304693649
 Transform:
   m_ObjectHideFlags: 0
@@ -780,7 +786,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &305305522
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -793,7 +799,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c9cc82ab83a1f48aa77c2b832a9c86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BlinkCycleTime: 5
+  BlinkCycleTime: 1
   RandomOffset: 1
 --- !u!4 &305305523
 Transform:
@@ -1120,10 +1126,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &368213122
 GameObject:
   m_ObjectHideFlags: 0
@@ -1318,10 +1320,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &410218696
 GameObject:
   m_ObjectHideFlags: 0
@@ -1578,6 +1576,53 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 487073159}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &488499105
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 488499106}
+  - component: {fileID: 488499107}
+  m_Layer: 0
+  m_Name: Draw Line To Hider
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &488499106
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488499105}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1677992294}
+  m_Father: {fileID: 1092565505}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &488499107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488499105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e731960c584375143a46b5ba70ed4721, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MyRevealer: {fileID: 1092565506}
+  TemplateLineRenderer: {fileID: 1677992295}
 --- !u!1 &509521009
 GameObject:
   m_ObjectHideFlags: 0
@@ -2150,27 +2195,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b1afdc8801548c4cab37872782c6e11, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UpdateMethod: 1
-  UsingSoftening: 0
   FogType: 1
   FogFade: 3
-  BlendType: 0
-  EdgeSoftenDistance: 0.3
-  UnobscuredSoftenDistance: 0.25
-  UseInnerSoften: 1
-  InnerSoftenAngle: 5
-  AllowBleeding: 0
-  SightExtraAmount: 0.01
-  MaxFogDistance: 1000
-  PixelateFog: 0
-  WorldSpacePixelate: 0
-  PixelDensity: 2
-  RoundRevealerPosition: 0
-  PixelGridOffset: {x: 0, y: 0}
+  FogFadePower: 1
+  BlendType: 1
   UseDithering: 0
   DitherSize: 20
-  InvertFowEffect: 0
-  FogFadePower: 1
+  SightExtraAmount: 0.01
+  EdgeSoftenDistance: 0.3
+  MaxFogDistance: 1000
   FogAppearance: 3
   UnknownColor: {r: 0.40392157, g: 0.40392157, b: 0.40392157, a: 0.83137256}
   SaturationStrength: 0
@@ -2183,34 +2216,51 @@ MonoBehaviour:
   FogTextureTiling: {x: 0.1, y: 0.1}
   FogScrollSpeed: {x: 1, y: 1}
   OutlineThickness: 0.1
-  FOWSamplingMode: 0
-  UseRegrow: 0
-  RevealerFadeIn: 0
-  FogRegrowSpeed: 0.5
-  InitialFogExplorationValue: 0
-  MaxFogRegrowAmount: 0.5
-  FowTextureMaterial: {fileID: 0}
-  FowResX: 256
-  FowResY: 256
-  UseConstantBlur: 1
-  ConstantTextureBlurQuality: 2
-  ConstantTextureBlurAmount: 0.75
+  PixelateFog: 0
+  WorldSpacePixelate: 0
+  PixelDensity: 2
+  RoundRevealerPosition: 0
+  PixelGridOffset: {x: 0, y: 0}
   UseWorldBounds: 0
   WorldBoundsSoftenDistance: 1
   WorldBoundsInfluence: 1
+  InvertFowEffect: 0
+  AllowBleeding: 0
+  FOWSamplingMode: 0
+  HidersUseFogTexture: 1
+  HiderSeenThreshold: 0.5
+  AsyncReadbackFogDataToCpu: 0
+  UseConstantBlur: 1
+  ConstantTextureBlurQuality: 2
+  ConstantTextureBlurAmount: 0.75
+  UseMiniMap: 0
+  FowResX: 256
+  FowResY: 256
+  UseRegrow: 0
+  RevealerFadeIn: 0
+  RevealerFadeInSpeed: 0.5
+  RevealerFadeOut: 0
+  RevealerFadeOutSpeed: 0.5
+  InitialFogExplorationValue: 0
+  MaxFogRegrowAmount: 0.5
   WorldBounds:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0.5, y: 0.5, z: 0.5}
-  UseMiniMap: 0
-  MiniMapColor: {r: 0.65, g: 0.65, b: 0.65, a: 0.65}
-  UIImage: {fileID: 0}
+  UpdateMethod: 1
   RevealerUpdateMode: 1
   MaxNumRevealersPerFrame: 3
+  UseStagedGPUUploads: 1
+  ScatterRevealersShader: {fileID: 7200000, guid: e219da27121706f4cb325510f3d915c2, type: 3}
+  UseSpatialAcceleration: 1
+  SpatialHashGridSize: 32
+  NumSpatialHashBuckets: 1024
   MaxPossibleRevealers: 256
   MaxPossibleSegmentsPerRevealer: 128
+  MaxPossibleHiders: 512
   is2D: 0
-  gamePlane: 0
+  GamePlaneOrientation: 0
   FogOfWarMaterial: {fileID: 0}
+  FowTextureMaterial: {fileID: 0}
 --- !u!4 &618396800
 Transform:
   m_ObjectHideFlags: 0
@@ -2614,10 +2664,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &806728573
 GameObject:
   m_ObjectHideFlags: 0
@@ -2902,7 +2948,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 963194225}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9de49a7657279af4c8e6f1889b2e8626, type: 3}
+  m_Script: {fileID: 11500000, guid: 41eea5c3a239e31459a4f1b34093eca5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &971205472
@@ -3068,10 +3114,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &990360998
 GameObject:
   m_ObjectHideFlags: 0
@@ -3210,7 +3252,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1028497005}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -3547,7 +3589,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 488499106}
   m_Father: {fileID: 677576054}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3563,40 +3606,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ViewRadius: 10
-  SoftenDistance: 3
-  ViewAngle: 360
-  UnobscuredRadius: 1
-  Opacity: 1
-  AddCorners: 1
-  RevealHiderInFadeOutZonePercentage: 0.5
+  viewRadius: 10
+  softenDistance: 3
+  innerSoftenAngle: 5
+  unobscuredRadius: 1
+  unobscuredSoftenDistance: 0.25
+  visionHeight: 3
+  visionHeightSoftenDistance: 1.5
+  viewAngle: 360
+  opacity: 1
   EyeOffset: 0
   ShaderEyeOffset: 0
-  VisionHeight: 3
-  VisionHeightSoftenDistance: 1.5
-  SampleHidersAtRevealerHeight: 1
-  CalculateHidersAtHiderHeight: 0
+  StartRevealerAsStatic: 0
+  revealHiderInFadeOutZonePercentage: 0.5
+  MaxHidersSampledPerFrame: 50
+  SetHiderRayOriginToHidersHeight: 0
+  SetHiderRayDestinationToRevealersHeight: 1
+  useOcclusion: 1
+  addCorners: 1
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 1
-  StartRevealerAsStatic: 0
-  StaticRevealer: 0
-  MaxHidersSampledPerFrame: 50
-  QualityPreset: 5
-  RaycastResolution: 0.5
+  OcclusionQuality: 5
+  raycastResolution: 0.5
   NumExtraIterations: 3
-  NumExtraRaysOnIteration: 3
+  numExtraRaysOnIteration: 3
   ResolveEdge: 1
-  MaxEdgeResolveIterations: 7
+  MaxEdgeResolveIterations: 3
   MaxAcceptableEdgeAngleDifference: 0.005
-  EdgeDstThreshold: 0.1
-  DoubleHitMaxAngleDelta: 15
-  FogOfWarID: 0
-  IndexID: 0
-  NumberOfPoints: 0
-  Angles: []
-  Radii: []
-  AreHits: 
+  edgeDstThreshold: 0.15
+  doubleHitMaxAngleDelta: 15
   DebugMode: 0
   DrawInitialRays: 0
   SegmentTest: 0
@@ -3606,6 +3645,89 @@ MonoBehaviour:
   DrawExtraCastLines: 0
   DrawHiderSamples: 0
   DebugLogHiderBlockerName: 0
+--- !u!1 &1142111962
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1142111963}
+  - component: {fileID: 1142111965}
+  - component: {fileID: 1142111964}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1142111963
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142111962}
+  m_LocalRotation: {x: 0.16687843, y: -0.00000008940697, z: -0.000000014901161, w: 0.98597753}
+  m_LocalPosition: {x: -0, y: 0, z: 0.37}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1845010529}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 19.213, y: 0, z: 0}
+--- !u!23 &1142111964
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142111962}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9981e4f2fd8d4ea429e9eb81755a66bd, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1142111965
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142111962}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1158869000
 GameObject:
   m_ObjectHideFlags: 0
@@ -3765,10 +3887,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &1185875866
 GameObject:
   m_ObjectHideFlags: 0
@@ -4210,10 +4328,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &1300354824
 GameObject:
   m_ObjectHideFlags: 0
@@ -4660,10 +4774,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &1361408154
 GameObject:
   m_ObjectHideFlags: 0
@@ -4920,89 +5030,6 @@ Transform:
   m_Father: {fileID: 1954754175}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1438156584
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1438156585}
-  - component: {fileID: 1438156587}
-  - component: {fileID: 1438156586}
-  m_Layer: 0
-  m_Name: Cube
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1438156585
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1438156584}
-  m_LocalRotation: {x: 0.16687843, y: -0.00000008940697, z: -0.000000014901161, w: 0.98597753}
-  m_LocalPosition: {x: -0, y: 0, z: 0.37}
-  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 131462857}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 19.213, y: 0, z: 0}
---- !u!23 &1438156586
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1438156584}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 9981e4f2fd8d4ea429e9eb81755a66bd, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &1438156587
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1438156584}
-  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1450670271
 GameObject:
   m_ObjectHideFlags: 0
@@ -5228,10 +5255,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &1534220036
 GameObject:
   m_ObjectHideFlags: 0
@@ -5298,10 +5321,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &1542995781
 GameObject:
   m_ObjectHideFlags: 0
@@ -5445,40 +5464,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ViewRadius: 15
-  SoftenDistance: 3
-  ViewAngle: 360
-  UnobscuredRadius: 1
-  Opacity: 1
-  AddCorners: 0
-  RevealHiderInFadeOutZonePercentage: 0.5
+  viewRadius: 15
+  softenDistance: 3
+  innerSoftenAngle: 5
+  unobscuredRadius: 1
+  unobscuredSoftenDistance: 0.25
+  visionHeight: 3
+  visionHeightSoftenDistance: 1.5
+  viewAngle: 360
+  opacity: 1
   EyeOffset: 0
   ShaderEyeOffset: 0
-  VisionHeight: 3
-  VisionHeightSoftenDistance: 1.5
-  SampleHidersAtRevealerHeight: 1
-  CalculateHidersAtHiderHeight: 0
+  StartRevealerAsStatic: 1
+  revealHiderInFadeOutZonePercentage: 0.5
+  MaxHidersSampledPerFrame: 50
+  SetHiderRayOriginToHidersHeight: 0
+  SetHiderRayDestinationToRevealersHeight: 1
+  useOcclusion: 1
+  addCorners: 1
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 1
-  StartRevealerAsStatic: 1
-  StaticRevealer: 0
-  MaxHidersSampledPerFrame: 50
-  QualityPreset: 5
-  RaycastResolution: 0.5
+  OcclusionQuality: 5
+  raycastResolution: 0.5
   NumExtraIterations: 3
-  NumExtraRaysOnIteration: 3
+  numExtraRaysOnIteration: 3
   ResolveEdge: 1
   MaxEdgeResolveIterations: 7
   MaxAcceptableEdgeAngleDifference: 0.005
-  EdgeDstThreshold: 0.1
-  DoubleHitMaxAngleDelta: 15
-  FogOfWarID: 0
-  IndexID: 0
-  NumberOfPoints: 0
-  Angles: []
-  Radii: []
-  AreHits: 
+  edgeDstThreshold: 0.1
+  doubleHitMaxAngleDelta: 15
   DebugMode: 0
   DrawInitialRays: 0
   SegmentTest: 0
@@ -5784,10 +5799,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &1571207766
 GameObject:
   m_ObjectHideFlags: 0
@@ -5999,111 +6010,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1629253625}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!1 &1641218925
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1641218926}
-  - component: {fileID: 1641218928}
-  - component: {fileID: 1641218927}
-  m_Layer: 0
-  m_Name: New Text (2)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
-  m_IsActive: 0
---- !u!4 &1641218926
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1641218925}
-  m_LocalRotation: {x: 0, y: -0.9942448, z: -0, w: 0.107131824}
-  m_LocalPosition: {x: 0.2045595, y: -1.42, z: 0.47431013}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 131462857}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!102 &1641218927
-TextMesh:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1641218925}
-  m_Text: 'This Camera Requires "Enable Minimum Distance To Revealers"
-
-    On the
-    Fog Of War World component.
-
-    With this enabled, the revealers "Unobscured
-    Radius"
-
-    will accept negative values.'
-  m_OffsetZ: 0
-  m_CharacterSize: 0.3
-  m_LineSpacing: 1
-  m_Anchor: 1
-  m_Alignment: 1
-  m_TabSize: 4
-  m_FontSize: 0
-  m_FontStyle: 0
-  m_RichText: 1
-  m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-  m_Color:
-    serializedVersion: 2
-    rgba: 4294967295
---- !u!23 &1641218928
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1641218925}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1675715998
 GameObject:
   m_ObjectHideFlags: 0
@@ -6201,6 +6107,137 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1675715998}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &1677992293
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1677992294}
+  - component: {fileID: 1677992295}
+  m_Layer: 0
+  m_Name: Line Renderer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1677992294
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677992293}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 488499106}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!120 &1677992295
+LineRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1677992293}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 0
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 63498584e5debe94f8368e8d0982eb2b, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Positions:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 1}
+  m_Parameters:
+    serializedVersion: 3
+    widthMultiplier: 1
+    widthCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0.13599968
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    colorGradient:
+      serializedVersion: 2
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 1, b: 1, a: 1}
+      key2: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0}
+      key4: {r: 0, g: 0, b: 0, a: 0}
+      key5: {r: 0, g: 0, b: 0, a: 0}
+      key6: {r: 0, g: 0, b: 0, a: 0}
+      key7: {r: 0, g: 0, b: 0, a: 0}
+      ctime0: 0
+      ctime1: 65535
+      ctime2: 0
+      ctime3: 0
+      ctime4: 0
+      ctime5: 0
+      ctime6: 0
+      ctime7: 0
+      atime0: 0
+      atime1: 65535
+      atime2: 0
+      atime3: 0
+      atime4: 0
+      atime5: 0
+      atime6: 0
+      atime7: 0
+      m_Mode: 0
+      m_NumColorKeys: 2
+      m_NumAlphaKeys: 2
+    numCornerVertices: 0
+    numCapVertices: 0
+    alignment: 0
+    textureMode: 0
+    shadowBias: 0.5
+    generateLightingData: 0
+  m_UseWorldSpace: 1
+  m_Loop: 0
 --- !u!1 &1693225688
 GameObject:
   m_ObjectHideFlags: 0
@@ -6589,10 +6626,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   SamplePoints: []
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!1 &1769528507
 GameObject:
   m_ObjectHideFlags: 0
@@ -6653,40 +6686,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ViewRadius: 9.24
-  SoftenDistance: 3
-  ViewAngle: 45
-  UnobscuredRadius: 1
-  Opacity: 1
-  AddCorners: 0
-  RevealHiderInFadeOutZonePercentage: 0.5
+  viewRadius: 9.24
+  softenDistance: 3
+  innerSoftenAngle: 5
+  unobscuredRadius: 1
+  unobscuredSoftenDistance: 0.25
+  visionHeight: 3
+  visionHeightSoftenDistance: 1.5
+  viewAngle: 45
+  opacity: 1
   EyeOffset: 0
   ShaderEyeOffset: 0
-  VisionHeight: 3
-  VisionHeightSoftenDistance: 1.5
-  SampleHidersAtRevealerHeight: 1
-  CalculateHidersAtHiderHeight: 0
+  StartRevealerAsStatic: 0
+  revealHiderInFadeOutZonePercentage: 0.5
+  MaxHidersSampledPerFrame: 50
+  SetHiderRayOriginToHidersHeight: 0
+  SetHiderRayDestinationToRevealersHeight: 1
+  useOcclusion: 1
+  addCorners: 1
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 1
-  StartRevealerAsStatic: 0
-  StaticRevealer: 1
-  MaxHidersSampledPerFrame: 50
-  QualityPreset: 5
-  RaycastResolution: 0.5
+  OcclusionQuality: 5
+  raycastResolution: 0.5
   NumExtraIterations: 3
-  NumExtraRaysOnIteration: 3
+  numExtraRaysOnIteration: 3
   ResolveEdge: 1
   MaxEdgeResolveIterations: 7
   MaxAcceptableEdgeAngleDifference: 0.001
-  EdgeDstThreshold: 0.1
-  DoubleHitMaxAngleDelta: 15
-  FogOfWarID: 0
-  IndexID: 0
-  NumberOfPoints: 0
-  Angles: []
-  Radii: []
-  AreHits: 
+  edgeDstThreshold: 0.1
+  doubleHitMaxAngleDelta: 15
   DebugMode: 0
   DrawInitialRays: 0
   SegmentTest: 0
@@ -6839,6 +6868,92 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1525529277}
   m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1845010527
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1845010529}
+  - component: {fileID: 1845010528}
+  m_Layer: 0
+  m_Name: SecurityCamera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1845010528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845010527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  viewRadius: 12
+  softenDistance: 3
+  innerSoftenAngle: 5
+  unobscuredRadius: -3
+  unobscuredSoftenDistance: 0.25
+  visionHeight: 6.41
+  visionHeightSoftenDistance: 1.5
+  viewAngle: 40
+  opacity: 1
+  EyeOffset: 0
+  ShaderEyeOffset: 0
+  StartRevealerAsStatic: 1
+  revealHiderInFadeOutZonePercentage: 0.5
+  MaxHidersSampledPerFrame: 50
+  SetHiderRayOriginToHidersHeight: 0
+  SetHiderRayDestinationToRevealersHeight: 1
+  useOcclusion: 1
+  addCorners: 1
+  ObstacleMask:
+    serializedVersion: 2
+    m_Bits: 1
+  OcclusionQuality: 5
+  raycastResolution: 0.5
+  NumExtraIterations: 3
+  numExtraRaysOnIteration: 3
+  ResolveEdge: 1
+  MaxEdgeResolveIterations: 7
+  MaxAcceptableEdgeAngleDifference: 0.005
+  edgeDstThreshold: 0.1
+  doubleHitMaxAngleDelta: 15
+  DebugMode: 0
+  DrawInitialRays: 0
+  SegmentTest: 0
+  DrawExpectedNextPoints: 0
+  DrawIteritiveRays: 0
+  DrawEdgeResolveRays: 0
+  DrawExtraCastLines: 0
+  DrawHiderSamples: 0
+  DebugLogHiderBlockerName: 0
+--- !u!4 &1845010529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1845010527}
+  m_LocalRotation: {x: -0, y: 0.62728363, z: -0, w: 0.77879095}
+  m_LocalPosition: {x: -25.050001, y: 4.99, z: 1.0688213}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1142111963}
+  - {fileID: 2071029770}
+  - {fileID: 168773108}
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1881983088
 GameObject:
@@ -7471,106 +7586,6 @@ MonoBehaviour:
   flippedColliders:
     colliders: []
     gameObjects: []
---- !u!1 &1959563994
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1959563995}
-  - component: {fileID: 1959563997}
-  - component: {fileID: 1959563996}
-  m_Layer: 0
-  m_Name: New Text (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
---- !u!4 &1959563995
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1959563994}
-  m_LocalRotation: {x: 0, y: -0.9942448, z: -0, w: 0.107131824}
-  m_LocalPosition: {x: 0.2045595, y: -1.097, z: 0.47431013}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 131462857}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!102 &1959563996
-TextMesh:
-  serializedVersion: 3
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1959563994}
-  m_Text: 'Setting a revealers "Unobscured Radius" To a negative value
-
-    will
-    cut a hole in the revealer, like this security camera'
-  m_OffsetZ: 0
-  m_CharacterSize: 0.3
-  m_LineSpacing: 1
-  m_Anchor: 1
-  m_Alignment: 1
-  m_TabSize: 4
-  m_FontSize: 0
-  m_FontStyle: 0
-  m_RichText: 1
-  m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-  m_Color:
-    serializedVersion: 2
-    rgba: 4294967295
---- !u!23 &1959563997
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1959563994}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1960456172
 GameObject:
   m_ObjectHideFlags: 0
@@ -8338,6 +8353,106 @@ Transform:
   m_Father: {fileID: 1175907278}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2071029769
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2071029770}
+  - component: {fileID: 2071029772}
+  - component: {fileID: 2071029771}
+  m_Layer: 0
+  m_Name: New Text (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 4294967295
+  m_IsActive: 1
+--- !u!4 &2071029770
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071029769}
+  m_LocalRotation: {x: 0, y: -0.9942448, z: -0, w: 0.107131824}
+  m_LocalPosition: {x: 0.2045595, y: -1.097, z: 0.47431013}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1845010529}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!102 &2071029771
+TextMesh:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071029769}
+  m_Text: 'Setting a revealers "Unobscured Radius" To a negative value
+
+    will
+    cut a hole in the revealer, like this security camera'
+  m_OffsetZ: 0
+  m_CharacterSize: 0.3
+  m_LineSpacing: 1
+  m_Anchor: 1
+  m_Alignment: 1
+  m_TabSize: 4
+  m_FontSize: 0
+  m_FontStyle: 0
+  m_RichText: 1
+  m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Color:
+    serializedVersion: 2
+    rgba: 4294967295
+--- !u!23 &2071029772
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2071029769}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10100, guid: 0000000000000000e000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &2116306597
 GameObject:
   m_ObjectHideFlags: 0
@@ -8469,7 +8584,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1573883948171016993
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8485,6 +8600,7 @@ MonoBehaviour:
   DrawDebugStats: 1
   DrawSegments: 0
   DrawOutline: 0
+  DrawForward: 0
   DrawRayNoise: 0
 --- !u!114 &1573883948171016995
 MonoBehaviour:
@@ -8498,40 +8614,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ViewRadius: 3
-  SoftenDistance: 3
-  ViewAngle: 360
-  UnobscuredRadius: 1
-  Opacity: 1
-  AddCorners: 0
-  RevealHiderInFadeOutZonePercentage: 0.5
+  viewRadius: 3
+  softenDistance: 3
+  innerSoftenAngle: 5
+  unobscuredRadius: 1
+  unobscuredSoftenDistance: 0.25
+  visionHeight: 3
+  visionHeightSoftenDistance: 0
+  viewAngle: 360
+  opacity: 1
   EyeOffset: 0
   ShaderEyeOffset: 0
-  VisionHeight: 3
-  VisionHeightSoftenDistance: 0
-  SampleHidersAtRevealerHeight: 1
-  CalculateHidersAtHiderHeight: 0
+  StartRevealerAsStatic: 1
+  revealHiderInFadeOutZonePercentage: 0.5
+  MaxHidersSampledPerFrame: 50
+  SetHiderRayOriginToHidersHeight: 0
+  SetHiderRayDestinationToRevealersHeight: 1
+  useOcclusion: 1
+  addCorners: 0
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 1
-  StartRevealerAsStatic: 1
-  StaticRevealer: 0
-  MaxHidersSampledPerFrame: 50
-  QualityPreset: 5
-  RaycastResolution: 0.5
+  OcclusionQuality: 5
+  raycastResolution: 0.5
   NumExtraIterations: 3
-  NumExtraRaysOnIteration: 3
+  numExtraRaysOnIteration: 3
   ResolveEdge: 1
   MaxEdgeResolveIterations: 7
   MaxAcceptableEdgeAngleDifference: 0.005
-  EdgeDstThreshold: 0.1
-  DoubleHitMaxAngleDelta: 15
-  FogOfWarID: 0
-  IndexID: 0
-  NumberOfPoints: 0
-  Angles: []
-  Radii: []
-  AreHits: 
+  edgeDstThreshold: 0.1
+  doubleHitMaxAngleDelta: 15
   DebugMode: 0
   DrawInitialRays: 0
   SegmentTest: 0

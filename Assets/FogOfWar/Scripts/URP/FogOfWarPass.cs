@@ -46,18 +46,21 @@ namespace FOW
         #endregion
 
         #region COMPATIBILITY MODE
-
-#if !UNITY_6000_0_OR_NEWER
+#if !UNITY_6000_4_OR_NEWER
         private RenderTargetIdentifier source;
         private RenderTargetIdentifier destination;
         private static readonly int temporaryRTId = Shader.PropertyToID("_FowTempRT");
         private static readonly int kBlitTexturePropertyId = Shader.PropertyToID("_BlitTexture");
         private static readonly int kBlitScaleBiasPropertyId = Shader.PropertyToID("_BlitScaleBias");
 
+#if UNITY_6000_0_OR_NEWER
+        [Obsolete]
+#endif
         public override void OnCameraSetup(CommandBuffer cmd, ref RenderingData renderingData)
         {
             instance = this;
             RenderTextureDescriptor blitTargetDescriptor = renderingData.cameraData.cameraTargetDescriptor;
+            //blitTargetDescriptor.depthBufferBits = 0;
 
             var renderer = renderingData.cameraData.renderer;
 
@@ -71,23 +74,36 @@ namespace FOW
             destination = new RenderTargetIdentifier(temporaryRTId);
         }
 
+#if UNITY_6000_0_OR_NEWER
+        [Obsolete]
+#endif
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             if (FogOfWarWorld.instance == null || !FogOfWarWorld.instance.enabled || !EffectEnabled)
+            {
+                //Debug.Log("returning");
                 return;
+            }
             if (renderingData.cameraData.camera.GetUniversalAdditionalCameraData().renderType == CameraRenderType.Overlay)
                 return;
 
+            FogOfWarWorld.OnPreRenderFog();
+
             CommandBuffer cmd = CommandBufferPool.Get(m_ProfilerTag);
-            renderingData.cameraData.camera.depthTextureMode = DepthTextureMode.DepthNormals;
 
-            SetShaderProperties(renderingData.cameraData.camera);
+            if (FogOfWarWorld.instance.GetFowAppearance() != FogOfWarWorld.FogOfWarAppearance.None)
+            {
+                renderingData.cameraData.camera.depthTextureMode = DepthTextureMode.DepthNormals;
 
-            cmd.SetGlobalTexture(kBlitTexturePropertyId, source);
-            cmd.SetGlobalVector(kBlitScaleBiasPropertyId, new Vector4(1, 1, 0, 0));
+                SetShaderProperties(renderingData.cameraData.camera);
 
-            cmd.Blit(source, destination, FogOfWarWorld.instance.FogOfWarMaterial, 0);
-            cmd.Blit(destination, source);
+                cmd.SetGlobalTexture(kBlitTexturePropertyId, source);
+                // This uniform needs to be set for user materials with shaders relying on core Blit.hlsl to work as expected
+                cmd.SetGlobalVector(kBlitScaleBiasPropertyId, new Vector4(1, 1, 0, 0));
+
+                cmd.Blit(source, destination, FogOfWarWorld.instance.FogOfWarMaterial, 0);
+                cmd.Blit(destination, source);
+            }
 
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);
@@ -98,7 +114,9 @@ namespace FOW
             if (temporaryRTId != -1)
                 cmd.ReleaseTemporaryRT(temporaryRTId);
         }
-#endif
+
+#endif  //!UNITY_6000_4_OR_NEWER
+
         #endregion
 
         #region RENDER GRAPH
@@ -131,9 +149,14 @@ namespace FOW
             //Unless you set the render event to AfterRendering, where we only have the BackBuffer. 
             if (resourceData.isActiveTargetBackBuffer)
             {
-                Debug.LogError($"Skipping render pass. BlitAndSwapColorRendererFeature requires an intermediate ColorTexture, we can't use the BackBuffer as a texture input.");
+                Debug.LogError($"Skipping render pass. FogOfWarPass requires an intermediate ColorTexture, we can't use the BackBuffer as a texture input.");
                 return;
             }
+
+            FogOfWarWorld.OnPreRenderFog();
+
+            if (FogOfWarWorld.instance.GetFowAppearance() == FogOfWarWorld.FogOfWarAppearance.None)
+                return;
 
             // The destination texture is created here, 
             // the texture is created with the same dimensions as the active color texture
@@ -144,7 +167,6 @@ namespace FOW
             destinationDesc.clearBuffer = false;
 
             TextureHandle destination = renderGraph.CreateTexture(destinationDesc);
-
             SetShaderProperties(cameraData.camera);
 
             RenderGraphUtils.BlitMaterialParameters para = new(source, destination, FogOfWarWorld.instance.FogOfWarMaterial, 0);

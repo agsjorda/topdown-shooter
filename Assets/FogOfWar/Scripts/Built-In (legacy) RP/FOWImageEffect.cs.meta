@@ -13,6 +13,6 @@ AssetOrigin:
   serializedVersion: 1
   productId: 229484
   packageName: Pixel-Perfect Fog Of War
-  packageVersion: 2.9.0
-  assetPath: Assets/FogOfWar/Scripts/Built-In (legacy) RP/FOWImageEffect.cs
-  uploadId: 813194
+  packageVersion: 3.3.0
+  assetPath: Assets/FogOfWar/Scripts/Built-In (legacy) RP/FowImageEffect.cs
+  uploadId: 916978

@@ -22,10 +22,13 @@ namespace FOW
 #if UNITY_6000_0_OR_NEWER
             fowPass.SetupRenderGraph();
 #endif
-            if (EnableNormals)
-                fowPass.ConfigureInput(ScriptableRenderPassInput.Normal);
-            else
-                fowPass.ConfigureInput(ScriptableRenderPassInput.Depth);
+            bool is2D = renderer.GetType().Name == "Renderer2D";
+            if (!is2D)
+            {
+                fowPass.ConfigureInput(EnableNormals
+                    ? ScriptableRenderPassInput.Normal
+                    : ScriptableRenderPassInput.Depth);
+            }
             renderer.EnqueuePass(fowPass);
         }
     }

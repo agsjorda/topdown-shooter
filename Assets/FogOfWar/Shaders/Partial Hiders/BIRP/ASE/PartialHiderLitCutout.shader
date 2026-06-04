@@ -196,7 +196,7 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 
 			#include "UnityStandardUtils.cginc"
 			#define ASE_NEEDS_FRAG_WORLD_POSITION
-			#include "Assets/FogOfWar/Shaders/Resources/FogOfWarLogic.hlsl"
+			#include "Assets/FogOfWar/Shaders/FogOfWarLogic.hlsl"
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -266,10 +266,9 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 			uniform sampler2D _MainTex;
 			uniform float2 _UVScale;
 			uniform float2 _UVOffset;
+			uniform float _AlphaClipThreshold;
 			uniform sampler2D _BumpMap;
 			uniform float _BumpScale;
-			uniform float FowEffectStrength;
-			uniform float _AlphaClipThreshold;
 			uniform sampler2D _MetallicGlossMap;
 			uniform float _MetallicRemapMin;
 			uniform float _MetallicRemapMax;
@@ -478,20 +477,19 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 
 				float2 temp_output_161_0 = (IN.ase_texcoord9.xy*_UVScale + _UVOffset);
 				float4 tex2DNode141 = tex2D( _MainTex, temp_output_161_0 );
-				float3 tex2DNode145 = UnpackScaleNormal( tex2D( _BumpMap, temp_output_161_0 ), _BumpScale );
 				float localGetOpacity9_g1 = ( 0.0 );
 				float3 Position9_g1 = worldPos;
 				float FOWOut9_g1 = 0;
 				{
 				FOW_Sample_WS_float(Position9_g1, FOWOut9_g1);
 				}
-				float lerpResult147 = lerp( tex2DNode145.b , ( tex2DNode141.a * FOWOut9_g1 ) , FowEffectStrength);
-				clip( lerpResult147 - _AlphaClipThreshold);
+				float temp_output_149_0 = ( tex2DNode141.a * FOWOut9_g1 );
+				clip( temp_output_149_0 - _AlphaClipThreshold);
 				
 				float4 tex2DNode150 = tex2D( _MetallicGlossMap, temp_output_161_0 );
 				
 				o.Albedo = ( _Color * tex2DNode141 ).rgb;
-				o.Normal = tex2DNode145;
+				o.Normal = UnpackScaleNormal( tex2D( _BumpMap, temp_output_161_0 ), _BumpScale );
 				o.Emission = half3( 0, 0, 0 );
 				#if defined(_SPECULAR_SETUP)
 					o.Specular = fixed3( 0, 0, 0 );
@@ -500,7 +498,7 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 				#endif
 				o.Smoothness = (_SmoothnessRemapMin + (tex2DNode150.a - 0.0) * (_SmoothnessRemapMax - _SmoothnessRemapMin) / (1.0 - 0.0));
 				o.Occlusion = (_AORemapMin + (tex2D( _OcclusionMap, temp_output_161_0 ).g - 0.0) * (_AORemapMax - _AORemapMin) / (1.0 - 0.0));
-				o.Alpha = lerpResult147;
+				o.Alpha = temp_output_149_0;
 				float AlphaClipThreshold = _AlphaClipThreshold;
 				float AlphaClipThresholdShadow = 0.5;
 				float3 BakedGI = 0;
@@ -682,7 +680,7 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 
 			#include "UnityStandardUtils.cginc"
 			#define ASE_NEEDS_FRAG_WORLD_POSITION
-			#include "Assets/FogOfWar/Shaders/Resources/FogOfWarLogic.hlsl"
+			#include "Assets/FogOfWar/Shaders/FogOfWarLogic.hlsl"
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -745,10 +743,9 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 			uniform sampler2D _MainTex;
 			uniform float2 _UVScale;
 			uniform float2 _UVOffset;
+			uniform float _AlphaClipThreshold;
 			uniform sampler2D _BumpMap;
 			uniform float _BumpScale;
-			uniform float FowEffectStrength;
-			uniform float _AlphaClipThreshold;
 			uniform sampler2D _MetallicGlossMap;
 			uniform float _MetallicRemapMin;
 			uniform float _MetallicRemapMax;
@@ -938,20 +935,19 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 
 				float2 temp_output_161_0 = (IN.ase_texcoord9.xy*_UVScale + _UVOffset);
 				float4 tex2DNode141 = tex2D( _MainTex, temp_output_161_0 );
-				float3 tex2DNode145 = UnpackScaleNormal( tex2D( _BumpMap, temp_output_161_0 ), _BumpScale );
 				float localGetOpacity9_g1 = ( 0.0 );
 				float3 Position9_g1 = worldPos;
 				float FOWOut9_g1 = 0;
 				{
 				FOW_Sample_WS_float(Position9_g1, FOWOut9_g1);
 				}
-				float lerpResult147 = lerp( tex2DNode145.b , ( tex2DNode141.a * FOWOut9_g1 ) , FowEffectStrength);
-				clip( lerpResult147 - _AlphaClipThreshold);
+				float temp_output_149_0 = ( tex2DNode141.a * FOWOut9_g1 );
+				clip( temp_output_149_0 - _AlphaClipThreshold);
 				
 				float4 tex2DNode150 = tex2D( _MetallicGlossMap, temp_output_161_0 );
 				
 				o.Albedo = ( _Color * tex2DNode141 ).rgb;
-				o.Normal = tex2DNode145;
+				o.Normal = UnpackScaleNormal( tex2D( _BumpMap, temp_output_161_0 ), _BumpScale );
 				o.Emission = half3( 0, 0, 0 );
 				#if defined(_SPECULAR_SETUP)
 					o.Specular = fixed3( 0, 0, 0 );
@@ -960,7 +956,7 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 				#endif
 				o.Smoothness = (_SmoothnessRemapMin + (tex2DNode150.a - 0.0) * (_SmoothnessRemapMax - _SmoothnessRemapMin) / (1.0 - 0.0));
 				o.Occlusion = (_AORemapMin + (tex2D( _OcclusionMap, temp_output_161_0 ).g - 0.0) * (_AORemapMax - _AORemapMin) / (1.0 - 0.0));
-				o.Alpha = lerpResult147;
+				o.Alpha = temp_output_149_0;
 				float AlphaClipThreshold = _AlphaClipThreshold;
 				float3 Transmission = 1;
 				float3 Translucency = 1;
@@ -1094,7 +1090,7 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 
 			#include "UnityStandardUtils.cginc"
 			#define ASE_NEEDS_FRAG_WORLD_POSITION
-			#include "Assets/FogOfWar/Shaders/Resources/FogOfWarLogic.hlsl"
+			#include "Assets/FogOfWar/Shaders/FogOfWarLogic.hlsl"
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -1146,10 +1142,9 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 			uniform sampler2D _MainTex;
 			uniform float2 _UVScale;
 			uniform float2 _UVOffset;
+			uniform float _AlphaClipThreshold;
 			uniform sampler2D _BumpMap;
 			uniform float _BumpScale;
-			uniform float FowEffectStrength;
-			uniform float _AlphaClipThreshold;
 			uniform sampler2D _MetallicGlossMap;
 			uniform float _MetallicRemapMin;
 			uniform float _MetallicRemapMax;
@@ -1340,20 +1335,19 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 
 				float2 temp_output_161_0 = (IN.ase_texcoord8.xy*_UVScale + _UVOffset);
 				float4 tex2DNode141 = tex2D( _MainTex, temp_output_161_0 );
-				float3 tex2DNode145 = UnpackScaleNormal( tex2D( _BumpMap, temp_output_161_0 ), _BumpScale );
 				float localGetOpacity9_g1 = ( 0.0 );
 				float3 Position9_g1 = worldPos;
 				float FOWOut9_g1 = 0;
 				{
 				FOW_Sample_WS_float(Position9_g1, FOWOut9_g1);
 				}
-				float lerpResult147 = lerp( tex2DNode145.b , ( tex2DNode141.a * FOWOut9_g1 ) , FowEffectStrength);
-				clip( lerpResult147 - _AlphaClipThreshold);
+				float temp_output_149_0 = ( tex2DNode141.a * FOWOut9_g1 );
+				clip( temp_output_149_0 - _AlphaClipThreshold);
 				
 				float4 tex2DNode150 = tex2D( _MetallicGlossMap, temp_output_161_0 );
 				
 				o.Albedo = ( _Color * tex2DNode141 ).rgb;
-				o.Normal = tex2DNode145;
+				o.Normal = UnpackScaleNormal( tex2D( _BumpMap, temp_output_161_0 ), _BumpScale );
 				o.Emission = half3( 0, 0, 0 );
 				#if defined(_SPECULAR_SETUP)
 					o.Specular = fixed3( 0, 0, 0 );
@@ -1362,7 +1356,7 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 				#endif
 				o.Smoothness = (_SmoothnessRemapMin + (tex2DNode150.a - 0.0) * (_SmoothnessRemapMax - _SmoothnessRemapMin) / (1.0 - 0.0));
 				o.Occlusion = (_AORemapMin + (tex2D( _OcclusionMap, temp_output_161_0 ).g - 0.0) * (_AORemapMax - _AORemapMin) / (1.0 - 0.0));
-				o.Alpha = lerpResult147;
+				o.Alpha = temp_output_149_0;
 				float AlphaClipThreshold = _AlphaClipThreshold;
 				float3 BakedGI = 0;
 
@@ -1492,8 +1486,7 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 			#include "UnityPBSLighting.cginc"
 			#include "UnityMetaPass.cginc"
 
-			#include "UnityStandardUtils.cginc"
-			#include "Assets/FogOfWar/Shaders/Resources/FogOfWarLogic.hlsl"
+			#include "Assets/FogOfWar/Shaders/FogOfWarLogic.hlsl"
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -1532,9 +1525,6 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 			uniform sampler2D _MainTex;
 			uniform float2 _UVScale;
 			uniform float2 _UVOffset;
-			uniform sampler2D _BumpMap;
-			uniform float _BumpScale;
-			uniform float FowEffectStrength;
 			uniform float _AlphaClipThreshold;
 
 
@@ -1695,7 +1685,6 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 
 				float2 temp_output_161_0 = (IN.ase_texcoord3.xy*_UVScale + _UVOffset);
 				float4 tex2DNode141 = tex2D( _MainTex, temp_output_161_0 );
-				float3 tex2DNode145 = UnpackScaleNormal( tex2D( _BumpMap, temp_output_161_0 ), _BumpScale );
 				float localGetOpacity9_g1 = ( 0.0 );
 				float3 ase_worldPos = IN.ase_texcoord4.xyz;
 				float3 Position9_g1 = ase_worldPos;
@@ -1703,13 +1692,13 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 				{
 				FOW_Sample_WS_float(Position9_g1, FOWOut9_g1);
 				}
-				float lerpResult147 = lerp( tex2DNode145.b , ( tex2DNode141.a * FOWOut9_g1 ) , FowEffectStrength);
-				clip( lerpResult147 - _AlphaClipThreshold);
+				float temp_output_149_0 = ( tex2DNode141.a * FOWOut9_g1 );
+				clip( temp_output_149_0 - _AlphaClipThreshold);
 				
 				o.Albedo = ( _Color * tex2DNode141 ).rgb;
 				o.Normal = fixed3( 0, 0, 1 );
 				o.Emission = half3( 0, 0, 0 );
-				o.Alpha = lerpResult147;
+				o.Alpha = temp_output_149_0;
 				float AlphaClipThreshold = _AlphaClipThreshold;
 
 				#ifdef _ALPHATEST_ON
@@ -1776,8 +1765,7 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 			#include "Lighting.cginc"
 			#include "UnityPBSLighting.cginc"
 
-			#include "UnityStandardUtils.cginc"
-			#include "Assets/FogOfWar/Shaders/Resources/FogOfWarLogic.hlsl"
+			#include "Assets/FogOfWar/Shaders/FogOfWarLogic.hlsl"
 
 			struct appdata {
 				float4 vertex : POSITION;
@@ -1808,12 +1796,9 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 				float _TessEdgeLength;
 				float _TessMaxDisp;
 			#endif
-			uniform sampler2D _BumpMap;
+			uniform sampler2D _MainTex;
 			uniform float2 _UVScale;
 			uniform float2 _UVOffset;
-			uniform float _BumpScale;
-			uniform sampler2D _MainTex;
-			uniform float FowEffectStrength;
 			uniform float _AlphaClipThreshold;
 
 
@@ -1963,7 +1948,6 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 				#endif
 
 				float2 temp_output_161_0 = (IN.ase_texcoord2.xy*_UVScale + _UVOffset);
-				float3 tex2DNode145 = UnpackScaleNormal( tex2D( _BumpMap, temp_output_161_0 ), _BumpScale );
 				float4 tex2DNode141 = tex2D( _MainTex, temp_output_161_0 );
 				float localGetOpacity9_g1 = ( 0.0 );
 				float3 ase_worldPos = IN.ase_texcoord3.xyz;
@@ -1972,11 +1956,11 @@ Shader "FOW/BIRP/ASE/Lit Cutout"
 				{
 				FOW_Sample_WS_float(Position9_g1, FOWOut9_g1);
 				}
-				float lerpResult147 = lerp( tex2DNode145.b , ( tex2DNode141.a * FOWOut9_g1 ) , FowEffectStrength);
+				float temp_output_149_0 = ( tex2DNode141.a * FOWOut9_g1 );
 				
 				o.Normal = fixed3( 0, 0, 1 );
 				o.Occlusion = 1;
-				o.Alpha = lerpResult147;
+				o.Alpha = temp_output_149_0;
 				float AlphaClipThreshold = _AlphaClipThreshold;
 				float AlphaClipThresholdShadow = 0.5;
 
@@ -2022,16 +2006,13 @@ Node;AmplifyShaderEditor.TexCoordVertexDataNode;162;-672,-112;Inherit;False;0;2;
 Node;AmplifyShaderEditor.Vector2Node;163;-652.5488,99.6131;Inherit;False;Property;_UVScale;UV Scale;1;0;Create;True;0;0;0;False;0;False;0,0;2,2;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
 Node;AmplifyShaderEditor.Vector2Node;164;-656,224;Inherit;False;Property;_UVOffset;UV Offset;2;0;Create;True;0;0;0;False;0;False;0,0;0,0;0;3;FLOAT2;0;FLOAT;1;FLOAT;2
 Node;AmplifyShaderEditor.ScaleAndOffsetNode;161;-334.4227,73.56;Inherit;False;3;0;FLOAT2;0,0;False;1;FLOAT2;1,0;False;2;FLOAT2;0,0;False;1;FLOAT2;0
-Node;AmplifyShaderEditor.RangedFloatNode;146;-128,-80;Inherit;False;Property;_BumpScale;Normal Scale;6;0;Create;False;0;0;0;False;0;False;1;1;0;8;0;1;FLOAT;0
 Node;AmplifyShaderEditor.SamplerNode;141;192,-352;Inherit;True;Property;_MainTex;Albedo;4;1;[NoScaleOffset];Create;False;0;0;0;False;0;False;-1;None;None;True;0;False;white;Auto;False;Object;-1;Auto;Texture2D;8;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;6;FLOAT;0;False;7;SAMPLERSTATE;;False;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
 Node;AmplifyShaderEditor.FunctionNode;167;272,1088;Inherit;False;PartialHiderSubFunction;-1;;1;811b19a86777df649ac0cd8605aacc29;0;0;1;FLOAT;0
-Node;AmplifyShaderEditor.SimpleMultiplyOpNode;149;752,1072;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.RangedFloatNode;146;-128,-80;Inherit;False;Property;_BumpScale;Normal Scale;6;0;Create;False;0;0;0;False;0;False;1;1;0;8;0;1;FLOAT;0
 Node;AmplifyShaderEditor.SamplerNode;145;208,-144;Inherit;True;Property;_BumpMap;Normal Map;5;1;[NoScaleOffset];Create;False;0;0;0;False;0;False;-1;None;None;True;0;False;bump;Auto;True;Object;-1;Auto;Texture2D;8;0;SAMPLER2D;;False;1;FLOAT2;0,0;False;2;FLOAT;0;False;3;FLOAT2;0,0;False;4;FLOAT2;0,0;False;5;FLOAT;1;False;6;FLOAT;0;False;7;SAMPLERSTATE;;False;6;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
-Node;AmplifyShaderEditor.RangedFloatNode;148;592,1184;Inherit;False;Global;FowEffectStrength;FowEffectStrength;4;0;Create;True;0;0;0;False;0;False;0;0;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.TFHCRemapNode;157;816,464;Inherit;False;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;0;False;4;FLOAT;1;False;1;FLOAT;0
 Node;AmplifyShaderEditor.TFHCRemapNode;158;816,288;Inherit;False;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;0;False;4;FLOAT;1;False;1;FLOAT;0
 Node;AmplifyShaderEditor.TFHCRemapNode;152;816,656;Inherit;False;5;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;1;False;3;FLOAT;0;False;4;FLOAT;1;False;1;FLOAT;0
-Node;AmplifyShaderEditor.LerpOp;147;944,1088;Inherit;False;3;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;155;512,560;Inherit;False;Property;_SmoothnessRemapMax;SmoothnessRemapMax;12;0;Create;True;0;0;0;False;0;False;0;1;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.SimpleMultiplyOpNode;142;544,-384;Inherit;False;2;2;0;COLOR;0,0,0,0;False;1;COLOR;0,0,0,0;False;1;COLOR;0
 Node;AmplifyShaderEditor.RangedFloatNode;160;512,336;Inherit;False;Property;_MetallicRemapMax;MetallicRemapMax;14;0;Create;True;0;0;0;False;0;False;0;1;0;1;0;1;FLOAT;0
@@ -2044,6 +2025,8 @@ Node;AmplifyShaderEditor.RangedFloatNode;156;512,480;Inherit;False;Property;_Smo
 Node;AmplifyShaderEditor.RangedFloatNode;159;512,256;Inherit;False;Property;_MetallicRemapMin;MetallicRemapMin;13;0;Create;True;0;0;0;False;0;False;0;0;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.RangedFloatNode;153;512,704;Inherit;False;Property;_AORemapMin;AORemapMin;9;0;Create;True;0;0;0;False;0;False;0;0;0;1;0;1;FLOAT;0
 Node;AmplifyShaderEditor.ColorNode;144;224,-592;Inherit;False;Property;_Color;Color;3;0;Create;True;0;0;0;False;0;False;1,1,1,1;0.2666666,1,0,1;True;True;0;6;COLOR;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4;FLOAT3;5
+Node;AmplifyShaderEditor.LerpOp;147;912,1104;Inherit;False;3;0;FLOAT;0;False;1;FLOAT;0;False;2;FLOAT;0;False;1;FLOAT;0
+Node;AmplifyShaderEditor.SimpleMultiplyOpNode;149;704,1072;Inherit;False;2;2;0;FLOAT;0;False;1;FLOAT;0;False;1;FLOAT;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;135;1056,288;Float;False;False;-1;2;ASEMaterialInspector;0;4;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;ExtraPrePass;0;0;ExtraPrePass;6;False;True;0;1;False;;0;False;;0;1;False;;0;False;;True;0;False;;0;False;;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;True;1;1;False;;0;False;;0;1;False;;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;True;True;0;False;;0;False;;True;1;LightMode=ForwardBase;False;False;0;;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;137;1056,288;Float;False;False;-1;2;ASEMaterialInspector;0;4;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;ForwardAdd;0;2;ForwardAdd;0;False;True;0;1;False;;0;False;;0;1;False;;0;False;;True;0;False;;0;False;;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;True;4;1;False;;1;False;;0;1;False;;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;2;False;;False;False;True;1;LightMode=ForwardAdd;False;False;0;;0;0;Standard;0;False;0
 Node;AmplifyShaderEditor.TemplateMultiPassMasterNode;138;1056,288;Float;False;False;-1;2;ASEMaterialInspector;0;4;New Amplify Shader;ed95fe726fd7b4644bb42f4d1ddd2bcd;True;Deferred;0;3;Deferred;0;False;True;0;1;False;;0;False;;0;1;False;;0;False;;True;0;False;;0;False;;False;False;False;False;False;False;False;False;False;True;0;False;;False;True;0;False;;False;True;True;True;True;True;0;False;;False;False;False;False;False;False;False;True;False;0;False;;255;False;;255;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;0;False;;False;True;1;False;;True;3;False;;False;True;3;RenderType=Opaque=RenderType;Queue=Geometry=Queue=0;DisableBatching=False=DisableBatching;True;2;False;0;False;False;False;False;False;False;False;False;False;False;False;False;True;0;False;;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;False;True;1;LightMode=Deferred;True;2;False;0;;0;0;Standard;0;False;0
@@ -2054,8 +2037,6 @@ WireConnection;161;0;162;0
 WireConnection;161;1;163;0
 WireConnection;161;2;164;0
 WireConnection;141;1;161;0
-WireConnection;149;0;141;4
-WireConnection;149;1;167;0
 WireConnection;145;1;161;0
 WireConnection;145;5;146;0
 WireConnection;157;0;150;4
@@ -2067,22 +2048,23 @@ WireConnection;158;4;160;0
 WireConnection;152;0;151;2
 WireConnection;152;3;153;0
 WireConnection;152;4;154;0
-WireConnection;147;0;145;3
-WireConnection;147;1;149;0
-WireConnection;147;2;148;0
 WireConnection;142;0;144;0
 WireConnection;142;1;141;0
 WireConnection;151;1;161;0
 WireConnection;150;1;161;0
 WireConnection;166;0;142;0
-WireConnection;166;1;147;0
+WireConnection;166;1;149;0
 WireConnection;166;2;165;0
+WireConnection;147;0;141;3
+WireConnection;147;1;149;0
+WireConnection;149;0;141;4
+WireConnection;149;1;167;0
 WireConnection;136;0;166;0
 WireConnection;136;1;145;0
 WireConnection;136;4;158;0
 WireConnection;136;5;157;0
 WireConnection;136;6;152;0
-WireConnection;136;7;147;0
+WireConnection;136;7;149;0
 WireConnection;136;8;165;0
 ASEEND*/
-//CHKSM=FC715C8DCFF38261012DB18EA7FBC809334DD021
+//CHKSM=153933F9C1D62B015E1E6CDC13150E7A2AFA62CB

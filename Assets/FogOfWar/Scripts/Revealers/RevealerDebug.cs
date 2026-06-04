@@ -1,6 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using Unity.Mathematics;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -13,6 +13,7 @@ namespace FOW
         public bool DrawDebugStats = true;
         public bool DrawSegments = false;
         public bool DrawOutline = false;
+        public bool DrawForward = false;
         [SerializeField] protected float DrawRayNoise = 0;
 
         private FogOfWarRevealer _revealer;
@@ -33,86 +34,104 @@ namespace FOW
 
             for (int i = 0; i < _revealer.NumberOfPoints; i++)
             {
-                DrawString(i.ToString(), GetSegmentEnd(i), Color.white);
                 if (DrawDebugStats)
                 {
-                    //Debug.Log(deg);
-                    //Debug.DrawRay(GetEyePosition(), (ViewPoints[i].point - GetEyePosition()) + UnityEngine.Random.insideUnitSphere * DrawRayNoise, Color.blue);
+                    float3 rayVec = GetSegmentEnd(i) - _revealer.GetEyePosition() + (float3)UnityEngine.Random.insideUnitSphere * DrawRayNoise;
                     if (DrawSegments)
-                        Debug.DrawRay(_revealer.GetEyePosition(), (GetSegmentEnd(i) - _revealer.GetEyePosition()) + UnityEngine.Random.insideUnitSphere * DrawRayNoise, Color.blue);
-                    //drawString(i.ToString(), ViewPoints[i].point, Color.white);
+                    {
+                        Debug.DrawRay(_revealer.GetEyePosition(), rayVec, Color.blue, Time.deltaTime);
+                        DrawString(i.ToString(), _revealer.GetEyePosition() + rayVec);
+                    }
 
                     if (i != 0 && DrawOutline)
                         Debug.DrawLine(GetSegmentEnd(i), GetSegmentEnd(i - 1), Color.yellow);
                     //Debug.DrawLine(ViewPoints[i].point, ViewPoints[i - 1].point, Color.yellow);
                 }
             }
+
+            if (DrawForward)
+                Debug.DrawLine(_revealer.GetEyePosition(), _revealer.GetEyePosition() + _revealer.ForwardVectorCached * 3, Color.magenta);
         }
 
-        static void DrawString(string text, Vector3 worldPos, Color? colour = null)
+        static readonly GUIStyle _labelStyle = new GUIStyle();
+        static void DrawString(string text, Vector3 worldPos)
         {
-            UnityEditor.Handles.BeginGUI();
-            if (colour.HasValue) GUI.color = colour.Value;
-            var view = UnityEditor.SceneView.currentDrawingSceneView;
-            if (!view)
-                return;
-            Vector3 screenPos = view.camera.WorldToScreenPoint(worldPos);
-            Vector2 size = GUI.skin.label.CalcSize(new GUIContent(text));
-            GUIStyle guiStyle = new GUIStyle(GUI.skin.label);
-            guiStyle.normal.textColor = Color.red;
-            GUI.Label(new Rect(screenPos.x - (size.x / 2), -screenPos.y + view.position.height + 4, size.x, size.y), text, guiStyle);
-            UnityEditor.Handles.EndGUI();
-
+            _labelStyle.normal.textColor = Color.red;
+            UnityEditor.Handles.Label(worldPos, text, _labelStyle);
         }
 
-        Vector3 GetSegmentEnd(int index)
+        float3 GetSegmentEnd(int index)
         {
-            return _revealer.GetEyePosition() + (_revealer.DirFromAngle(_revealer.ViewPoints[index].Angle, true) * (_revealer.ViewPoints[index].DidHit ? _revealer.ViewPoints[index].Radius : _revealer.GetRayDistance()));
+            //return _revealer.GetEyePosition() + (_revealer.DirFromAngle(_revealer.Directions[index]) * (_revealer.AreHits[index] ? _revealer.Radii[index] : _revealer.GetRayDistance()));
+            var proj = FogOfWarRevealer3D.Projection;
+            float2 dir2D = _revealer.OutputDirections[index];
+            float3 dir3D = default;
+            dir3D[proj.Axis0] = dir2D.x;
+            dir3D[proj.Axis1] = dir2D.y;
+            float dist = math.min(_revealer.OutputDistances[index], _revealer.TotalRevealerRadius);
+            return _revealer.GetEyePosition() + dir3D * dist;
         }
 #endif
     }
 
-//#if UNITY_EDITOR
-//    [CustomEditor(typeof(RevealerDebug))]
-//    public class RevealerDebugEditor : Editor
-//    {
-//        FogOfWarRevealer Revealer;
-//        public override void OnInspectorGUI()
-//        {
-//            DrawDefaultInspector();
-//            RevealerDebug stat = (RevealerDebug)target;
+#if UNITY_EDITOR
+    [CustomEditor(typeof(RevealerDebug))]
+    public class RevealerDebugEditor : Editor
+    {
+        RaycastRevealer Revealer;
+        public override void OnInspectorGUI()
+        {
+            RevealerDebug stat = (RevealerDebug)target;
+            DrawDefaultInspector();
+            
 
-//            //FogOfWarRevealer rev = stat.GetRevealerComponent();
+            //FogOfWarRevealer rev = stat.GetRevealerComponent();
 
-//            if (Revealer == null)
-//            {
-//                if (!stat.TryGetComponent<FogOfWarRevealer>(out Revealer))
-//                {
-//                    EditorGUILayout.LabelField($"Revealer component not found.");
-//                    return;
-//                }
-//            }
+            if (Revealer == null)
+            {
+                if (!stat.TryGetComponent<RaycastRevealer>(out Revealer))
+                {
+                    EditorGUILayout.LabelField($"Revealer component not found.");
+                    return;
+                }
+            }
 
-//            if (!stat.DrawDebugStats)
-//                return;
 
-//            EditorGUILayout.LabelField(" ");
-//            EditorGUILayout.LabelField($"NUM SEGMENTS: {Revealer.NumberOfPoints}");
-//            for (int i = 0; i < Revealer.NumberOfPoints; i++)
-//            {
-//                EditorGUILayout.LabelField($"------------- Segment {i} -------------");
-//                EditorGUILayout.LabelField($"Angle: {Revealer.Angles[i]}");
-//                EditorGUILayout.LabelField($"Radius: {Revealer.Radii[i]}");
-//                EditorGUILayout.LabelField($"Did Hit?: {Revealer.AreHits[i]}");
-//            }
-//            if (Application.isPlaying)
-//            {
-//                if (GUILayout.Button("Debug Toggle Static"))
-//                {
-//                    Revealer.SetRevealerAsStatic(!Revealer.StaticRevealer);
-//                }
-//            }
-//        }
-//    }
-//#endif
+            EditorGUILayout.LabelField(" ");
+
+            EditorGUILayout.LabelField($"Revealer array position id (can change): {Revealer.RevealerArrayPosition}");
+            EditorGUILayout.LabelField($"GPU data position id (cant change): {Revealer.RevealerGPUDataPosition}");
+
+            if (!stat.DrawDebugStats)
+                return;
+
+            EditorGUILayout.LabelField(" ");
+            if (stat.DrawSegments)
+            {
+                EditorGUILayout.LabelField($"NUM SEGMENTS: {Revealer.NumberOfPoints}");
+                for (int i = 0; i < Revealer.NumberOfPoints; i++)
+                {
+                    EditorGUILayout.LabelField($"------------- Segment {i} -------------");
+                    EditorGUILayout.LabelField($"Angle: {Revealer.ViewPoints[i].Angle}");
+                    EditorGUILayout.LabelField($"Direction: {Revealer.OutputDirections[i]}");
+                    EditorGUILayout.LabelField($"Radius: {Revealer.OutputDistances[i]}");
+                    EditorGUILayout.LabelField($"Did Hit?: {Revealer.OutputDistances[i] <= Revealer.TotalRevealerRadius}");
+                }
+            }
+
+            EditorGUILayout.LabelField($"HASH BUCKETS:");
+            for (int i = 0; i < Revealer.SpatialHashBuckets.Count; i++)
+            {
+                EditorGUILayout.LabelField(Revealer.SpatialHashBuckets[i].ToString());
+            }
+            if (Application.isPlaying)
+            {
+                if (GUILayout.Button("Debug Toggle Static"))
+                {
+                    Revealer.SetRevealerAsStatic(!Revealer.CurrentlyStaticRevealer);
+                }
+            }
+        }
+    }
+#endif
 }

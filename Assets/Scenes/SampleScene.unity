@@ -828,7 +828,6 @@ GameObject:
   m_Component:
   - component: {fileID: 212930629}
   - component: {fileID: 212930630}
-  - component: {fileID: 212930631}
   m_Layer: 0
   m_Name: Fog Of War
   m_TagString: Untagged
@@ -862,31 +861,19 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5b1afdc8801548c4cab37872782c6e11, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarWorld
-  UpdateMethod: 1
-  UsingSoftening: 0
+  m_EditorClassIdentifier: Pixel-PerfectFogOfWar::FOW.FogOfWarWorld
   FogType: 1
   FogFade: 4
-  BlendType: 0
-  EdgeSoftenDistance: 0.1
-  UnobscuredSoftenDistance: 1
-  UseInnerSoften: 1
-  InnerSoftenAngle: 15
-  AllowBleeding: 0
-  SightExtraAmount: 0.01
-  MaxFogDistance: 10000
-  PixelateFog: 0
-  WorldSpacePixelate: 0
-  PixelDensity: 2
-  RoundRevealerPosition: 0
-  PixelGridOffset: {x: 0, y: 0}
+  FogFadePower: 1
+  BlendType: 1
   UseDithering: 0
   DitherSize: 20
-  InvertFowEffect: 0
-  FogFadePower: 1
+  SightExtraAmount: 0.01
+  EdgeSoftenDistance: 0.1
+  MaxFogDistance: 10000
   FogAppearance: 0
-  UnknownColor: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
-  SaturationStrength: 0.344
+  UnknownColor: {r: 0.35, g: 0.35, b: 0.35, a: 1}
+  SaturationStrength: 0
   BlurStrength: 1
   BlurDistanceScreenPercentMin: 0.1
   BlurDistanceScreenPercentMax: 1
@@ -896,53 +883,51 @@ MonoBehaviour:
   FogTextureTiling: {x: 1, y: 1}
   FogScrollSpeed: {x: 1, y: 1}
   OutlineThickness: 0.1
+  PixelateFog: 0
+  WorldSpacePixelate: 0
+  PixelDensity: 2
+  RoundRevealerPosition: 0
+  PixelGridOffset: {x: 0, y: 0}
+  UseWorldBounds: 0
+  WorldBoundsSoftenDistance: 2.95
+  WorldBoundsInfluence: 1
+  InvertFowEffect: 0
+  AllowBleeding: 0
   FOWSamplingMode: 0
-  UseRegrow: 0
-  RevealerFadeIn: 0
-  FogRegrowSpeed: 0.5
-  InitialFogExplorationValue: 0
-  MaxFogRegrowAmount: 0.3
-  FowTextureMaterial: {fileID: 0}
-  FowResX: 256
-  FowResY: 256
+  HidersUseFogTexture: 1
+  HiderSeenThreshold: 0.5
+  AsyncReadbackFogDataToCpu: 0
   UseConstantBlur: 1
   ConstantTextureBlurQuality: 2
   ConstantTextureBlurAmount: 0.75
-  UseWorldBounds: 0
-  WorldBoundsSoftenDistance: 1
-  WorldBoundsInfluence: 1
-  WorldBounds:
-    m_Center: {x: 4.1, y: 0, z: 0}
-    m_Extent: {x: 26.2, y: 0.5, z: 17.9}
   UseMiniMap: 0
-  MiniMapColor: {r: 0, g: 0, b: 0, a: 1}
-  UIImage: {fileID: 1544110766}
-  RevealerUpdateMode: 0
-  MaxNumRevealersPerFrame: 3
+  FowResX: 512
+  FowResY: 512
+  UseRegrow: 0
+  RevealerFadeIn: 0
+  RevealerFadeInSpeed: 0.5
+  RevealerFadeOut: 0
+  RevealerFadeOutSpeed: 0.5
+  InitialFogExplorationValue: 0
+  MaxFogRegrowAmount: 0.3
+  WorldBounds:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0.5, y: 0.5, z: 0.5}
+  UpdateMethod: 1
+  RevealerUpdateMode: 1
+  MaxNumRevealersPerFrame: 25
+  UseStagedGPUUploads: 1
+  ScatterRevealersShader: {fileID: 7200000, guid: e219da27121706f4cb325510f3d915c2, type: 3}
+  UseSpatialAcceleration: 1
+  SpatialHashGridSize: 32
+  NumSpatialHashBuckets: 1024
   MaxPossibleRevealers: 256
   MaxPossibleSegmentsPerRevealer: 128
+  MaxPossibleHiders: 512
   is2D: 0
-  gamePlane: 0
+  GamePlaneOrientation: 0
   FogOfWarMaterial: {fileID: 0}
---- !u!114 &212930631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 212930627}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8fbdec31f77110e46b1853d9705c9d79, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FOW.MiniMapFrustum
-  MapCollider: {fileID: 2096561751}
-  RayDistance: 100
-  ResolutionX: 256
-  ResolutionY: 256
-  RawImageComponent: {fileID: 697761289}
-  LineColor: {r: 1, g: 1, b: 1, a: 1}
-  LineWidth: 0.05
+  FowTextureMaterial: {fileID: 0}
 --- !u!1 &222215369
 GameObject:
   m_ObjectHideFlags: 0
@@ -2265,7 +2250,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 410087039}
   m_Enabled: 1
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 2
@@ -2317,7 +2302,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -4594,6 +4579,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
@@ -10557,41 +10543,37 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarRevealer3D
-  ViewRadius: 8
-  SoftenDistance: 6
-  ViewAngle: 82
-  UnobscuredRadius: 1.5
-  Opacity: 1
-  AddCorners: 1
-  RevealHiderInFadeOutZonePercentage: 0.5
+  m_EditorClassIdentifier: Pixel-PerfectFogOfWar::FOW.FogOfWarRevealer3D
+  viewRadius: 15
+  softenDistance: 3
+  innerSoftenAngle: 5
+  unobscuredRadius: 1
+  unobscuredSoftenDistance: 0.25
+  visionHeight: 3
+  visionHeightSoftenDistance: 1.5
+  viewAngle: 70
+  opacity: 0.65
   EyeOffset: 0
   ShaderEyeOffset: 0
-  VisionHeight: 3
-  VisionHeightSoftenDistance: 1.5
-  SampleHidersAtRevealerHeight: 1
-  CalculateHidersAtHiderHeight: 0
+  StartRevealerAsStatic: 0
+  revealHiderInFadeOutZonePercentage: 0.5
+  MaxHidersSampledPerFrame: 50
+  SetHiderRayOriginToHidersHeight: 0
+  SetHiderRayDestinationToRevealersHeight: 1
+  useOcclusion: 1
+  addCorners: 1
   ObstacleMask:
     serializedVersion: 2
     m_Bits: 128
-  StartRevealerAsStatic: 0
-  StaticRevealer: 0
-  MaxHidersSampledPerFrame: 50
-  QualityPreset: 1
-  RaycastResolution: 1
-  NumExtraIterations: 0
-  NumExtraRaysOnIteration: 1
-  ResolveEdge: 0
-  MaxEdgeResolveIterations: 1
+  OcclusionQuality: 5
+  raycastResolution: 0.5
+  NumExtraIterations: 4
+  numExtraRaysOnIteration: 3
+  ResolveEdge: 1
+  MaxEdgeResolveIterations: 10
   MaxAcceptableEdgeAngleDifference: 0.005
-  EdgeDstThreshold: 0.5
-  DoubleHitMaxAngleDelta: 15
-  FogOfWarID: 0
-  IndexID: 0
-  NumberOfPoints: 0
-  Angles: []
-  Radii: []
-  AreHits: 
+  edgeDstThreshold: 0.1
+  doubleHitMaxAngleDelta: 15
   DebugMode: 0
   DrawInitialRays: 0
   SegmentTest: -1
@@ -15541,7 +15523,7 @@ Light:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2119923226}
   m_Enabled: 0
-  serializedVersion: 12
+  serializedVersion: 13
   m_Type: 1
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 2
@@ -15593,7 +15575,7 @@ Light:
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ForceVisible: 0
-  m_ShadowRadius: 0
+  m_ShapeRadius: 0
   m_ShadowAngle: 0
   m_LightUnit: 1
   m_LuxAtDistance: 1
@@ -17502,10 +17484,6 @@ MonoBehaviour:
   - {fileID: 1399601529130252654}
   - {fileID: 3506116166546425709}
   PermanentlyReveal: 0
-  MaxDistBetweenSamplePoints: 0
-  NumObservers: 0
-  Observers: []
-  CachedTransform: {fileID: 0}
 --- !u!4 &995643390958662161
 Transform:
   m_ObjectHideFlags: 0
@@ -22883,7 +22861,6 @@ GameObject:
   - component: {fileID: 1399601529130252654}
   - component: {fileID: 4638885571250525213}
   - component: {fileID: 973399288116018202}
-  - component: {fileID: 5834432804887219432}
   - component: {fileID: 1158367929119267685}
   - component: {fileID: 5451770926681444219}
   - component: {fileID: 5834432804887219433}
@@ -26052,52 +26029,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &5834432804887219432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4120800165088626920}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c7fec6eb6f205fb4bb7717f4b9fa2a87, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FOW.CustomHideRenderers
-  ObjectsToHide:
-  - {fileID: 604011162590487603}
-  - {fileID: 5296222828219730971}
-  - {fileID: 2412163592533832400}
-  - {fileID: 6515478505578500143}
-  - {fileID: 2046942816790486759}
-  - {fileID: 5531259224651366208}
-  - {fileID: 9107353254730972358}
-  - {fileID: 4786852168997208656}
-  - {fileID: 8518840663075992094}
-  - {fileID: 1372678104792738159}
-  - {fileID: 5977056062703844079}
-  - {fileID: 1204233875766221183}
-  - {fileID: 1506221003481207110}
-  - {fileID: 7013243778302047105}
-  - {fileID: 4769357772318920965}
-  - {fileID: 3883114248840342977}
-  - {fileID: 3208779156885635091}
-  - {fileID: 5770403938837768486}
-  - {fileID: 3718006085018419019}
-  - {fileID: 6835461971069954124}
-  - {fileID: 5115260881720746589}
-  - {fileID: 6888772185169556084}
-  - {fileID: 3793357278377921708}
-  - {fileID: 3097291879723236523}
-  - {fileID: 2803385775755408030}
-  - {fileID: 2772240626614854387}
-  - {fileID: 2401704214611542699}
-  - {fileID: 249100936619512290}
-  - {fileID: 6991273772586231131}
-  - {fileID: 8338678711610919829}
-  autoCollectChildRenderers: 0
-  includeInactive: 1
-  includeSelfRenderer: 1
 --- !u!114 &5834432804887219433
 MonoBehaviour:
   m_ObjectHideFlags: 0

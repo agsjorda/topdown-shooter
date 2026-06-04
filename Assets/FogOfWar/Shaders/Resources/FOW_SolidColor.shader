@@ -8,12 +8,12 @@ Shader "Hidden/FullScreen/FOW/SolidColor"
         Pass
         {
             HLSLPROGRAM
-            #pragma multi_compile_local IS_2D IS_3D
+            #pragma multi_compile _ FOW_IS_2D
 
             #pragma vertex Vert
             #pragma fragment Frag
 
-            #include_with_pragmas "FogOfWarLogic.hlsl"
+            #include_with_pragmas "../FogOfWarLogic.hlsl"
             
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/Runtime/Utilities/Blit.hlsl"
@@ -23,29 +23,26 @@ Shader "Hidden/FullScreen/FOW/SolidColor"
             #if UNITY_VERSION <= 202310
             uniform float4 _BlitTexture_TexelSize;
             #endif
-
-            float _maxDistance;
-            float2 _fowTiling;
-            float _fowScrollSpeed;
-            float4 _unKnownColor;
-
-            float4x4 _camToWorldMatrix;
+            
             float4x4 _inverseProjectionMatrix;
+            float4x4 _camToWorldMatrix;
+
+            float4 _unKnownColor;
+            float _maxDistance;
 
             float4 Frag (Varyings i) : SV_Target
             {
-                //float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.uv);
                 float4 color = SAMPLE_TEXTURE2D_X_LOD(_BlitTexture, sampler_LinearRepeat, i.texcoord, _BlitMipLevel);
 
                 float2 pos;
                 float height;
-            #if IS_2D
+            #if FOW_IS_2D
                 
                 pos = (i.texcoord * float2(2,2) - float2(1,1)) * _cameraSize * float2(_BlitTexture_TexelSize.z / _BlitTexture_TexelSize.w, 1);
                 pos+= _cameraPosition;
                 FOW_Rotate_Degrees_float(pos, _cameraPosition, -_cameraRotation, pos);
                 height = 0;
-            #elif IS_3D
+            #else
                 float2 uv = i.texcoord;
 
             #if UNITY_REVERSED_Z
@@ -68,9 +65,9 @@ Shader "Hidden/FullScreen/FOW/SolidColor"
                 FOW_Sample_float(pos, height, coneCheckOut);
 
                 OutOfBoundsCheck(pos, color);
-
                 float3 fogColor = lerp(_unKnownColor.rgb, color.rgb * _unKnownColor.rgb, _unKnownColor.a);
-                return real4(lerp(fogColor, color.rgb, coneCheckOut), color.a);
+                return float4(lerp(fogColor, color.rgb, coneCheckOut), color.a);
+                //return float4(lerp(fogColor.rgb * _unKnownColor.rgb, color.rgb, coneCheckOut), color.a);
             }
             ENDHLSL
         }
