@@ -187,7 +187,7 @@ namespace FOW
 
         void EnsureComputeShaders()
         {
-            if (_fow.ScatterRevealersShader != null)
+            if (_fow == null || _fow.ScatterRevealersShader != null)
                 return;
 
             _fow.ScatterRevealersShader = FindComputeShaderByName("ScatterRevealers");

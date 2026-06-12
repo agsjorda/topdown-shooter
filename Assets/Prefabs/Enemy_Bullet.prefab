@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: 1249249042157010875}
   - component: {fileID: 541092796926393260}
   - component: {fileID: -6659112132282987357}
+  - component: {fileID: -6707870330509699424}
+  - component: {fileID: -9014545245365857762}
   m_Layer: 14
   m_Name: Enemy_Bullet
   m_TagString: Untagged
@@ -92,6 +94,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!65 &4480681223862233510
 BoxCollider:
@@ -143,7 +146,7 @@ Rigidbody:
   m_CollisionDetection: 2
 --- !u!96 &541092796926393260
 TrailRenderer:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -189,6 +192,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Time: 0.5
   m_PreviewTimeScale: 1
   m_Parameters:
@@ -256,7 +260,6 @@ TrailRenderer:
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.1
-  m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
@@ -273,3 +276,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Enemy_Bullet
   bulletImpactFX: {fileID: 8837954484471007722, guid: 78da16120c7c05f4fbe166e2dfa292d5, type: 3}
+--- !u!114 &-6707870330509699424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4119617429578941580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06c78af948052824d93c22c84c08dd65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pixel-PerfectFogOfWar::FOW.FogOfWarHider
+  SamplePoints:
+  - {fileID: 3124344338817136885}
+  PermanentlyReveal: 0
+--- !u!114 &-9014545245365857762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4119617429578941580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f44249f50e24e4fb14ab143fbf9a50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pixel-PerfectFogOfWar::FOW.CustomHider
+  ObjectsToHide:
+  - {fileID: 3755776503688253874}
+  - {fileID: 541092796926393260}

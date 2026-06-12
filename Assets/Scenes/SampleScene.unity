@@ -10540,10 +10540,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c8c92e8943a9914ba89720ba5fcf806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Pixel-PerfectFogOfWar::FOW.FogOfWarRevealer3D
-  viewRadius: 15
+  viewRadius: 10
   softenDistance: 3
   innerSoftenAngle: 5
-  unobscuredRadius: 1
+  unobscuredRadius: 0.7
   unobscuredSoftenDistance: 0.25
   visionHeight: 3
   visionHeightSoftenDistance: 1.5
@@ -17477,7 +17477,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FOW.FogOfWarHider
   SamplePoints:
-  - {fileID: 1399601529130252654}
+  - {fileID: 5019101749645649157}
+  - {fileID: 3506116166546425709}
   - {fileID: 3506116166546425709}
   PermanentlyReveal: 0
 --- !u!4 &995643390958662161
@@ -22857,6 +22858,7 @@ GameObject:
   - component: {fileID: 1399601529130252654}
   - component: {fileID: 4638885571250525213}
   - component: {fileID: 973399288116018202}
+  - component: {fileID: 5834432804887219434}
   - component: {fileID: 1158367929119267685}
   - component: {fileID: 5451770926681444219}
   - component: {fileID: 5834432804887219433}
@@ -26056,6 +26058,19 @@ MonoBehaviour:
   bulletSpeed: 20
   bulletsToShoot: 5
   weaponCooldownTime: 1.5
+--- !u!114 &5834432804887219434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4120800165088626920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f44249f50e24e4fb14ab143fbf9a50, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Pixel-PerfectFogOfWar::FOW.CustomHider
+  ObjectsToHide: []
 --- !u!4 &5837862240299548540
 Transform:
   m_ObjectHideFlags: 0
