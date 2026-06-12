@@ -122,13 +122,18 @@ public class PlayerWeaponController : MonoBehaviour
     #endregion
 
     #region Weapon Pickup/Drop
-    public void PickupWeapon(Weapon newWeapon)
+    /// <summary>
+    /// Takes a weapon into the player's possession (merge ammo, fill a slot, or overflow
+    /// to the inventory). Returns false when nothing could take it, so callers must
+    /// leave the pickup in the world.
+    /// </summary>
+    public bool PickupWeapon(Weapon newWeapon)
     {
         // Check for existing weapon of same type
         Weapon existingWeapon = FindWeaponByType(newWeapon.weaponType);
         if (existingWeapon != null) {
             existingWeapon.totalReserveAmmo += newWeapon.bulletsInMagazine;
-            return;
+            return true;
         }
 
         // Find empty slot
@@ -136,11 +141,11 @@ public class PlayerWeaponController : MonoBehaviour
         if (emptySlot != -1) {
             AddWeaponToSlot(newWeapon, emptySlot);
             player.weaponVisuals.UpdateBackupVisuals();
-            return;
+            return true;
         }
 
         // Send to inventory if slots full
-        SendToInventory(newWeapon);
+        return SendToInventory(newWeapon);
     }
 
     private int FindEmptySlot()
@@ -163,16 +168,17 @@ public class PlayerWeaponController : MonoBehaviour
 
     /// <summary>
     /// Attempts to add a weapon to the player's inventory when weapon slots are full.
+    /// Returns false when the inventory is missing or full.
     /// </summary>
-    private void SendToInventory(Weapon weapon)
+    private bool SendToInventory(Weapon weapon)
     {
         var inventory = InventoryService.GetPlayerInventory();
-        if (inventory != null && inventory.CanAddItem()) {
-            inventory.AddItem(new InventoryItem(weapon.weaponData));
+        if (inventory != null && inventory.AddItem(new InventoryItem(weapon.weaponData))) {
             Debug.Log($"Weapon {weapon.weaponData.itemName} added to inventory (weapon slots full)");
-        } else {
-            Debug.LogWarning($"Cannot add weapon to inventory - inventory is full or not found");
+            return true;
         }
+        Debug.LogWarning($"Cannot add weapon to inventory - inventory is full or not found");
+        return false;
     }
 
     public void DropCurrentWeapon()

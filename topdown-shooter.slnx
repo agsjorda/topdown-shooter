@@ -1,6 +1,8 @@
 ﻿<Solution>
+  <Project Path="InventorySystem.csproj" />
   <Project Path="Pixel-PerfectFogOfWar.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="InventorySystem.Demos.csproj" />
   <Project Path="UberWaterPlannerReflection.csproj" />
   <Project Path="Pixel-PerfectFogOfWarEditor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />

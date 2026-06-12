@@ -26,3 +26,6 @@ MonoBehaviour:
   currentDurability: 100
   armorModelPrefab: {fileID: 7919750326980988814, guid: 4b1c0b10232fc414ea953b15b52fc603, type: 3}
   armorTintColor: {r: 1, g: 1, b: 1, a: 1}
+  category: {fileID: 11400000, guid: d87369de9a48ece11db9756d50950323, type: 2}
+  compatibleSlots:
+  - {fileID: 11400000, guid: 8a514b833fc58d9c7a09449a541f38a4, type: 2}

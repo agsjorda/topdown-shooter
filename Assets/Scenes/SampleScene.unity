@@ -2695,6 +2695,7 @@ GameObject:
   - component: {fileID: 474115371}
   - component: {fileID: 474115374}
   - component: {fileID: 474115373}
+  - component: {fileID: 474115399}
   m_Layer: 5
   m_Name: GameUI
   m_TagString: Untagged
@@ -2754,6 +2755,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   mainDocument: {fileID: 474115368}
   hudPanelName: hud-panel
+  inventoryController: {fileID: 474115399}
   inventoryPanelName: inventory-panel
   testHealth: 1
   characterPreviewCamera: {fileID: 1932459818}
@@ -2779,31 +2781,25 @@ MonoBehaviour:
   scrollHeightPx: 0
   verticalVisibility: 2
   tabs:
-  - id: all
-    label: 
-    iconTexture: {fileID: 2800000, guid: 3a5042b43d5788d4892ff4ae84bcc0a3, type: 3}
-    iconTint: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
-  - id: weapon
-    label: 
-    iconTexture: {fileID: 2800000, guid: 3fed58a9305314544922e12c854af2d0, type: 3}
-    iconTint: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
-  - id: armor
-    label: 
-    iconTexture: {fileID: 2800000, guid: 5f54be2900ebead41911aaa3560779c6, type: 3}
-    iconTint: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
-  - id: consumable
-    label: 
-    iconTexture: {fileID: 2800000, guid: 3c638adb5dfbbe64aa680b528ae4e2df, type: 3}
-    iconTint: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
-  - id: misc
-    label: 
-    iconTexture: {fileID: 2800000, guid: 3fc619f11d9b63342859641b1af9df96, type: 3}
-    iconTint: {r: 0.8018868, g: 0.8018868, b: 0.8018868, a: 1}
+  - {fileID: 11400000, guid: 901d7b61b9d472aad664f76f650f6718, type: 2}
+  - {fileID: 11400000, guid: dfa3f800c4cc6037a36561ad1fe4d6d4, type: 2}
+  - {fileID: 11400000, guid: d87369de9a48ece11db9756d50950323, type: 2}
+  - {fileID: 11400000, guid: 1bf83f137af9ad346839d156ad8854c5, type: 2}
+  - {fileID: 11400000, guid: fc3b2c6ee75fe4a2e12168afea5c0d4e, type: 2}
   activeTabIndex: 0
   tabWidthPx: 285
   tabHeightPx: 200
   tabIconWidthPx: 200
   tabIconHeightPx: 200
+  equipmentSlotBindings:
+  - elementName: equipSlotWeapon
+    slotType: {fileID: 11400000, guid: 9f77a15fb8e4046ddd4b5d8a1c9e5ec9, type: 2}
+  - elementName: equipSlotHeadgear
+    slotType: {fileID: 11400000, guid: 4ce574ea89062e6a281c69eb02bc7b3e, type: 2}
+  - elementName: equipSlotArmor
+    slotType: {fileID: 11400000, guid: 8a514b833fc58d9c7a09449a541f38a4, type: 2}
+  - elementName: equipSlotBoots
+    slotType: {fileID: 11400000, guid: 36b626a0877dfcf0a2438a0c01f16985, type: 2}
 --- !u!114 &474115373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32502,3 +32498,18 @@ SceneRoots:
   - {fileID: 616828294}
   - {fileID: 474115369}
   - {fileID: 1986915530}
+--- !u!114 &474115399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 474115367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6cb51a69f6525eb7e95bfc11b243e43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  document: {fileID: 474115368}
+  inventoryPanelName: inventory-panel
+  startHidden: 1

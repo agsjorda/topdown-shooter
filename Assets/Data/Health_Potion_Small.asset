@@ -19,3 +19,5 @@ MonoBehaviour:
   itemType: 2
   stackable: 1
   maxStack: 99
+  category: {fileID: 11400000, guid: 1bf83f137af9ad346839d156ad8854c5, type: 2}
+  compatibleSlots: []

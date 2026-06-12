@@ -1,0 +1,120 @@
+/* ============================================================
+   InventorySystem core styles — FUNCTIONAL state classes only.
+   These cover the classes the inventory code toggles at runtime
+   (drag states, drag ghost, stack-count label). The LOOK of slots,
+   equipment slots, and tabs is deliberately NOT defined here — the
+   host game styles those in its own stylesheet (see the demo's
+   InventoryPanel.uss for a working example).
+   ============================================================ */
+
+/* --- Slot grid behavior ---
+   The slots container must lay out as a wrapping row to form a grid.
+   Functional, not cosmetic: without it the slots stack in one column.
+   Games can still override (their sheets sit deeper than this one). --- */
+.inventory-slots-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+/* --- Drag & drop slot states --- */
+.inventorySlots--dragging {
+    opacity: 0.3;
+    border-left-color: rgba(248, 163, 46, 0.5);
+    border-right-color: rgba(248, 163, 46, 0.5);
+    border-top-color: rgba(248, 163, 46, 0.5);
+    border-bottom-color: rgba(248, 163, 46, 0.5);
+}
+
+.inventorySlots--empty-highlight {
+    border-left-color: rgba(0, 255, 100, 0.5);
+    border-right-color: rgba(0, 255, 100, 0.5);
+    border-top-color: rgba(0, 255, 100, 0.5);
+    border-bottom-color: rgba(0, 255, 100, 0.5);
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    background-color: rgba(0, 50, 0, 0.2);
+}
+
+.inventorySlots--drop-target {
+    border-left-color: rgb(0, 255, 100);
+    border-right-color: rgb(0, 255, 100);
+    border-top-color: rgb(0, 255, 100);
+    border-bottom-color: rgb(0, 255, 100);
+    border-top-width: 4px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
+    border-left-width: 4px;
+    background-color: rgba(0, 50, 0, 0.3);
+    scale: 1.05 1.05;
+}
+
+.inventorySlots--dragging,
+.inventorySlots--empty-highlight,
+.inventorySlots--drop-target {
+    transition-property: background-color, border-left-color, border-right-color, border-top-color, border-bottom-color, border-top-width, border-right-width, border-bottom-width, border-left-width, opacity, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-in-out;
+}
+
+/* --- Stack count label --- */
+.inventorySlots-qty {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    -unity-font-style: bold;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding-left: 3px;
+    padding-right: 3px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+/* --- Drag ghost --- */
+.drag-ghost {
+    position: absolute;
+    width: 128px;
+    height: 128px;
+    visibility: hidden;
+    opacity: 0;
+    border-left-color: rgba(248, 163, 46, 0.7);
+    border-right-color: rgba(248, 163, 46, 0.7);
+    border-top-color: rgba(248, 163, 46, 0.7);
+    border-bottom-color: rgba(248, 163, 46, 0.7);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    background-color: rgba(34, 34, 34, 0.8);
+    -unity-background-scale-mode: scale-to-fit;
+    transition-property: opacity, border-left-color, border-right-color, border-top-color, border-bottom-color, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+}
+
+.drag-ghost--visible {
+    visibility: visible;
+    opacity: 0.8;
+}
+
+.drag-ghost--over-empty {
+    border-left-color: rgba(0, 255, 100, 0.7);
+    border-right-color: rgba(0, 255, 100, 0.7);
+    border-top-color: rgba(0, 255, 100, 0.7);
+    border-bottom-color: rgba(0, 255, 100, 0.7);
+    scale: 1.1 1.1;
+}
+
+.drag-ghost--over-occupied {
+    border-left-color: rgba(255, 100, 100, 0.7);
+    border-right-color: rgba(255, 100, 100, 0.7);
+    border-top-color: rgba(255, 100, 100, 0.7);
+    border-bottom-color: rgba(255, 100, 100, 0.7);
+    scale: 1.05 1.05;
+}

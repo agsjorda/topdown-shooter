@@ -70,7 +70,7 @@ public class Pickup_Armor : Interactable
         if (armorData == null) return;
 
         // Update name for clarity
-        gameObject.name = $"Pickup_Armor - {armorData.armorType} - {armorData.itemName}";
+        gameObject.name = $"Pickup_Armor - {armorData.itemName}";
 
         // Update armor visual if prefab is set
         if (armorData.armorModelPrefab != null && armorVisual != null) {
@@ -123,15 +123,13 @@ public class Pickup_Armor : Interactable
             return;
         }
 
-        // Check if inventory can accept the item
-        if (!inventory.CanAddItem()) {
+        // Only consume the pickup when the add actually succeeded
+        if (!inventory.AddItem(armorItem)) {
             Debug.Log($"{name}: Inventory is full!");
             return;
         }
 
-        // Add armor to inventory
-        inventory.AddItem(armorItem);
-        Debug.Log($"Picked up armor: {armorData.itemName} ({armorData.armorType})");
+        Debug.Log($"Picked up armor: {armorData.itemName}");
         ReturnToPool();
     }
 
@@ -164,28 +162,15 @@ public class Pickup_Armor : Interactable
     {
         base.OnDrawGizmosSelected();
 
-        // Visual indicator for armor pickups with color coding by type
+        // Visual indicator for armor pickups
         if (armorData != null) {
-            switch (armorData.armorType) {
-                case ArmorType.Headgear:
-                    Gizmos.color = Color.green;
-                    break;
-                case ArmorType.Vest:
-                    Gizmos.color = Color.blue;
-                    break;
-                case ArmorType.Boots:
-                    Gizmos.color = new Color(1f, 0.5f, 0f); // Orange
-                    break;
-                default:
-                    Gizmos.color = Color.cyan;
-                    break;
-            }
+            Gizmos.color = Color.cyan;
             Gizmos.DrawIcon(transform.position + Vector3.up * 0.5f, "d_PreMatCube", true);
 
-            // Draw armor type label
+            // Draw armor label
 #if UNITY_EDITOR
             UnityEditor.Handles.Label(transform.position + Vector3.up * 0.75f,
-                $"{armorData.armorType}\n{armorData.itemName}");
+                armorData.itemName);
 #endif
         }
     }

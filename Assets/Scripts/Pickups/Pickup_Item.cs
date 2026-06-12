@@ -61,8 +61,8 @@ public class Pickup_Item : Interactable
 
         Debug.Log($"Attempting to add {inventoryItem.itemData.itemName} to inventory");
 
-        if (inventory.CanAddItem()) {
-            inventory.AddItem(inventoryItem);
+        // Only consume the pickup when the add actually succeeded
+        if (inventory.AddItem(inventoryItem)) {
             DestroyPickup();
         } else {
             Debug.LogWarning("Failed to add item - inventory is full");

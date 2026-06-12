@@ -118,8 +118,10 @@ public class Pickup_Weapon : Interactable
             return;
         }
 
-        weaponController.PickupWeapon(weapon);
-        ReturnToPool();
+        // Only consume the pickup when something actually took the weapon
+        // (ammo merge, free slot, or inventory overflow)
+        if (weaponController.PickupWeapon(weapon))
+            ReturnToPool();
     }
 
     private void ReturnToPool()

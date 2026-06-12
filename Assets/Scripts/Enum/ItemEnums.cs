@@ -1,23 +1,6 @@
-//Referenced in Item
-public enum ItemType
-{
-    Weapon,
-    Armor,
-    Consumable,
-    Material,
-    Quest,
-    Miscellaneous
-}
-
-public enum EquipmentSlotType { Weapon, Headgear, Vest, Boots };
-
-// Armor System Enums
-public enum ArmorType
-{
-    Headgear,  // Helmets, hats, masks
-    Vest,      // Body armor, vests, jackets  
-    Boots      // Footwear, shoes, greaves
-}
+// Game-specific enums. The old inventory enums (ItemType, EquipmentSlotType, ArmorType)
+// were replaced by ScriptableObject assets (ItemCategorySO / EquipmentSlotTypeSO) in the
+// InventorySystem module — author them via Create > Inventory System.
 
 //Pickup_Ammo
 public enum AmmoBoxType { smallBox, bigBox }

@@ -1,3 +1,4 @@
+using InventorySystem;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;

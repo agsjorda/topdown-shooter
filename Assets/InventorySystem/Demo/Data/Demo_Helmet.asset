@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df2aeb1601490334aa4128fe10707e93, type: 3}
+  m_Name: Demo_Helmet
+  m_EditorClassIdentifier: 
+  _itemId: e367fec37d65b557c7d6689deea9f493
+  itemName: Demo Helmet
+  icon: {fileID: 21300000, guid: aaf7eee46f4a14bf83f69c4a80a64be2, type: 3}
+  description: Demo gear item
+  category: {fileID: 11400000, guid: 6e4d3d26561d1201ff5bcb3128c6d160, type: 2}
+  compatibleSlots:
+  - {fileID: 11400000, guid: 6e8cc94c93ce1c6cf4c73363a142a909, type: 2}
+  stackable: 0
+  maxStack: 1

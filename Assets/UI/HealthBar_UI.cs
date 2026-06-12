@@ -1,3 +1,4 @@
+using InventorySystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 

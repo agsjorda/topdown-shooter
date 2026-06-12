@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/InventorySystem/Demo/UI/InventoryPanel.uss?fileID=7433441132597879392&amp;guid=99b317148ef8137279dc85e8afba5f8b&amp;type=3#InventoryPanel" />
+    <ui:VisualElement name="inventory-panel" class="demo-inventory-panel">
+        <ui:Label text="Inventory - press I to toggle, 1-3 to give items, walk over orbs to pick up, drag or double-click to equip" class="demo-title" />
+        <ui:VisualElement name="equipmentContainer" class="demo-equipment-row">
+            <InventorySystem.EquipmentSlotView name="equipSlotHand" class="demo-equip-slot" />
+            <InventorySystem.EquipmentSlotView name="equipSlotHead" class="demo-equip-slot" />
+        </ui:VisualElement>
+        <ui:VisualElement name="tabButtonsContainer" class="demo-tabs-row" />
+        <ui:VisualElement name="tabContentContainer" class="demo-content" />
+    </ui:VisualElement>
+</ui:UXML>
