@@ -24,7 +24,9 @@ Do not delete `Resources/InventorySystem/`. The slot grid loads `InventoryCore.u
 
 ## One-click setup
 
-*GameObject > Inventory System > Inventory UI* instantiates `Starter/InventoryUI.prefab` into the scene you right-clicked in (or the active scene). The prefab holds a `PanelRenderer` (starter UXML, USS and PanelSettings) plus `InventoryModel`, `EquipmentController`, `InventoryUIConfig`, `TabFilterManager`, `DragDropController` and `InventoryUIController`, all wired. The starter data lives in `Starter/Data/`: an "All" category and Weapon/Armor slot types.
+*GameObject > Inventory System > Inventory UI* instantiates `Starter/InventoryUI.prefab` into the scene you right-clicked in (or the active scene). The prefab holds a `PanelRenderer` (starter UXML, USS and PanelSettings) plus `InventoryModel`, `EquipmentController`, `InventoryUIConfig`, `TabFilterManager`, `DragDropController` and `InventoryUIController`, all wired.
+
+The default look is the top-down shooter's inventory, with its icons (`Starter/Icons/`) and Bangers font (`Starter/Fonts/`) copied in. The starter data lives in `Starter/Data/`: five categories (all, weapon, armor, consumable, misc) and four slot types (weapon, headgear, armor, boots). Sizes in `InventoryStarter.uss` are reference pixels for `InventoryStarterPanelSettings` (3840×2160, match height). The `playerPreview` element is an empty character area; give it a RenderTexture background to show a character camera.
 
 - The menu asks before adding a second Inventory UI to a scene that already has one.
 - When that scene already has an `InventoryModel` or `EquipmentController`, the menu removes the prefab's copy. `InventoryService` finds these by type, so a second copy would split the inventory.

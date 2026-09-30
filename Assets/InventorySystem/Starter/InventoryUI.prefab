@@ -139,25 +139,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: InventorySystem::InventorySystem.InventoryUIConfig
   targetPanel: {fileID: 4642838864540038303}
   panelElementName: inventory-panel
-  slotSize: 80
+  slotSize: 200
   slotCount: 24
-  cellMargin: 8
+  cellMargin: 4
   autoCreateScrollWrapper: 1
   scrollWidthPx: 0
   scrollHeightPx: 350
-  verticalVisibility: 0
+  verticalVisibility: 2
   tabs:
   - {fileID: 11400000, guid: 189f681158b901f4194016f74d617a06, type: 2}
+  - {fileID: 11400000, guid: bf9ed8ba91290a14caf5e94f767b3535, type: 2}
+  - {fileID: 11400000, guid: 0eeb076ce59265544bf6dc41b20eee57, type: 2}
+  - {fileID: 11400000, guid: beb71173d1db6a1478f765c8ee47a527, type: 2}
+  - {fileID: 11400000, guid: 07b7c915fd520b249b32e0bc9664a2cb, type: 2}
   activeTabIndex: 0
-  tabWidthPx: 0
-  tabHeightPx: 0
-  tabIconWidthPx: 0
-  tabIconHeightPx: 0
+  tabWidthPx: 285
+  tabHeightPx: 200
+  tabIconWidthPx: 200
+  tabIconHeightPx: 200
   equipmentSlotBindings:
   - elementName: equipSlotWeapon
     slotType: {fileID: 11400000, guid: 898aa51c00703764582cc1df28138f05, type: 2}
+  - elementName: equipSlotHeadgear
+    slotType: {fileID: 11400000, guid: de1be56c0fce65242af6882a6b129e70, type: 2}
   - elementName: equipSlotArmor
     slotType: {fileID: 11400000, guid: eb59f44b4c2dfc5458dcc58f0ae45895, type: 2}
+  - elementName: equipSlotBoots
+    slotType: {fileID: 11400000, guid: 0db08df97b4c82e45abd5dec90ab40f4, type: 2}
   equipmentController: {fileID: 3818988861744198062}
   theme: {fileID: 0}
   coreStyles: {fileID: 0}

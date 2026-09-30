@@ -1,12 +1,31 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="InventoryStarter.uss" />
     <ui:VisualElement name="inventory-panel" class="starter-inventory-panel">
-        <ui:Label text="Inventory" class="starter-title" />
-        <ui:VisualElement name="equipmentContainer" class="starter-equipment-row">
-            <InventorySystem.EquipmentSlotView name="equipSlotWeapon" class="starter-equip-slot" />
-            <InventorySystem.EquipmentSlotView name="equipSlotArmor" class="starter-equip-slot" />
+        <ui:VisualElement name="Header" class="starter-header">
+            <ui:Label text="Inventory" class="starter-title" />
         </ui:VisualElement>
-        <ui:VisualElement name="tabButtonsContainer" class="starter-tabs-row" />
-        <ui:VisualElement name="tabContentContainer" class="starter-content" />
+        <ui:VisualElement name="Content" class="starter-content">
+            <ui:VisualElement name="characterPreview-container" class="starter-character-area">
+                <ui:VisualElement name="playerPreview" class="starter-player-preview" />
+                <ui:VisualElement class="equipSlots equipSlots--weapon">
+                    <InventorySystem.EquipmentSlotView name="equipSlotWeapon" class="equipSlot-icon equipSlot-icon--weapon" />
+                </ui:VisualElement>
+                <ui:VisualElement class="equipSlots equipSlots--headgear">
+                    <InventorySystem.EquipmentSlotView name="equipSlotHeadgear" class="equipSlot-icon equipSlot-icon--headgear" />
+                </ui:VisualElement>
+                <ui:VisualElement class="equipSlots equipSlots--armor">
+                    <InventorySystem.EquipmentSlotView name="equipSlotArmor" class="equipSlot-icon equipSlot-icon--armor" />
+                </ui:VisualElement>
+                <ui:VisualElement class="equipSlots equipSlots--boots">
+                    <InventorySystem.EquipmentSlotView name="equipSlotBoots" class="equipSlot-icon equipSlot-icon--boots" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="inventory-container" class="starter-inventory-area">
+                <ui:VisualElement name="tabButtonsContainer" class="starter-tabs-row" />
+                <ui:VisualElement name="tabContentContainer" class="starter-grid-area" />
+                <ui:VisualElement class="starter-spacer" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="Footer" class="starter-footer" />
     </ui:VisualElement>
 </ui:UXML>

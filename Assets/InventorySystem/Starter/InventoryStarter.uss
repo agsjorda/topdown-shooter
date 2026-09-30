@@ -1,115 +1,385 @@
-/* Starter look for the InventoryUI prefab. Replace or restyle freely:
-   InventoryCore.uss owns the functional rules, this sheet only sets the look. */
+/* Default look for the InventoryUI prefab (the top-down shooter's inventory).
+   InventoryCore.uss owns the functional rules; this sheet only sets the look.
+   Sizes are in reference pixels for InventoryStarterPanelSettings (3840x2160, match height).
+   To restyle, point a prefab variant's PanelRenderer at your own UXML/USS. */
 
+/* ------------ Panel layout ------------- */
 .starter-inventory-panel {
+    flex-grow: 1;
     position: absolute;
+    width: 100%;
+    height: 100%;
     align-self: center;
-    width: 60%;
-    height: 85%;
-    margin-top: 40px;
-    background-color: rgba(20, 20, 24, 0.95);
-    border-top-left-radius: 12px;
-    border-top-right-radius: 12px;
-    border-bottom-right-radius: 12px;
-    border-bottom-left-radius: 12px;
-    padding-top: 10px;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 16px;
+    justify-content: flex-start;
+    background-color: rgba(34, 34, 34, 0);
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.starter-header {
+    flex-grow: 0;
+    height: 15%;
+    background-color: rgba(34, 34, 34, 0.7);
+    align-items: center;
+    justify-content: center;
 }
 
 .starter-title {
-    color: rgb(220, 220, 220);
-    font-size: 20px;
-    -unity-text-align: middle-center;
-    margin-bottom: 8px;
-}
-
-.starter-equipment-row {
-    flex-direction: row;
-    justify-content: center;
-    height: 110px;
-    margin-bottom: 8px;
-}
-
-.starter-equip-slot {
-    width: 96px;
-    height: 96px;
-    margin-left: 8px;
-    margin-right: 8px;
-}
-
-.starter-tabs-row {
-    flex-direction: row;
-    justify-content: center;
-    height: 56px;
-    margin-bottom: 8px;
+    -unity-font-definition: url("Fonts/Bangers.ttf");
+    color: rgb(255, 255, 255);
+    font-size: 120px;
 }
 
 .starter-content {
     flex-grow: 1;
-}
-
-.inventory-slots-container {
-    justify-content: flex-start;
+    flex-direction: row;
     align-items: flex-start;
-    padding: 8px;
-    background-color: rgba(0, 0, 0, 0.25);
+    justify-content: center;
+    background-color: rgba(0, 0, 0, 0.21);
 }
 
-.inventorySlots {
-    background-color: rgba(30, 30, 30, 0.85);
-    border-left-color: rgba(90, 90, 90, 0.8);
-    border-right-color: rgba(90, 90, 90, 0.8);
-    border-top-color: rgba(90, 90, 90, 0.8);
-    border-bottom-color: rgba(90, 90, 90, 0.8);
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
+.starter-footer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 10%;
+    background-color: rgba(34, 34, 34, 0.7);
 }
 
-.equipment-slot {
-    background-color: rgba(30, 30, 30, 0.85);
-    border-left-color: rgba(120, 120, 120, 0.8);
-    border-right-color: rgba(120, 120, 120, 0.8);
-    border-top-color: rgba(120, 120, 120, 0.8);
-    border-bottom-color: rgba(120, 120, 120, 0.8);
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-bottom-width: 1px;
-    border-left-width: 1px;
+.starter-character-area {
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 45%;
+    height: 100%;
 }
 
+/* Assign a RenderTexture (e.g. a character camera) as background-image to show the player here. */
+.starter-player-preview {
+    flex-grow: 0;
+    flex-shrink: 0;
+    width: 90%;
+    height: 90%;
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.starter-inventory-area {
+    flex-grow: 1;
+    flex-shrink: 1;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 55%;
+    height: 100%;
+}
+
+.starter-tabs-row {
+    flex-grow: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    height: 15%;
+    margin-top: 5%;
+}
+
+.starter-grid-area {
+    flex-grow: 0;
+    flex-shrink: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: center;
+    width: 80%;
+    height: 70%;
+    overflow: hidden;
+}
+
+.starter-spacer {
+    flex-grow: 1;
+    width: 100%;
+}
+
+/* ------------ Tabs ------------- */
 .inventoryTab {
-    min-width: 88px;
-    height: 40px;
-    margin-left: 4px;
-    margin-right: 4px;
-    background-color: rgba(30, 30, 30, 0.85);
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    border-bottom-right-radius: 4px;
-    border-bottom-left-radius: 4px;
+    background-color: rgba(0, 0, 0, 0);
+    border-bottom-width: 2px;
+    border-bottom-color: rgb(102, 102, 102);
+    width: 15%;
+    height: 80%;
+    justify-content: center;
+    align-items: center;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    padding-left: 20px;
+}
+
+.inventoryTab-icon {
+    width: 70%;
+    height: 70%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    -unity-background-image-tint-color: rgb(178, 178, 178);
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
 }
 
 .inventoryTab--active {
-    background-color: rgba(248, 163, 46, 0.25);
+    border-bottom-width: 4px;
+    border-bottom-color: rgb(248, 163, 46);
 }
 
-.equipment-slot-bg,
-.inventoryTab-bg,
-.inventoryTab-bg--active {
-    -unity-background-scale-mode: scale-to-fit;
+.inventoryTab--active .inventoryTab-icon {
+    -unity-background-image-tint-color: rgb(248, 163, 46);
+}
+
+.inventoryTab:hover {
+    background-color: rgba(34, 34, 34, 0.4);
+}
+
+.inventoryTab:hover .inventoryTab-icon {
+    scale: 1.05 1.05;
 }
 
 .inventoryTab-label {
-    flex-grow: 1;
     color: rgb(220, 220, 220);
-    font-size: 16px;
     -unity-text-align: middle-center;
+}
+
+/* ------------ Slot grid ------------- */
+.inventory-slots-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
+    border-top-width: 10px;
+    border-right-width: 10px;
+    border-bottom-width: 10px;
+    border-left-width: 10px;
+}
+
+.inventorySlots {
+    flex-shrink: 0;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-width: 5px;
+    border-right-width: 5px;
+    border-top-width: 5px;
+    border-bottom-width: 5px;
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    justify-content: center;
+    align-items: center;
+}
+
+.inventorySlots-icon {
+    padding: 15px;
+    flex-shrink: 0;
+    flex-grow: 1;
+}
+
+.inventorySlots:hover {
+    scale: 1.02 1.02;
+    border-left-color: rgb(248, 163, 46);
+    border-right-color: rgb(248, 163, 46);
+    border-top-color: rgb(248, 163, 46);
+    border-bottom-color: rgb(248, 163, 46);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    background-color: rgba(34, 34, 34, 0.7);
+}
+
+/* ------------ Drag & drop states ------------- */
+.inventorySlots--dragging {
+    opacity: 0.3;
+    border-left-color: rgba(248, 163, 46, 0.5);
+    border-right-color: rgba(248, 163, 46, 0.5);
+    border-top-color: rgba(248, 163, 46, 0.5);
+    border-bottom-color: rgba(248, 163, 46, 0.5);
+}
+
+.inventorySlots--empty-highlight {
+    border-left-color: rgba(0, 255, 100, 0.5);
+    border-right-color: rgba(0, 255, 100, 0.5);
+    border-top-color: rgba(0, 255, 100, 0.5);
+    border-bottom-color: rgba(0, 255, 100, 0.5);
+    border-top-width: 3px;
+    border-right-width: 3px;
+    border-bottom-width: 3px;
+    border-left-width: 3px;
+    background-color: rgba(0, 50, 0, 0.2);
+}
+
+.inventorySlots--drop-target {
+    border-left-color: rgb(0, 255, 100);
+    border-right-color: rgb(0, 255, 100);
+    border-top-color: rgb(0, 255, 100);
+    border-bottom-color: rgb(0, 255, 100);
+    border-top-width: 4px;
+    border-right-width: 4px;
+    border-bottom-width: 4px;
+    border-left-width: 4px;
+    background-color: rgba(0, 50, 0, 0.3);
+    scale: 1.05 1.05;
+}
+
+.inventorySlots,
+.inventorySlots--dragging,
+.inventorySlots--empty-highlight,
+.inventorySlots--drop-target {
+    transition-property: background-color, border-left-color, border-right-color, border-top-color, border-bottom-color,
+        border-top-width, border-right-width, border-bottom-width, border-left-width, opacity, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-in-out;
+}
+
+.drag-ghost {
+    width: 128px;
+    height: 128px;
+    border-left-color: rgba(248, 163, 46, 0.7);
+    border-right-color: rgba(248, 163, 46, 0.7);
+    border-top-color: rgba(248, 163, 46, 0.7);
+    border-bottom-color: rgba(248, 163, 46, 0.7);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    background-color: rgba(34, 34, 34, 0.8);
+    -unity-background-scale-mode: scale-to-fit;
+    transition-property: opacity, border-left-color, border-right-color, border-top-color, border-bottom-color, scale;
+    transition-duration: 0.15s;
+    transition-timing-function: ease-out;
+}
+
+.drag-ghost--visible {
+    opacity: 0.8;
+}
+
+.drag-ghost--over-empty {
+    border-left-color: rgba(0, 255, 100, 0.7);
+    border-right-color: rgba(0, 255, 100, 0.7);
+    border-top-color: rgba(0, 255, 100, 0.7);
+    border-bottom-color: rgba(0, 255, 100, 0.7);
+    scale: 1.1 1.1;
+}
+
+.drag-ghost--over-occupied {
+    border-left-color: rgba(255, 100, 100, 0.7);
+    border-right-color: rgba(255, 100, 100, 0.7);
+    border-top-color: rgba(255, 100, 100, 0.7);
+    border-bottom-color: rgba(255, 100, 100, 0.7);
+    scale: 1.05 1.05;
+}
+
+/* ------------ Equipment slots (diamonds around the character area) ------------- */
+.equipSlots {
+    flex-grow: 1;
+    position: absolute;
+    top: 224px;
+    left: 265px;
+    width: 200px;
+    height: 200px;
+    rotate: 45deg;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-left-color: rgba(236, 226, 226, 0.56);
+    border-right-color: rgba(236, 226, 226, 0.56);
+    border-top-color: rgba(236, 226, 226, 0.56);
+    border-bottom-color: rgba(236, 226, 226, 0.56);
+    border-top-width: 2px;
+    border-right-width: 2px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.equipSlots--headgear {
+    top: 224px;
+    left: 1200px;
+}
+
+.equipSlots--armor {
+    top: 812px;
+    left: 265px;
+}
+
+.equipSlots--boots {
+    top: 812px;
+    left: 1200px;
+}
+
+.equipSlots:hover {
+    scale: 1.05 1.05;
+    border-left-color: rgb(248, 163, 46);
+    border-right-color: rgb(248, 163, 46);
+    border-top-color: rgb(248, 163, 46);
+    border-bottom-color: rgb(248, 163, 46);
+    background-color: rgba(34, 34, 34, 0.7);
+}
+
+/* The EquipmentSlotView itself: counter-rotated placeholder icon for its slot type */
+.equipSlot-icon {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    rotate: -45deg;
+    -unity-background-image-tint-color: rgb(178, 178, 178);
+    -unity-background-scale-mode: scale-to-fit;
+    scale: 0.8 0.8;
+    transition-property: scale;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
+.equipSlot-icon--weapon {
+    background-image: url("Icons/pistol-gun.png");
+}
+
+.equipSlot-icon--headgear {
+    background-image: url("Icons/spartan-helmet.png");
+}
+
+.equipSlot-icon--armor {
+    background-image: url("Icons/lamellar.png");
+}
+
+.equipSlot-icon--boots {
+    background-image: url("Icons/boots.png");
+}
+
+.equipSlot-icon:hover {
+    scale: 0.9 0.9;
+}
+
+.equipment-slot.inventorySlots--drop-target {
+    background-color: rgba(0, 50, 0, 0.3);
+    scale: 1.05 1.05;
+}
+
+.equipment-slot-bg {
+    -unity-background-scale-mode: scale-to-fit;
 }

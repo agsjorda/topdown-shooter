@@ -36,8 +36,10 @@ Assets/InventorySystem/
 │   └── Extras/      ItemPickup (optional, namespace InventorySystem.Extras)
 ├── Resources/InventorySystem/   InventoryContainer.uxml+.uss, InventoryCore.uss  (Resources.Load path is a contract)
 ├── Editor/          InventorySystem.Editor.asmdef, InventorySystemMenu (one-click setup menu)
-├── Starter/         InventoryUI.prefab (PanelRenderer + all 6 components wired), InventoryStarter.uxml/.uss,
-│                    InventoryStarterTheme.tss, InventoryStarterPanelSettings.asset, Data/ (All category, Weapon/Armor slot types)
+├── Starter/         InventoryUI.prefab (PanelRenderer + all 6 components wired). Default look = the shooter's inventory
+│                    (InventoryStarter.uxml/.uss mirror the inventory part of Assets/UI/GameUi.uxml + GameUI.uss; keep them in sync
+│                    when the game's inventory look changes). Icons/ + Fonts/ (copies with own GUIDs), InventoryStarterTheme.tss,
+│                    InventoryStarterPanelSettings.asset (3840x2160, match height), Data/ (5 categories, 4 slot types)
 ├── Demo/            InventoryDemo.unity, Data/*.asset, UI/InventoryPanel.uxml+.uss, Scripts/Demo*.cs
 └── Documentation/QuickStart.md   (CURRENT, authoritative usage doc)
 ```

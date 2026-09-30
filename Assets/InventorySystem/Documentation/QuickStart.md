@@ -23,10 +23,23 @@ Open `InventorySystem/Demo/InventoryDemo.unity` and press Play:
 
 ### Fastest start: the ready-made prefab
 
-*GameObject > Inventory System > Inventory UI* adds `Starter/InventoryUI.prefab` to the scene. It carries a `PanelRenderer` with a starter panel (weapon + armor equipment slots, an "All" tab, a 24-slot grid) and all six components already wired. Press Play and call `InventoryUIController.Toggle()` from your input.
+*GameObject > Inventory System > Inventory UI* adds `Starter/InventoryUI.prefab` to the scene. Its default look is the top-down shooter's inventory: a Bangers "Inventory" header, a character area with four diamond equipment slots (weapon, headgear, armor, boots), five icon tabs (all, weapon, armor, consumable, misc) and a 24-slot grid. All six components are already wired. Press Play and call `InventoryUIController.Toggle()` from your input.
 
+- Everything the look needs ships inside `Starter/` (icons, font, stylesheet, Panel Settings at 3840×2160 matching height), so it works in a fresh project.
+- The character area (`playerPreview`) is empty by default. Assign a RenderTexture from a character camera as its background image to show the player there.
 - If the scene already has an `InventoryModel` or `EquipmentController` (for example on another object), the menu removes the prefab's copy so the scene keeps one inventory.
-- To make it yours, create your own category, slot-type and item assets (below), then swap them into `InventoryUIConfig` (`tabs`, `equipmentSlotBindings`) and edit or replace `Starter/InventoryStarter.uxml` / `.uss`. Prefer a prefab variant so updates to the module don't overwrite your changes.
+- Your items use the starter categories and slot types (`Starter/Data/`), or your own assets swapped into `InventoryUIConfig` (`tabs`, `equipmentSlotBindings`).
+
+#### Changing the look later
+
+Make a prefab variant of `InventoryUI` (right-click the prefab > *Create > Prefab Variant*) and change it there, so module updates never overwrite your changes:
+
+- **Recolor or resize:** copy `InventoryStarter.uss`, edit it, and reference your copy from a copied UXML.
+- **New layout:** point the variant's `PanelRenderer` at your own UXML. Keep the element names (`inventory-panel`, `tabButtonsContainer`, `tabContentContainer`, and one `EquipmentSlotView` per entry in `equipmentSlotBindings`).
+- **Sprites without USS:** assign an Inventory Theme asset to `InventoryUIConfig.theme`.
+- **Sizes set in code:** `slotSize`, `cellMargin`, `tabWidthPx`/`tabHeightPx` and `tabIconWidthPx`/`tabIconHeightPx` on `InventoryUIConfig`.
+
+The icons are copies of the shooter's (they look like [game-icons.net](https://game-icons.net) art, CC BY 3.0, so keep attribution if you ship them). Bangers is under the SIL Open Font License (`Starter/Fonts/Bangers - OFL.txt`).
 
 The steps below build the same thing by hand.
 
