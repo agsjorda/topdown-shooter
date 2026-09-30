@@ -46,18 +46,33 @@ public class Pickup_Ammo : Interactable
 
     public override void Interaction()
     {
-        PlayerWeaponController weaponController = Object.FindAnyObjectByType<PlayerWeaponController>();
-        if (weaponController == null)
+        // Player_Preview carries a disabled PlayerWeaponController; use the live one
+        PlayerWeaponController weaponController = null;
+        foreach (var candidate in Object.FindObjectsByType<PlayerWeaponController>()) {
+            if (candidate.isActiveAndEnabled) {
+                weaponController = candidate;
+                break;
+            }
+        }
+        if (weaponController == null) {
+            Debug.LogWarning($"{name}: No enabled PlayerWeaponController found");
             return;
+        }
 
         List<AmmoData> currentAmmoList = ammoBoxType == AmmoBoxType.bigBox ? bigBoxAmmo : smallBoxAmmo;
 
-        foreach (var ammo in currentAmmoList) {
-            Weapon weapon = weaponController.WeaponInSlots(ammo.weaponType);
-            AddBulletsToWeapon(weapon, GetBulletAmount(ammo));
+        // Ammo goes to the shared reserve even for weapons not carried yet
+        int added = 0;
+        foreach (var entry in currentAmmoList) {
+            added += weaponController.Ammo.Add(entry.weaponType, GetBulletAmount(entry));
         }
 
-        // Return to pool or destroy
+        // Every matching pool is full; leave the box for later
+        if (added == 0 && currentAmmoList.Count > 0) {
+            Debug.Log($"{name}: Ammo reserve full");
+            return;
+        }
+
         if (ObjectPool.instance != null)
             ObjectPool.instance.ReturnObject(gameObject);
         else
@@ -69,12 +84,6 @@ public class Pickup_Ammo : Interactable
         int min = Mathf.Min(ammoData.minAmount, ammoData.maxAmount);
         int max = Mathf.Max(ammoData.minAmount, ammoData.maxAmount);
         return Random.Range(min, max + 1);
-    }
-
-    private void AddBulletsToWeapon(Weapon weapon, int amount)
-    {
-        if (weapon != null)
-            weapon.totalReserveAmmo += amount;
     }
 
     #region Editor

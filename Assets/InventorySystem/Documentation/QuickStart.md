@@ -21,6 +21,15 @@ Open `InventorySystem/Demo/InventoryDemo.unity` and press Play:
 
 ## Drop into your game
 
+### Fastest start: the ready-made prefab
+
+*GameObject > Inventory System > Inventory UI* adds `Starter/InventoryUI.prefab` to the scene. It carries a `PanelRenderer` with a starter panel (weapon + armor equipment slots, an "All" tab, a 24-slot grid) and all six components already wired. Press Play and call `InventoryUIController.Toggle()` from your input.
+
+- If the scene already has an `InventoryModel` or `EquipmentController` (for example on another object), the menu removes the prefab's copy so the scene keeps one inventory.
+- To make it yours, create your own category, slot-type and item assets (below), then swap them into `InventoryUIConfig` (`tabs`, `equipmentSlotBindings`) and edit or replace `Starter/InventoryStarter.uxml` / `.uss`. Prefer a prefab variant so updates to the module don't overwrite your changes.
+
+The steps below build the same thing by hand.
+
 ### 1. Author your data (no code)
 
 - **Item categories** — `Create > Inventory System > Item Category`. The `id` doubles as the tab id (`"all"` is reserved for the show-everything tab); `displayName`/`tabIcon`/`tabIconTint` feed the tab button.
@@ -30,7 +39,7 @@ Open `InventorySystem/Demo/InventoryDemo.unity` and press Play:
 
 ### 2. Build the UI (UI Toolkit)
 
-One `UIDocument` whose tree contains, by element name (names configurable on the components):
+One `PanelRenderer` (Unity 6.6's replacement for `UIDocument`) whose UXML contains, by element name (names configurable on the components):
 
 ```text
 inventory-panel                  ← panel root (InventoryUIController shows/hides this)
@@ -49,8 +58,8 @@ inventory-panel                  ← panel root (InventoryUIController shows/hid
 | `EquipmentController` | Equipped items per slot type; fires `OnEquipmentChanged` |
 | `InventoryUIConfig` | Slot grid, tab list, **equipmentSlotBindings**, theme, and the equipment-view sync (assign `theme`; `equipmentController` auto-resolves on the same object) |
 | `TabFilterManager` | Tab building + category filtering (assign its `uiConfig`) |
-| `DragDropController` | Drag/drop + double-click transactions (assign `uiDocument`, `equipmentController`). Reads slots from `InventoryUIConfig` |
-| `InventoryUIController` | Panel open/close API + `OnInventoryToggled` event (assign `document`) |
+| `DragDropController` | Drag/drop + double-click transactions (`uiConfig` and `equipmentController` auto-resolve). Reads slots and the root from `InventoryUIConfig` |
+| `InventoryUIController` | Panel open/close API + `OnInventoryToggled` event (`panelRenderer` auto-resolves) |
 
 Bind your own input: call `InventoryUIController.Toggle()` (see the shooter's `UIManager` or the demo's `DemoInventoryInput`).
 

@@ -42,9 +42,11 @@ namespace InventorySystem
             if (inventoryViewModel != null) {
                 inventoryViewModel.OnInventoryChanged += OnInventoryChanged;
             }
-            InitializeTabFiltering();
             RefreshFilteredItems();
-            RefreshDisplayForCurrentTab();
+            if (uiConfig != null) {
+                uiConfig.UIBuilt += OnUIBuilt;
+                if (uiConfig.IsBuilt) OnUIBuilt();
+            }
         }
 
         void OnDestroy()
@@ -52,12 +54,22 @@ namespace InventorySystem
             if (inventoryViewModel != null) {
                 inventoryViewModel.OnInventoryChanged -= OnInventoryChanged;
             }
+            if (uiConfig != null) {
+                uiConfig.UIBuilt -= OnUIBuilt;
+            }
+        }
+
+        // The panel loads asynchronously and can reload; tabs and slot contents follow each build
+        private void OnUIBuilt()
+        {
+            InitializeTabFiltering();
+            RefreshDisplayForCurrentTab();
         }
 
         private void InitializeTabFiltering()
         {
             if (!enableTabFiltering || uiConfig == null) return;
-            var root = uiConfig.targetDocument?.rootVisualElement;
+            var root = uiConfig.Root;
             if (root == null) return;
             var tabButtonsContainer = root.Q<VisualElement>("tabButtonsContainer");
             if (tabButtonsContainer == null) return;
@@ -98,7 +110,7 @@ namespace InventorySystem
 
         private void UpdateActiveTabVisual()
         {
-            var root = uiConfig.targetDocument?.rootVisualElement;
+            var root = uiConfig.Root;
             if (root == null) return;
             var tabButtonsContainer = root.Q<VisualElement>("tabButtonsContainer");
             if (tabButtonsContainer == null) return;
@@ -133,7 +145,8 @@ namespace InventorySystem
                 _filteredItems["all"] = new List<InventoryItem>();
             }
             for (int i = 0; i < inventoryViewModel.MaxInventorySize; i++) {
-                InventoryItem item = (i < inventoryViewModel.Items.Count) ? inventoryViewModel.Items[i] : null;
+                // GetItemAt normalizes serialized blank entries to null
+                InventoryItem item = inventoryViewModel.GetItemAt(i);
                 if (item == null) continue;
                 _filteredItems["all"].Add(item);
                 string tabId = GetTabIdForItem(item);
@@ -154,16 +167,16 @@ namespace InventorySystem
         {
             if (!enableTabFiltering || inventoryViewModel == null || uiConfig?.Slots == null) return;
             var slots = uiConfig.Slots;
-            var items = inventoryViewModel.Items;
             string currentTab = _currentTabId;
 
             for (int i = 0; i < slots.Count; i++)
             {
-                if (i < items.Count && items[i] != null)
+                var item = inventoryViewModel.GetItemAt(i);
+                if (item != null)
                 {
-                    string tabId = GetTabIdForItem(items[i]);
+                    string tabId = GetTabIdForItem(item);
                     if (currentTab == "all" || (tabId != null && tabId == currentTab))
-                        slots[i].SetItem(items[i]);
+                        slots[i].SetItem(item);
                     else
                         slots[i].ClearItem();
                 }

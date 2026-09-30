@@ -12,8 +12,8 @@ namespace InventorySystem
         [Tooltip("Controls equipped items (weapon, armor, etc.)")]
         [SerializeField] private EquipmentController equipmentController;
 
-        [Tooltip("The UI Document that contains all UI elements")]
-        [SerializeField] private UIDocument uiDocument;
+        [Tooltip("Inventory panel config whose slots this drags between. Auto-filled from the same GameObject, then the scene.")]
+        [SerializeField] private InventoryUIConfig uiConfig;
 
         [Header("Drag Settings")]
         [Tooltip("How many pixels to move before drag starts (prevents accidental drags)")]
@@ -33,7 +33,7 @@ namespace InventorySystem
         private DragVisualHandler visualHandler;
         private DoubleClickHandler doubleClickHandler;
         private bool isInitialized;
-        private InventoryUIConfig uiConfig;
+        private Coroutine initializeRoutine;
         private VisualElement slotsContainer;
 
         private static readonly List<SlotView> EmptySlots = new List<SlotView>();
@@ -44,28 +44,45 @@ namespace InventorySystem
 
         private void Awake()
         {
-            equipmentController ??= GetComponent<EquipmentController>();
-            uiDocument ??= GetComponent<UIDocument>();
+            if (equipmentController == null) equipmentController = GetComponent<EquipmentController>();
+            if (uiConfig == null) uiConfig = GetComponent<InventoryUIConfig>();
+            if (uiConfig == null) uiConfig = Object.FindAnyObjectByType<InventoryUIConfig>();
             doubleClickHandler = new DoubleClickHandler(doubleClickWindow);
             inventory ??= InventoryService.GetPlayerInventoryViewModel();
         }
 
         private void OnEnable()
         {
+            if (uiConfig != null) uiConfig.UIBuilt += OnUIBuilt;
             if (!isInitialized) {
-                StartCoroutine(Initialize());
+                initializeRoutine = StartCoroutine(Initialize());
             }
         }
 
         private void OnDisable()
         {
+            if (uiConfig != null) uiConfig.UIBuilt -= OnUIBuilt;
+            if (initializeRoutine != null) {
+                StopCoroutine(initializeRoutine);
+                initializeRoutine = null;
+            }
             Cleanup();
+        }
+
+        // A reload replaces every slot element and the root the drag ghost lives in
+        private void OnUIBuilt()
+        {
+            if (!isInitialized) return;
+            Cleanup();
+            initializeRoutine = StartCoroutine(Initialize());
         }
 
         private IEnumerator Initialize()
         {
-            yield return null;
-            yield return null;
+            if (uiConfig == null) {
+                if (debugMode) Debug.LogError("[DragDrop] No InventoryUIConfig found in scene");
+                yield break;
+            }
             int maxWait = 60;
             int waited = 0;
             while ((inventory == null || inventory.Items == null) && waited < maxWait) {
@@ -77,13 +94,13 @@ namespace InventorySystem
                 if (debugMode) Debug.LogError("[DragDrop] Inventory or Items not found");
                 yield break;
             }
-            uiConfig = Object.FindAnyObjectByType<InventoryUIConfig>();
-            if (uiConfig == null) {
-                if (debugMode) Debug.LogError("[DragDrop] No InventoryUIConfig found in scene");
-                yield break;
+            // The Panel Renderer loads its tree asynchronously; slots exist once the config builds
+            while (!uiConfig.IsBuilt) {
+                yield return null;
             }
+            initializeRoutine = null;
             visualHandler = new DragVisualHandler(
-                uiDocument.rootVisualElement,
+                uiConfig.Root,
                 () => InventorySlots,
                 highlightEmptySlots
             );

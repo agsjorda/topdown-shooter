@@ -14,9 +14,7 @@ public class PlayerAnimationEvents : MonoBehaviour
     public void ReloadIsOver()
     {
         visualController.MaximizeRigWeight();
-        weaponController.CurrentWeapon.ReloadBullets();
-
-        weaponController.SetWeaponReady(true);
+        weaponController.CompleteReload();
     }
 
     public void ReturnRig()

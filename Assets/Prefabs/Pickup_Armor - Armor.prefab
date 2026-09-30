@@ -223,7 +223,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5810294266438744173}
   - component: {fileID: 5511744402494441422}
-  - component: {fileID: 2410412051591677486}
+  - component: {fileID: 8889126523637972523}
   m_Layer: 0
   m_Name: Pickup_Armor - Armor
   m_TagString: Untagged
@@ -268,7 +268,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.2, y: 0.26, z: 0.6}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &2410412051591677486
+--- !u!114 &8889126523637972523
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -277,12 +277,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 8245020478746777426}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90cbf44658d40864eb1930ec306467b7, type: 3}
+  m_Script: {fileID: 11500000, guid: 299d9c7d6f2d4d344be0e7ca618654b5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Pickup_Armor
+  m_EditorClassIdentifier: Assembly-CSharp::Pickup_Item
   highlightMaterial: {fileID: 2100000, guid: d3e7cb7638b303845b4a813492e9c975, type: 2}
   interactionRadius: 2
   requireLookAt: 0
   maxLookAngle: 45
-  armorData: {fileID: 11400000, guid: 4e21ae659b6957c41bab1896f9d5bba0, type: 2}
-  armorVisual: {fileID: 55367664036015813}
+  itemData: {fileID: 11400000, guid: 4e21ae659b6957c41bab1896f9d5bba0, type: 2}
+  quantity: 1
+  visual: {fileID: 55367664036015813}

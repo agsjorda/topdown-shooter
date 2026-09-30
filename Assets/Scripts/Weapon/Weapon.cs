@@ -27,7 +27,7 @@ public class Weapon
     [Header("Magazine Details")]
     public int bulletsInMagazine;
     public int magazineCapacity;
-    public int totalReserveAmmo;
+    // Reserve ammo is shared per weapon type in the player's AmmoReserve, not stored per weapon
 
     #region Weapon Generic Info
 
@@ -55,7 +55,6 @@ public class Weapon
     {
         bulletsInMagazine = weaponData.bulletsInMagazine;
         magazineCapacity = weaponData.magazineCapacity;
-        totalReserveAmmo = weaponData.totalReserveAmmo;
 
         fireRate = weaponData.fireRate;
         weaponType = weaponData.weaponType;
@@ -164,30 +163,14 @@ public class Weapon
     }
 
     #region Reload Methods
-    public bool CanReload()
+    public int MissingBullets => Mathf.Max(0, magazineCapacity - bulletsInMagazine);
+
+    public bool IsMagazineFull => bulletsInMagazine >= magazineCapacity;
+
+    /// <summary>Tops up the magazine with bullets taken from the reserve.</summary>
+    public void LoadBullets(int amount)
     {
-        if (bulletsInMagazine == magazineCapacity)
-            return false; // Magazine is already full
-
-        return totalReserveAmmo > 0 ? true : false;
-    }
-    public void ReloadBullets()
-    {
-        // Reload drops any remaining bullets in the magazine to simulate real-life reloading
-        // totalReserveAmmo += bulletsInMagazine; // Add remaining bullets back to reserve
-
-        int bulletsToReload = magazineCapacity;
-
-        if (bulletsToReload > totalReserveAmmo) {
-            bulletsToReload = totalReserveAmmo;
-        }
-
-        totalReserveAmmo -= bulletsToReload;
-        bulletsInMagazine = bulletsToReload;
-
-        if (totalReserveAmmo < 0) {
-            totalReserveAmmo = 0;
-        }
+        bulletsInMagazine = Mathf.Min(magazineCapacity, bulletsInMagazine + Mathf.Max(0, amount));
     }
     private bool HaveEnoughBulltes() => bulletsInMagazine > 0;
     #endregion

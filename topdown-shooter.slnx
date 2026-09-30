@@ -9,6 +9,7 @@
   <Project Path="Pixel-PerfectFogOfWarDemos.csproj" />
   <Project Path="ShaderGraphVariables.csproj" />
   <Project Path="kTools.Mirrors.Runtime.csproj" />
+  <Project Path="InventorySystem.Editor.csproj" />
   <Project Path="Pixel-PerfectFogOfWarURP.csproj" />
   <Project Path="kTools.Mirrors.Editor.csproj" />
 </Solution>

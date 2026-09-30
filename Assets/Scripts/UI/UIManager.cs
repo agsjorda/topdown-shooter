@@ -1,5 +1,4 @@
 using InventorySystem;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -15,8 +14,9 @@ public class UIManager : MonoBehaviour
 
     private PlayerControls controls;
 
-    [Header("UI Document")]
-    [SerializeField] private UIDocument mainDocument;
+    [Header("UI Panel")]
+    [Tooltip("Panel Renderer holding the HUD. Auto-filled from the same GameObject.")]
+    [SerializeField] private PanelRenderer mainPanel;
 
     [Header("UI Panel Names")]
     [SerializeField] private string hudPanelName = "hud-panel";
@@ -30,6 +30,8 @@ public class UIManager : MonoBehaviour
 
     private GameHUD_UI gameHUD;
     private bool isInitialized = false;
+    private VisualElement loadedRoot;
+    private int loadedVersion;
 
     [Header("cameras")]
     [SerializeField] private Camera characterPreviewCamera;
@@ -66,23 +68,38 @@ public class UIManager : MonoBehaviour
 
     private void OnEnable()
     {
-        StartCoroutine(InitializeWithDelay());
+        if (mainPanel == null) mainPanel = GetComponent<PanelRenderer>();
+        if (mainPanel == null) {
+            Debug.LogError("UIManager: No PanelRenderer assigned or found on this GameObject");
+            return;
+        }
+        // Replays immediately when the UI is already loaded, and fires again on every reload
+        mainPanel.RegisterUIReloadCallback(OnUIReloaded);
     }
 
-    private IEnumerator InitializeWithDelay()
+    private void OnDisable()
     {
-        yield return new WaitForEndOfFrame();
-        InitializeUI();
+        if (mainPanel != null) mainPanel.UnregisterUIReloadCallback(OnUIReloaded);
     }
 
-    private void InitializeUI()
+    private void OnUIReloaded(PanelRenderer renderer, VisualElement root, int version)
     {
-        if (mainDocument?.rootVisualElement == null) {
-            Debug.LogError("UIManager: UIDocument or root element is null");
+        if (isInitialized && root == loadedRoot && version == loadedVersion) return;
+        loadedRoot = root;
+        loadedVersion = version;
+        InitializeUI(root);
+    }
+
+    private void InitializeUI(VisualElement root)
+    {
+        if (root == null) {
+            Debug.LogError("UIManager: Panel Renderer delivered a null root element");
             return;
         }
 
-        var root = mainDocument.rootVisualElement;
+        // A reload replaces the tree; keep the HUD's visibility across it
+        bool hudVisible = gameHUD == null || gameHUD.IsVisible;
+        isInitialized = false;
 
         gameHUD = new GameHUD_UI(root.Q<VisualElement>(hudPanelName));
 
@@ -97,9 +114,10 @@ public class UIManager : MonoBehaviour
         }
 
         // Set initial state
-        gameHUD.Show();
+        if (hudVisible) gameHUD.Show();
+        else gameHUD.Hide();
         gameHUD.SetHealthPercent(testHealth);
-        characterPreviewCamera.enabled = false;
+        characterPreviewCamera.enabled = IsInventoryOpen();
 
         isInitialized = true;
         Debug.Log("UIManager: Initialized successfully");

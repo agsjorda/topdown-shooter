@@ -7,7 +7,7 @@ The module is UI Toolkit only. It does not use uGUI, and it does not know about 
 ## Requirements
 
 - Unity 6000.x.
-- UI Toolkit (`UIDocument`).
+- UI Toolkit (`PanelRenderer`, Unity 6.6's replacement for `UIDocument`).
 - The core assembly (`InventorySystem`) references engine modules only. It does not need the Input System.
 - The demo scene uses the Input System. Delete `Demo/` if you do not want that dependency.
 
@@ -21,6 +21,16 @@ You can delete:
 - `Scripts/Extras/` — the generic `ItemPickup`. Delete it when the game already has pickups.
 
 Do not delete `Resources/InventorySystem/`. The slot grid loads `InventoryCore.uss` from that path at runtime.
+
+## One-click setup
+
+*GameObject > Inventory System > Inventory UI* instantiates `Starter/InventoryUI.prefab` into the scene you right-clicked in (or the active scene). The prefab holds a `PanelRenderer` (starter UXML, USS and PanelSettings) plus `InventoryModel`, `EquipmentController`, `InventoryUIConfig`, `TabFilterManager`, `DragDropController` and `InventoryUIController`, all wired. The starter data lives in `Starter/Data/`: an "All" category and Weapon/Armor slot types.
+
+- The menu asks before adding a second Inventory UI to a scene that already has one.
+- When that scene already has an `InventoryModel` or `EquipmentController`, the menu removes the prefab's copy. `InventoryService` finds these by type, so a second copy would split the inventory.
+- Customize through a prefab variant: swap in your own `tabs` and `equipmentSlotBindings` on `InventoryUIConfig`, and point the `PanelRenderer` at your own UXML. Sections 1–4 below explain each piece.
+
+The menu lives in the editor-only `InventorySystem.Editor` assembly (`Editor/`). It finds the prefab by name and component, so moving the folder is fine.
 
 ## What you do not attach to the player
 
@@ -97,7 +107,7 @@ Leave a sprite empty to keep whatever your stylesheet draws. An assigned sprite 
 
 ## 2. Build the UI
 
-Create a `UIDocument` and a UXML tree with these names. Equipment slot names are yours; the other three names are the defaults (the panel name is set on `InventoryUIController`).
+Create a UXML tree with these names; a `PanelRenderer` will display it. Equipment slot names are yours; the other three names are the defaults (the panel name is set on `InventoryUIController`).
 
 ```xml
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
@@ -113,7 +123,7 @@ Create a `UIDocument` and a UXML tree with these names. Equipment slot names are
 
 Tabs and the slot grid are generated at runtime into `tabButtonsContainer` and `tabContentContainer`. Do not hand-place inventory slots. Do place every equipment slot yourself, anywhere in the panel, and give each a unique `name`.
 
-`Demo/UI/InventoryPanel.uxml` is a working copy of this shape. The shooter's inventory lives inside `Assets/UI/GameUi.uxml` on the same document as the HUD; that is fine. One `UIDocument` can hold both.
+`Demo/UI/InventoryPanel.uxml` is a working copy of this shape. The shooter's inventory lives inside `Assets/UI/GameUi.uxml` on the same panel as the HUD; that is fine. One `PanelRenderer` can hold both.
 
 `InventoryContainerComponent` is an optional element that clones `Resources/InventorySystem/InventoryContainer.uxml` (a tab row plus a content area). Use it when you do not want to write those two containers yourself. The demo and the shooter do not use it; they name the containers directly.
 
@@ -169,7 +179,7 @@ Do not write `.equipment-icon { display: none }` in your stylesheet. Core USS sh
 
 ## 4. Add the components
 
-Create an empty GameObject, for example `InventoryUI`. Put the `UIDocument` on it, assign the UXML and Panel Settings, then add:
+Create an empty GameObject, for example `InventoryUI`. Put a `PanelRenderer` on it, assign the UXML (`visualTreeAsset`) and Panel Settings, then add:
 
 | Component | Inspector |
 | --- | --- |
@@ -177,14 +187,16 @@ Create an empty GameObject, for example `InventoryUI`. Put the `UIDocument` on i
 | `EquipmentController` | Nothing required. `debugLogging` logs equip and unequip. |
 | `InventoryUIConfig` | See the table below. |
 | `TabFilterManager` | Drag this GameObject into `uiConfig`. |
-| `DragDropController` | `uiDocument` and `equipmentController` resolve from the same GameObject when left empty. |
-| `InventoryUIController` | `document` resolves from the same GameObject. `inventoryPanelName` defaults to `inventory-panel`. `startHidden` hides the panel after the first frame. |
+| `DragDropController` | `uiConfig` and `equipmentController` resolve from the same GameObject when left empty (`uiConfig` then falls back to the scene). |
+| `InventoryUIController` | `panelRenderer` resolves from the same GameObject. `inventoryPanelName` defaults to `inventory-panel`. `startHidden` hides the panel as soon as it loads. |
+
+The panel's tree loads asynchronously. Each component registers `PanelRenderer.RegisterUIReloadCallback` in `OnEnable`; the callback fires once the UI is ready (immediately if it already is) and again whenever the UXML reloads. `InventoryUIConfig.IsBuilt` and its `UIBuilt` event tell other code when slots exist.
 
 `InventoryUIConfig` fields:
 
 | Field | Effect |
 | --- | --- |
-| `targetDocument` | The `UIDocument`. Auto-filled from the same GameObject. |
+| `targetPanel` | The `PanelRenderer`. Auto-filled from the same GameObject. |
 | `panelElementName` | Element that receives the theme's panel background. Default `inventory-panel`. |
 | `slotSize` | Width and height of each generated slot, in pixels. |
 | `slotCount` | How many slot views to generate. Keep this at least `maxInventorySize`. |
@@ -277,7 +289,7 @@ Unsubscribe in `OnDestroy`. The inventory object outlives a typical player, but 
 - `OnPickedUp` and the UnityEvent `onPickedUp` fire after a successful add.
 - Call `TryPickup()` from your own interact key and turn `pickupOnTriggerEnter` off.
 
-The shooter's `Pickup_Item` and `Pickup_Armor` do the same thing against `InventoryService` without using `ItemPickup`. Either path is valid.
+The shooter's `Pickup_Item` does the same thing against `InventoryService` without using `ItemPickup`, for every inventory item including armor. Either path is valid.
 
 ## 7. Equip from code
 
@@ -382,7 +394,7 @@ The UI components resolve the shared `InventoryViewModel` from the service. Do n
 
 ## Troubleshooting
 
-**The panel never appears.** The `UIDocument` needs Panel Settings. `InventoryUIController.inventoryPanelName` must match the UXML element name. `startHidden` leaves it closed until `Toggle()` or `Open()`.
+**The panel never appears.** The `PanelRenderer` needs Panel Settings and a UXML. `InventoryUIController.inventoryPanelName` must match the UXML element name. `startHidden` leaves it closed until `Toggle()` or `Open()`.
 
 **Tabs or slots are missing.** `tabButtonsContainer` and `tabContentContainer` must exist under the document. `InventoryUIConfig.tabs` needs at least one category asset. `slotCount` must be greater than zero.
 
@@ -394,7 +406,7 @@ The UI components resolve the shared `InventoryViewModel` from the service. Do n
 
 **Empty equipment slots lost their silhouette.** `.equipment-slot.has-item` clears the slot background while an item is in it. The silhouette belongs on `equipment-slot` or `equipment-slot--{suffix}`, not on a rule that stays active after `has-item` is added.
 
-**Drag never starts.** `DragDropController` needs the `UIDocument` and an `InventoryModel` in the scene. Enable `debugMode` and look for `[DragDrop] Initialized`. Raising `dragThreshold` makes drags harder to start; lowering it makes them easier.
+**Drag never starts.** `DragDropController` needs an `InventoryUIConfig` whose panel has loaded and an `InventoryModel` in the scene. Enable `debugMode` and look for `[DragDrop] Initialized`. Raising `dragThreshold` makes drags harder to start; lowering it makes them easier.
 
 **AddItem returns false on an empty bag.** `maxInventorySize` is 0, the `Item_DataSO` reference is missing, or a stackable add found no legal stack and no free slot. `debugLogging` on `InventoryModel` prints the reason.
 

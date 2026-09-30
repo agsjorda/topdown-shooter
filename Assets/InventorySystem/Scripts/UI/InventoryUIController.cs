@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,16 +12,18 @@ namespace InventorySystem
     [DisallowMultipleComponent]
     public class InventoryUIController : MonoBehaviour
     {
-        [Tooltip("UIDocument containing the inventory panel")]
-        [SerializeField] private UIDocument document;
+        [Tooltip("Panel Renderer containing the inventory panel. Auto-filled from the same GameObject.")]
+        [SerializeField] private PanelRenderer panelRenderer;
 
-        [Tooltip("Element name of the inventory panel root inside the UIDocument")]
+        [Tooltip("Element name of the inventory panel root inside the Panel Renderer's UXML")]
         [SerializeField] private string inventoryPanelName = "inventory-panel";
 
         [Tooltip("Hide the panel when the scene starts")]
         [SerializeField] private bool startHidden = true;
 
         private Inventory_UI inventoryUI;
+        private VisualElement loadedRoot;
+        private int loadedVersion;
 
         public bool IsInventoryOpen => inventoryUI?.IsVisible ?? false;
         public bool IsInitialized { get; private set; }
@@ -32,47 +33,57 @@ namespace InventorySystem
 
         private void Awake()
         {
-            document ??= GetComponent<UIDocument>();
+            if (panelRenderer == null) panelRenderer = GetComponent<PanelRenderer>();
         }
 
         private void OnEnable()
         {
-            if (!IsInitialized) {
-                StartCoroutine(InitializeWithDelay());
+            if (panelRenderer == null) {
+                Debug.LogError("[InventoryUIController] No PanelRenderer assigned or found on this GameObject");
+                return;
             }
+            // Replays immediately when the UI is already loaded, and fires again on every reload
+            panelRenderer.RegisterUIReloadCallback(OnUIReloaded);
         }
 
-        // UIDocument builds its visual tree during the first frame; query after it exists
-        private IEnumerator InitializeWithDelay()
+        private void OnDisable()
         {
-            yield return new WaitForEndOfFrame();
-            InitializeUI();
+            if (panelRenderer != null) panelRenderer.UnregisterUIReloadCallback(OnUIReloaded);
         }
 
-        private void InitializeUI()
+        private void OnUIReloaded(PanelRenderer renderer, VisualElement root, int version)
         {
-            var root = document != null ? document.rootVisualElement : null;
+            if (IsInitialized && root == loadedRoot && version == loadedVersion) return;
+            loadedRoot = root;
+            loadedVersion = version;
+            // A reload replaces the whole tree; carry the open state over to the new panel
+            bool keepOpen = IsInitialized ? IsInventoryOpen : !startHidden;
+            IsInitialized = false;
+            InitializeUI(root, keepOpen);
+        }
+
+        private void InitializeUI(VisualElement root, bool open)
+        {
             if (root == null) {
-                Debug.LogError("[InventoryUIController] UIDocument or root element is null");
+                Debug.LogError("[InventoryUIController] Panel Renderer delivered a null root element");
                 return;
             }
 
             // The panel toggles via .ui-hidden. That rule lives in InventoryCore and must be
-            // on the document before the first Hide(), which can run before InventoryUIConfig.
+            // on the root before the first Hide(), which can run before InventoryUIConfig.
             var coreStyles = Resources.Load<StyleSheet>("InventorySystem/InventoryCore");
             if (coreStyles != null && !root.styleSheets.Contains(coreStyles))
                 root.styleSheets.Add(coreStyles);
 
             inventoryUI = new Inventory_UI(root.Q<VisualElement>(inventoryPanelName));
             if (!inventoryUI.IsValid) {
-                Debug.LogError($"[InventoryUIController] Inventory panel '{inventoryPanelName}' not found in UIDocument");
+                Debug.LogError($"[InventoryUIController] Inventory panel '{inventoryPanelName}' not found in the Panel Renderer's UXML");
                 inventoryUI = null;
                 return;
             }
 
-            if (startHidden) {
-                inventoryUI.Hide();
-            }
+            if (open) inventoryUI.Show();
+            else inventoryUI.Hide();
             IsInitialized = true;
         }
 

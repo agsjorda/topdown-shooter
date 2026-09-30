@@ -16,6 +16,7 @@ Last relevant commits: `530ceeb partial InventorySystem refactor`, `725d330 adde
 | --- | --- | --- | --- |
 | `Scripts/InventorySystem.asmdef` | `InventorySystem` | none (engine only) | `autoReferenced: true`. Must NEVER reference game code (`Assembly-CSharp`). |
 | `Demo/InventorySystem.Demos.asmdef` | `InventorySystem.Demos` | `InventorySystem`, `Unity.InputSystem` | Demo only. Core must not depend on Input System. |
+| `Editor/InventorySystem.Editor.asmdef` | `InventorySystem.Editor` | `InventorySystem` | Editor only. `InventorySystemMenu`: *GameObject > Inventory System > Inventory UI* instantiates the `InventoryUI` prefab (found by name + `InventoryUIController`, prefers `/Starter/`), scoped to the target scene: asks if that scene already has an `InventoryUIController`, removes the instance's `InventoryModel`/`EquipmentController` if that scene already has one. |
 
 Game code (`Assembly-CSharp`) consumes the module with `using InventorySystem;`. Dependency direction is one-way: game → module.
 
@@ -34,6 +35,9 @@ Assets/InventorySystem/
 │   ├── Utilities/   VisualElementExtensions (fluent API), EnumerableExtensions, RectExtensions
 │   └── Extras/      ItemPickup (optional, namespace InventorySystem.Extras)
 ├── Resources/InventorySystem/   InventoryContainer.uxml+.uss, InventoryCore.uss  (Resources.Load path is a contract)
+├── Editor/          InventorySystem.Editor.asmdef, InventorySystemMenu (one-click setup menu)
+├── Starter/         InventoryUI.prefab (PanelRenderer + all 6 components wired), InventoryStarter.uxml/.uss,
+│                    InventoryStarterTheme.tss, InventoryStarterPanelSettings.asset, Data/ (All category, Weapon/Armor slot types)
 ├── Demo/            InventoryDemo.unity, Data/*.asset, UI/InventoryPanel.uxml+.uss, Scripts/Demo*.cs
 └── Documentation/QuickStart.md   (CURRENT, authoritative usage doc)
 ```
@@ -80,14 +84,15 @@ inventory-panel                                  ← InventoryUIController toggl
 ```
 Reference: `Demo/UI/InventoryPanel.uxml`. Shooter: `GameUI.uxml`/`GameUI.uss` (game side).
 
-### Components (typically all on one GameObject with the `UIDocument`)
+### Components (typically all on one GameObject with the `PanelRenderer`)
+The scenes use `PanelRenderer` (Unity 6.6), not `UIDocument`. It is a `Renderer` with no `rootVisualElement`; the root arrives only via `RegisterUIReloadCallback(VersionedUIReloadCallback)` (the unversioned overload is obsolete). Registering after load replays the current root immediately; it fires again on UXML reload, so consumers rebuild per root and skip repeats of the same root+version.
 | Component | Responsibility | Key fields |
 | --- | --- | --- |
 | `InventoryUIConfig` | Builds the slot grid; owns `Slots`, `EquipmentSlots`, and `SlotsContainer`; initializes equipment slots from bindings; subscribes to `OnEquipmentChanged` and projects it onto `EquipmentSlotView`; loads `InventoryCore.uss`; applies `InventoryThemeSO` | `slotSize`, `slotCount`, `theme`, `panelElementName`, `equipmentController`, `equipmentSlotBindings`, `tabs` |
 | `InventoryThemeApplier` | Writes theme sprites inline (empty sprite clears the inline value so USS shows). Targets: panel, slots container, each `SlotView`, each `equipment-slot-bg`, each tab bg layer | static `Apply` |
 | `TabFilterManager` | Builds tab buttons (per-instance size, not static), tracks `_currentTabId`, subscribes to `ViewModel.OnInventoryChanged`, writes items into `SlotView`s, then `ApplyTheme()` | `uiConfig`, `enableTabFiltering`, `defaultTabId` |
-| `DragDropController` | Orchestrates drag/drop + double-click. Reads slots from `InventoryUIConfig`. Transactions take `IInventory` | `equipmentController`, `uiDocument`, `dragThreshold` (5px), `doubleClickWindow` (0.3s), `debugMode`, `highlightEmptySlots` |
-| `InventoryUIController` | Panel open/close API: `Toggle()/Open()/Close()`, `IsInventoryOpen`, `event OnInventoryToggled(bool)`. Deliberately has NO input/player/camera refs | `document`, `inventoryPanelName`, `startHidden` |
+| `DragDropController` | Orchestrates drag/drop + double-click. Reads slots from `InventoryUIConfig`. Transactions take `IInventory` | `equipmentController`, `uiConfig` (root comes from `uiConfig.Root`), `dragThreshold` (5px), `doubleClickWindow` (0.3s), `debugMode`, `highlightEmptySlots` |
+| `InventoryUIController` | Panel open/close API: `Toggle()/Open()/Close()`, `IsInventoryOpen`, `event OnInventoryToggled(bool)`. Deliberately has NO input/player/camera refs | `panelRenderer`, `inventoryPanelName`, `startHidden` |
 | `EquipmentController`, `InventoryModel` | data (see above) | |
 
 Slot content refresh is **index-based**: slot `i` shows `Items[i]` (or cleared if filtered out). Filtering hides items, it does not compact them.
@@ -125,7 +130,7 @@ Transactions mutate `IInventory` and `IEquipmentSystem` only. `InventoryUIConfig
 - Equipment slots are fixed UXML elements → per-slot handlers, capture on the `EquipmentSlotView` itself.
 - `Cleanup()` (OnDisable) must release any stale capture and unregister everything; `isInitialized` resets so `OnEnable` re-inits.
 - Drop hit-testing uses `worldBound.Padded(20)` for equipment and `Padded(10)` for inventory slots; equipment is checked first.
-- `DragDropController.Initialize()` is a coroutine that waits 2 frames + up to 60 frames for the ViewModel; `InventoryUIController` waits `WaitForEndOfFrame` before querying the UIDocument tree.
+- `InventoryUIConfig` builds on the reload callback and exposes `Root`, `IsBuilt`, `event UIBuilt`. `TabFilterManager` builds tabs/contents on `UIBuilt`. `DragDropController.Initialize()` waits up to 60 frames for the ViewModel, then until `uiConfig.IsBuilt`, and re-initializes on each later `UIBuilt`. `InventoryUIController` and the game's `UIManager` register their own reload callbacks and keep open/visible state across reloads.
 
 ## Initialization order (per scene load)
 1. `InventoryModel`/`EquipmentController` exist (`Awake`).
@@ -147,7 +152,7 @@ inventoryUIController.Toggle(); inventoryUIController.OnInventoryToggled += open
 ## Shooter-side integration (Assets/Scripts)
 - `UIManager` binds `PlayerControls.Character.InventoryToggle` → `InventoryUIController.Toggle()`, also toggles HUD + character preview camera; exposes `IsInventoryOpen()` for gating weapon fire.
 - `PlayerWeaponController` adds picked-up weapons via `InventoryService.GetPlayerInventory().AddItem(new InventoryItem(weapon.weaponData))`.
-- `Pickup_Item`, `Pickup_Armor` (game's own pickups) use `InventoryService`; `Extras/ItemPickup` is the module's generic alternative.
+- `Pickup_Item` (game's one pickup for all inventory items, armor included) uses `InventoryService`; item data implementing the game's `IPickupModelSource` (e.g. `Armor_Data`) supplies the world model. `Pickup_Weapon` (weapon slots first) and `Pickup_Ammo` (reserve ammo, not an item) stay separate. `Extras/ItemPickup` is the module's generic alternative.
 - `Assets/Scripts/Documentation/INVENTORY_SYSTEM_COMPLETE_DOCUMENTATION.md` predates modularization — treat as historical.
 
 ## Conventions to preserve when editing

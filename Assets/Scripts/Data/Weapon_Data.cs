@@ -9,7 +9,7 @@ public class Weapon_Data : Item_DataSO
     [Header("Magazine Details")]
     public int bulletsInMagazine;
     public int magazineCapacity;
-    public int totalReserveAmmo;
+    // Reserve ammo lives in the player's shared AmmoReserve (PlayerWeaponController > Ammo)
 
     [Header("Regular Shot")]
     public ShootType shootType;

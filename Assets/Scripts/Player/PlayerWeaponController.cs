@@ -21,6 +21,10 @@ public class PlayerWeaponController : MonoBehaviour
     [SerializeField] private int currentSlotIndex = 0;
     [SerializeField] private Weapon currentWeapon;
 
+    [Header("Ammo")]
+    [Tooltip("Shared reserve per weapon type. Reloads draw from it; ammo boxes and duplicate weapons add to it.")]
+    [SerializeField] private AmmoReserve ammo = new AmmoReserve();
+
     [Header("Bullet Settings")]
     [SerializeField] private float bulletImpactForce = 100f;
     [SerializeField] private GameObject bulletPrefab;
@@ -33,6 +37,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     #region Properties
     public Weapon CurrentWeapon => currentWeapon;
+    public AmmoReserve Ammo => ammo;
     public int SlotCount => maxSlots;
     public bool IsWeaponReady => weaponReady;
     #endregion
@@ -130,11 +135,9 @@ public class PlayerWeaponController : MonoBehaviour
     /// </summary>
     public bool PickupWeapon(Weapon newWeapon)
     {
-        // Check for existing weapon of same type
-        Weapon existingWeapon = FindWeaponByType(newWeapon.weaponType);
-        if (existingWeapon != null) {
-            existingWeapon.totalReserveAmmo += newWeapon.bulletsInMagazine;
-            return true;
+        // A duplicate weapon is stripped for its magazine; leave it in the world when the pool is full
+        if (FindWeaponByType(newWeapon.weaponType) != null) {
+            return ammo.Add(newWeapon.weaponType, newWeapon.bulletsInMagazine) > 0;
         }
 
         // Find empty slot
@@ -305,19 +308,23 @@ public class PlayerWeaponController : MonoBehaviour
     #endregion
 
     #region Reloading
+    public bool CanReload() =>
+        currentWeapon != null && !currentWeapon.IsMagazineFull && ammo.Has(currentWeapon.weaponType);
+
     public void Reload()
     {
-        if (currentWeapon == null || !currentWeapon.CanReload() || !weaponReady)
+        if (!CanReload() || !weaponReady)
             return;
 
         SetWeaponReady(false);
         player.weaponVisuals.PlayReloadAnimation();
     }
 
+    // Tops up the magazine; bullets left in it are kept, so partial reloads waste nothing
     public void CompleteReload()
     {
         if (currentWeapon != null)
-            currentWeapon.ReloadBullets();
+            currentWeapon.LoadBullets(ammo.Take(currentWeapon.weaponType, currentWeapon.MissingBullets));
         SetWeaponReady(true);
     }
     #endregion

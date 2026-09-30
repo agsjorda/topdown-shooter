@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,7 +9,8 @@ namespace InventorySystem
     public class InventoryUIConfig : MonoBehaviour
     {
         [Header("Target")]
-        public UIDocument targetDocument;
+        [Tooltip("Panel Renderer whose UXML contains the inventory. Auto-filled from the same GameObject.")]
+        public PanelRenderer targetPanel;
 
         [Tooltip("Element name of the panel the theme's panel background is applied to")]
         public string panelElementName = "inventory-panel";
@@ -56,7 +57,7 @@ namespace InventorySystem
         [Header("Styling")]
         [Tooltip("Functional styles the inventory code toggles (drag states, ghost, qty label). Auto-loaded from the module's Resources when null; the host game's own stylesheets override these")]
         public StyleSheet coreStyles;
-        [Tooltip("Add the core stylesheet to the UIDocument root at startup")]
+        [Tooltip("Add the core stylesheet to the panel root at startup")]
         [SerializeField] private bool addCoreStyles = true;
 
         private VisualElement _tabContentContainer;
@@ -66,9 +67,23 @@ namespace InventorySystem
         private readonly List<EquipmentSlotView> _equipmentSlots = new List<EquipmentSlotView>();
         private IEquipmentSystem _equipment;
         private bool _equipmentSubscribed;
-        private Coroutine _initializeRoutine;
+        private VisualElement _root;
+        private int _uiVersion;
+        private PanelRenderer _registeredPanel;
 
         public InventoryViewModel ViewModel { get; set; }
+
+        /// <summary>Root of the Panel Renderer's tree; null until the panel has loaded.</summary>
+        public VisualElement Root => _root;
+
+        /// <summary>True once slots and equipment views exist for the current root.</summary>
+        public bool IsBuilt { get; private set; }
+
+        /// <summary>
+        /// Fired after the slot grid and equipment views are (re)built for a newly loaded root.
+        /// Slot and container instances are replaced, so listeners must re-query them.
+        /// </summary>
+        public event Action UIBuilt;
 
         public List<SlotView> Slots => _createdSlots;
         public List<EquipmentSlotView> EquipmentSlots => _equipmentSlots;
@@ -97,8 +112,8 @@ namespace InventorySystem
 
         void Awake()
         {
-            targetDocument ??= GetComponent<UIDocument>();
-            equipmentController ??= GetComponent<EquipmentController>();
+            ResolvePanel();
+            if (equipmentController == null) equipmentController = GetComponent<EquipmentController>();
             if (ViewModel == null) {
                 ViewModel = InventoryService.GetPlayerInventoryViewModel();
                 if (ViewModel == null) {
@@ -109,42 +124,74 @@ namespace InventorySystem
 
         void OnEnable()
         {
-            targetDocument ??= GetComponent<UIDocument>();
-            if (_initializeRoutine != null)
-                StopCoroutine(_initializeRoutine);
-            _initializeRoutine = StartCoroutine(InitializeWhenReady());
+            ResolvePanel();
+            RegisterPanel();
         }
 
         void OnDisable()
         {
-            if (_initializeRoutine != null) {
-                StopCoroutine(_initializeRoutine);
-                _initializeRoutine = null;
-            }
+            UnregisterPanel();
             UnsubscribeEquipment();
         }
 
-        // UIDocument builds its visual tree during the first frame. Building in OnEnable
-        // often sees a null root, so the slot grid and InventoryCore.uss never attach.
-        private IEnumerator InitializeWhenReady()
+        // Edit-mode preview: registering replays the current root, which rebuilds the grid
+        // with the new Inspector values. Rebuilding also runs on every UXML reload.
+        void OnValidate()
         {
-            yield return new WaitForEndOfFrame();
-            _initializeRoutine = null;
+            if (Application.isPlaying) return;
+            ResolvePanel();
+            if (_registeredPanel != null && _registeredPanel == targetPanel && _root != null) {
+                BuildForRoot(_root);
+            } else {
+                RegisterPanel();
+            }
+        }
+
+        private void ResolvePanel()
+        {
+            if (targetPanel == null) targetPanel = GetComponent<PanelRenderer>();
+        }
+
+        private void RegisterPanel()
+        {
+            if (_registeredPanel == targetPanel && _registeredPanel != null) return;
+            UnregisterPanel();
+            if (targetPanel == null) return;
+            _registeredPanel = targetPanel;
+            // Replays immediately when the UI is already loaded
+            _registeredPanel.RegisterUIReloadCallback(OnUIReloaded);
+        }
+
+        private void UnregisterPanel()
+        {
+            if (_registeredPanel != null) _registeredPanel.UnregisterUIReloadCallback(OnUIReloaded);
+            _registeredPanel = null;
+        }
+
+        private void OnUIReloaded(PanelRenderer renderer, VisualElement root, int version)
+        {
+            if (IsBuilt && root == _root && version == _uiVersion) return;
+            _uiVersion = version;
+            BuildForRoot(root);
+        }
+
+        private void BuildForRoot(VisualElement root)
+        {
+            if (root != _root) {
+                // Containers belong to the previous tree
+                _tabContentContainer = null;
+                _scrollWrapper = null;
+                _slotsContainer = null;
+                _root = root;
+            }
             CacheContainers();
             BuildOrUpdateSlotsOnly();
             InitializeEquipmentSlots();
             SubscribeEquipment();
+            SyncEquipmentFromModel();
             ApplyTheme();
-        }
-
-        void OnValidate()
-        {
-            if (!Application.isPlaying) {
-                CacheContainers();
-                BuildOrUpdateSlotsOnly();
-                InitializeEquipmentSlots();
-                ApplyTheme();
-            }
+            IsBuilt = _root != null;
+            if (IsBuilt && Application.isPlaying) UIBuilt?.Invoke();
         }
 
         // Recreates the slot views for layout changes (slot size/count/margin).
@@ -172,7 +219,7 @@ namespace InventorySystem
         /// <summary>Paints the current theme onto the panel, grid, slots, equipment layers, and tabs.</summary>
         public void ApplyTheme()
         {
-            var root = targetDocument?.rootVisualElement;
+            var root = _root;
             if (root == null) return;
 
             string panelName = string.IsNullOrEmpty(panelElementName) ? "inventory-panel" : panelElementName;
@@ -191,7 +238,7 @@ namespace InventorySystem
         private void InitializeEquipmentSlots()
         {
             _equipmentSlots.Clear();
-            var root = targetDocument?.rootVisualElement;
+            var root = _root;
             if (root == null || equipmentSlotBindings == null) return;
 
             foreach (var binding in equipmentSlotBindings) {
@@ -267,7 +314,7 @@ namespace InventorySystem
 
         private void CacheContainers()
         {
-            var root = targetDocument?.rootVisualElement;
+            var root = _root;
             if (root == null) return;
 
             ApplyCoreStyles(root);

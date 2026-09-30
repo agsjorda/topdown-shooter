@@ -12,7 +12,9 @@ namespace InventorySystem
         public event Action<int> OnSlotChanged;
 
         public int maxInventorySize = 24;
-        //Item list can contain nulls representing empty slots
+        // Item list can contain nulls representing empty slots. InventoryItem is a serializable
+        // class, so Unity swaps those nulls for blank instances (itemData == null) whenever the
+        // list is serialized; IsEmptySlot treats both forms as empty.
         public List<InventoryItem> itemList = new List<InventoryItem>();
 
         [Tooltip("Log inventory operations to the Console")]
@@ -20,6 +22,8 @@ namespace InventorySystem
 
         public IReadOnlyList<InventoryItem> Items => itemList;
         public int MaxInventorySize => maxInventorySize;
+
+        private static bool IsEmptySlot(InventoryItem item) => item == null || item.itemData == null;
 
         public bool CanAddItem() => FindFirstEmptySlot() >= 0;
 
@@ -56,7 +60,7 @@ namespace InventorySystem
         {
             for (int i = 0; i < itemList.Count; i++) {
                 var existing = itemList[i];
-                if (existing == null || existing.itemData == null) continue;
+                if (IsEmptySlot(existing)) continue;
                 if (existing.itemData.itemId != itemToAdd.itemData.itemId) continue;
                 if (existing.quantity + itemToAdd.quantity > itemToAdd.itemData.maxStack) continue;
 
@@ -72,7 +76,7 @@ namespace InventorySystem
         public bool RemoveItemAt(int index)
         {
             if (!IsValidSlotIndex(index)) return false;
-            if (index >= itemList.Count || itemList[index] == null) return false;
+            if (index >= itemList.Count || IsEmptySlot(itemList[index])) return false;
             itemList[index] = null;
             OnSlotChanged?.Invoke(index);
             NotifyInventoryChanged();
@@ -104,14 +108,16 @@ namespace InventorySystem
             if (index < 0 || index >= maxInventorySize)
                 return null;
             // Indices beyond the backing list are valid empty slots; do not grow the list here.
-            return index < itemList.Count ? itemList[index] : null;
+            if (index >= itemList.Count) return null;
+            var item = itemList[index];
+            return IsEmptySlot(item) ? null : item;
         }
 
         public bool SetItemAt(int index, InventoryItem item)
         {
             if (!IsValidSlotIndex(index)) return false;
             EnsureSize(index);
-            itemList[index] = item;
+            itemList[index] = IsEmptySlot(item) ? null : item;
             OnSlotChanged?.Invoke(index);
             NotifyInventoryChanged();
             return true;
@@ -125,7 +131,7 @@ namespace InventorySystem
         private int FindFirstEmptySlot()
         {
             for (int i = 0; i < itemList.Count; i++) {
-                if (itemList[i] == null) {
+                if (IsEmptySlot(itemList[i])) {
                     return i;
                 }
             }
@@ -150,8 +156,9 @@ namespace InventorySystem
             if (toIndex < 0 || toIndex >= maxInventorySize) return false;
             EnsureSize(toIndex);
             var itemToMove = itemList[fromIndex];
+            if (IsEmptySlot(itemToMove)) return false;
             var targetItem = itemList[toIndex];
-            if (targetItem == null) {
+            if (IsEmptySlot(targetItem)) {
                 itemList[fromIndex] = null;
                 itemList[toIndex] = itemToMove;
             } else {

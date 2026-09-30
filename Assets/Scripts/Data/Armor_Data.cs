@@ -2,7 +2,7 @@ using UnityEngine;
 using InventorySystem;
 
 [CreateAssetMenu(fileName = "New Armor Data", menuName = "Armor System/Armor Data")]
-public class Armor_Data : Item_DataSO
+public class Armor_Data : Item_DataSO, IPickupModelSource
 {
     // Which slot this armor fits is declared via the inherited compatibleSlots list
     // (e.g. a hat lists SlotType_Headgear), not a dedicated armor-type field.
@@ -24,4 +24,7 @@ public class Armor_Data : Item_DataSO
     public GameObject armorModelPrefab;
     
     public Color armorTintColor = Color.white;
+
+    GameObject IPickupModelSource.PickupModelPrefab => armorModelPrefab;
+    Color IPickupModelSource.PickupModelTint => armorTintColor;
 }

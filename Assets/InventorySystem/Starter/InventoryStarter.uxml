@@ -1,0 +1,12 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="InventoryStarter.uss" />
+    <ui:VisualElement name="inventory-panel" class="starter-inventory-panel">
+        <ui:Label text="Inventory" class="starter-title" />
+        <ui:VisualElement name="equipmentContainer" class="starter-equipment-row">
+            <InventorySystem.EquipmentSlotView name="equipSlotWeapon" class="starter-equip-slot" />
+            <InventorySystem.EquipmentSlotView name="equipSlotArmor" class="starter-equip-slot" />
+        </ui:VisualElement>
+        <ui:VisualElement name="tabButtonsContainer" class="starter-tabs-row" />
+        <ui:VisualElement name="tabContentContainer" class="starter-content" />
+    </ui:VisualElement>
+</ui:UXML>
