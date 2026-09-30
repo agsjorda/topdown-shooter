@@ -1,0 +1,32 @@
+/* Default layout for the reusable InventoryContainerComponent.
+   Cosmetic overrides belong in the host game's stylesheet. */
+
+.inventory-container__layout {
+    width: 90%;
+    height: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    flex-grow: 0;
+}
+
+.inventory-container__tabs {
+    width: 80%;
+    height: 15%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0;
+    margin-top: 5%;
+}
+
+.inventory-container__content {
+    flex-grow: 0;
+    flex-direction: row;
+    width: 90%;
+    height: 70%;
+    flex-shrink: 1;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    overflow: hidden;
+}

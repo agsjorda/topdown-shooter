@@ -1054,6 +1054,7 @@ MonoBehaviour:
   m_Name:
   m_EditorClassIdentifier:
   targetDocument: {fileID: 600002}
+  panelElementName: inventory-panel
   slotSize: 90
   slotCount: 24
   cellMargin: 6
@@ -1075,6 +1076,8 @@ MonoBehaviour:
     slotType: {fileID: 11400000, guid: 9d84e2a0c08e2128601408c36395fcc4, type: 2}
   - elementName: equipSlotHead
     slotType: {fileID: 11400000, guid: 6e8cc94c93ce1c6cf4c73363a142a909, type: 2}
+  equipmentController: {fileID: 0}
+  theme: {fileID: 11400000, guid: 7b3e9c1a4d2f48e0a6b5c4d3e2f1a098, type: 2}
   coreStyles: {fileID: 0}
   addCoreStyles: 1
 --- !u!114 &600006

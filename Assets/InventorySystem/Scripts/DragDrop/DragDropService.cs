@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,20 +17,20 @@ namespace InventorySystem
         public event Action<string> OnDebugLog;
 
         private DragState dragState;
-        private InventoryViewModel inventoryViewModel;
+        private IInventory inventory;
         private IEquipmentSystem equipmentSystem;
         private List<EquipmentSlotView> equipmentSlots;
         private bool debugMode;
         private readonly DragVisualHandler dragVisualHandler;
 
         public DragDropService(
-            InventoryViewModel inventoryViewModel,
+            IInventory inventory,
             IEquipmentSystem equipmentSystem,
             List<EquipmentSlotView> equipmentSlots,
             DragVisualHandler dragVisualHandler,
             bool debugMode = false)
         {
-            this.inventoryViewModel = inventoryViewModel;
+            this.inventory = inventory;
             this.equipmentSystem = equipmentSystem;
             this.equipmentSlots = equipmentSlots;
             this.dragVisualHandler = dragVisualHandler;
@@ -44,7 +43,7 @@ namespace InventorySystem
         public void StartDrag(Vector2 position)
         {
             dragState.IsDragging = true;
-            var draggedItem = dragState.GetDraggedItem(inventoryViewModel);
+            var draggedItem = dragState.GetDraggedItem(inventory, equipmentSystem);
             if (draggedItem == null)
             {
                 ResetDrag();
@@ -90,7 +89,7 @@ namespace InventorySystem
                 targetInventory,
                 targetEquipment,
                 inventorySlots,
-                inventoryViewModel,
+                inventory,
                 equipmentSystem,
                 debugMode
             );

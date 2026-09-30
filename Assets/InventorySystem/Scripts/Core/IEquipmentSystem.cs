@@ -9,11 +9,17 @@ namespace InventorySystem
     public interface IEquipmentSystem
     {
         /// <summary>
+        /// Whether the item is allowed in the slot. The item's compatibleSlots list is the rule.
+        /// </summary>
+        bool CanEquip(InventoryItem item, EquipmentSlotTypeSO slotType);
+
+        /// <summary>
         /// Equips an item to the specified equipment slot.
+        /// Returns false when the item cannot go in that slot; nothing changes in that case.
         /// </summary>
         /// <param name="item">The inventory item to equip</param>
-        /// <param name="slotType">The equipment slot type (Weapon, Headgear, Vest, Boots)</param>
-        void EquipItem(InventoryItem item, EquipmentSlotTypeSO slotType);
+        /// <param name="slotType">The equipment slot type asset</param>
+        bool EquipItem(InventoryItem item, EquipmentSlotTypeSO slotType);
 
         /// <summary>
         /// Unequips the item from the specified equipment slot.

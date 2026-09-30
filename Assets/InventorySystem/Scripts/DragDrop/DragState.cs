@@ -19,13 +19,13 @@ namespace InventorySystem
         public bool HasValidSource => IsFromInventory || IsFromEquipment;
 
         /// Gets the item being dragged (works for both inventory and equipment sources)
-        public InventoryItem GetDraggedItem(InventoryViewModel inventoryViewModel)
+        public InventoryItem GetDraggedItem(IInventory inventory, IEquipmentSystem equipment)
         {
-            if (IsFromEquipment)
-                return SourceEquipmentSlot.GetEquippedItem();
+            if (IsFromEquipment && equipment != null)
+                return equipment.GetEquippedItem(SourceEquipmentSlot.SlotType);
 
-            if (IsFromInventory && inventoryViewModel != null)
-                return inventoryViewModel.GetItemAt(SourceInventorySlot.SlotIndex);
+            if (IsFromInventory && inventory != null)
+                return inventory.GetItemAt(SourceInventorySlot.SlotIndex);
 
             return null;
         }

@@ -4,7 +4,7 @@ namespace InventorySystem
 {
     /// <summary>
     /// Central service for accessing inventory and equipment systems.
-    /// Replaces scattered FindFirstObjectByType calls with a centralized registry.
+    /// Replaces scattered FindAnyObjectByType calls with a centralized registry.
     /// </summary>
     public static class InventoryService
     {
@@ -27,7 +27,7 @@ namespace InventorySystem
         {
             if (_playerInventory == null)
             {
-                var inventoryModel = Object.FindFirstObjectByType<InventoryModel>();
+                var inventoryModel = Object.FindAnyObjectByType<InventoryModel>();
                 if (inventoryModel != null)
                 {
                     _playerInventory = inventoryModel;
@@ -45,7 +45,7 @@ namespace InventorySystem
         {
             if (_playerEquipment == null)
             {
-                var equipmentController = Object.FindFirstObjectByType<EquipmentController>();
+                var equipmentController = Object.FindAnyObjectByType<EquipmentController>();
                 if (equipmentController != null)
                 {
                     _playerEquipment = equipmentController;

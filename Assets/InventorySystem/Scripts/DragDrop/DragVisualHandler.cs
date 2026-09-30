@@ -30,9 +30,7 @@ namespace InventorySystem
             // Create new ghost with fluent API using extensions
             return root.CreateChild("drag-ghost")
                 .WithName("dragGhost")
-                .WithPickingMode(PickingMode.Ignore)
-                .WithAbsolutePosition()
-                .WithSize(128, 128);
+                .WithPickingMode(PickingMode.Ignore);
         }
 
         public void ShowGhost(Sprite icon, Vector2 position)

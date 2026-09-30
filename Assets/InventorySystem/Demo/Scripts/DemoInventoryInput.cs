@@ -15,7 +15,7 @@ namespace InventorySystem.Demos
             if (inventoryController == null)
                 inventoryController = GetComponent<InventoryUIController>();
             if (inventoryController == null)
-                inventoryController = Object.FindFirstObjectByType<InventoryUIController>();
+                inventoryController = Object.FindAnyObjectByType<InventoryUIController>();
         }
 
         private void Update()

@@ -5,7 +5,10 @@ public class WeaponSlot
     public Weapon weapon;
     public bool isEquipped;
 
-    public bool IsEmpty => weapon == null;
+    // Weapon is a serializable class, so Unity replaces a null reference with a blank
+    // instance whenever this slot is serialized (Inspector, play-mode reload). A blank
+    // Weapon has no data asset, so treat that as empty too.
+    public bool IsEmpty => weapon == null || weapon.weaponData == null;
 
     public void Clear()
     {

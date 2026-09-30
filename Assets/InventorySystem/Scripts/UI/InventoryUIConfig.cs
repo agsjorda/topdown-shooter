@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -9,6 +10,9 @@ namespace InventorySystem
     {
         [Header("Target")]
         public UIDocument targetDocument;
+
+        [Tooltip("Element name of the panel the theme's panel background is applied to")]
+        public string panelElementName = "inventory-panel";
 
         [Header("Slot Layout")]
         [Range(40, 300)] public int slotSize = 100;
@@ -42,6 +46,13 @@ namespace InventorySystem
         [Tooltip("Maps EquipmentSlotView elements in the UXML (by element name) to slot type assets. Defines which equipment slots exist for this game")]
         public List<EquipmentSlotBinding> equipmentSlotBindings = new List<EquipmentSlotBinding>();
 
+        [Tooltip("Equipment data this panel displays. Falls back to InventoryService when empty.")]
+        [SerializeField] private EquipmentController equipmentController;
+
+        [Header("Theme")]
+        [Tooltip("Optional textures for the panel, slot grid, empty slots, tabs, and equipment slots. Empty sprites fall back to USS.")]
+        public InventoryThemeSO theme;
+
         [Header("Styling")]
         [Tooltip("Functional styles the inventory code toggles (drag states, ghost, qty label). Auto-loaded from the module's Resources when null; the host game's own stylesheets override these")]
         public StyleSheet coreStyles;
@@ -52,11 +63,15 @@ namespace InventorySystem
         private InventoryScrollElement _scrollWrapper;
         private VisualElement _slotsContainer;
         private readonly List<SlotView> _createdSlots = new List<SlotView>();
+        private readonly List<EquipmentSlotView> _equipmentSlots = new List<EquipmentSlotView>();
+        private IEquipmentSystem _equipment;
+        private bool _equipmentSubscribed;
+        private Coroutine _initializeRoutine;
 
-        // MVVM: ViewModel property (set externally or via inspector)
         public InventoryViewModel ViewModel { get; set; }
 
         public List<SlotView> Slots => _createdSlots;
+        public List<EquipmentSlotView> EquipmentSlots => _equipmentSlots;
         public int CreatedSlotCount => _createdSlots.Count;
 
         // The element holding all SlotViews. Stable across rebuilds (only its children are
@@ -78,13 +93,12 @@ namespace InventorySystem
             return false;
         }
 
-        // Added reference to TabFilterManager
         public TabFilterManager TabFilterManager { get; set; }
 
         void Awake()
         {
             targetDocument ??= GetComponent<UIDocument>();
-            // Use the shared ViewModel so all systems observe the same instance
+            equipmentController ??= GetComponent<EquipmentController>();
             if (ViewModel == null) {
                 ViewModel = InventoryService.GetPlayerInventoryViewModel();
                 if (ViewModel == null) {
@@ -96,8 +110,31 @@ namespace InventorySystem
         void OnEnable()
         {
             targetDocument ??= GetComponent<UIDocument>();
+            if (_initializeRoutine != null)
+                StopCoroutine(_initializeRoutine);
+            _initializeRoutine = StartCoroutine(InitializeWhenReady());
+        }
+
+        void OnDisable()
+        {
+            if (_initializeRoutine != null) {
+                StopCoroutine(_initializeRoutine);
+                _initializeRoutine = null;
+            }
+            UnsubscribeEquipment();
+        }
+
+        // UIDocument builds its visual tree during the first frame. Building in OnEnable
+        // often sees a null root, so the slot grid and InventoryCore.uss never attach.
+        private IEnumerator InitializeWhenReady()
+        {
+            yield return new WaitForEndOfFrame();
+            _initializeRoutine = null;
             CacheContainers();
             BuildOrUpdateSlotsOnly();
+            InitializeEquipmentSlots();
+            SubscribeEquipment();
+            ApplyTheme();
         }
 
         void OnValidate()
@@ -105,6 +142,8 @@ namespace InventorySystem
             if (!Application.isPlaying) {
                 CacheContainers();
                 BuildOrUpdateSlotsOnly();
+                InitializeEquipmentSlots();
+                ApplyTheme();
             }
         }
 
@@ -115,14 +154,117 @@ namespace InventorySystem
         {
             CacheContainers();
             BuildOrUpdateSlotsOnly();
-            // Only let TabFilterManager handle slot filling to ensure correct filtering
-            if (TabFilterManager != null)
-            {
+            InitializeEquipmentSlots();
+            if (TabFilterManager != null) {
                 TabFilterManager.RefreshDisplayForCurrentTab();
+            }
+            SyncEquipmentFromModel();
+            ApplyTheme();
+        }
+
+        /// <summary>Swap the theme at runtime and repaint every themed element.</summary>
+        public void SetTheme(InventoryThemeSO newTheme)
+        {
+            theme = newTheme;
+            ApplyTheme();
+        }
+
+        /// <summary>Paints the current theme onto the panel, grid, slots, equipment layers, and tabs.</summary>
+        public void ApplyTheme()
+        {
+            var root = targetDocument?.rootVisualElement;
+            if (root == null) return;
+
+            string panelName = string.IsNullOrEmpty(panelElementName) ? "inventory-panel" : panelElementName;
+            VisualElement panel = root.Q<VisualElement>(panelName);
+
+            InventoryThemeApplier.Apply(
+                theme,
+                root,
+                panel,
+                _slotsContainer,
+                _createdSlots,
+                _equipmentSlots,
+                CollectTabs(root));
+        }
+
+        private void InitializeEquipmentSlots()
+        {
+            _equipmentSlots.Clear();
+            var root = targetDocument?.rootVisualElement;
+            if (root == null || equipmentSlotBindings == null) return;
+
+            foreach (var binding in equipmentSlotBindings) {
+                if (binding == null || string.IsNullOrEmpty(binding.elementName) || binding.slotType == null) continue;
+                var slot = root.Q<EquipmentSlotView>(binding.elementName);
+                if (slot == null) continue;
+                slot.Initialize(binding.slotType);
+                _equipmentSlots.Add(slot);
             }
         }
 
-        #region Private Methods
+        private void SubscribeEquipment()
+        {
+            if (!Application.isPlaying || _equipmentSubscribed) return;
+            _equipment = equipmentController != null
+                ? equipmentController
+                : InventoryService.GetPlayerEquipment();
+            if (_equipment == null) return;
+            _equipment.OnEquipmentChanged += HandleEquipmentChanged;
+            _equipmentSubscribed = true;
+            SyncEquipmentFromModel();
+        }
+
+        private void UnsubscribeEquipment()
+        {
+            if (!_equipmentSubscribed || _equipment == null) {
+                _equipmentSubscribed = false;
+                return;
+            }
+            _equipment.OnEquipmentChanged -= HandleEquipmentChanged;
+            _equipmentSubscribed = false;
+        }
+
+        private void HandleEquipmentChanged(EquipmentSlotTypeSO slotType, InventoryItem item)
+        {
+            var slot = FindEquipmentSlot(slotType);
+            if (slot == null) return;
+            if (item == null) slot.ClearItem();
+            else slot.SetItem(item);
+        }
+
+        private void SyncEquipmentFromModel()
+        {
+            if (_equipment == null) return;
+            for (int i = 0; i < _equipmentSlots.Count; i++) {
+                var slot = _equipmentSlots[i];
+                if (slot == null || slot.SlotType == null) continue;
+                var item = _equipment.GetEquippedItem(slot.SlotType);
+                if (item == null) slot.ClearItem();
+                else slot.SetItem(item);
+            }
+        }
+
+        private EquipmentSlotView FindEquipmentSlot(EquipmentSlotTypeSO slotType)
+        {
+            for (int i = 0; i < _equipmentSlots.Count; i++) {
+                var slot = _equipmentSlots[i];
+                if (slot != null && slot.SlotType == slotType) return slot;
+            }
+            return null;
+        }
+
+        private static List<InventoryTabElement> CollectTabs(VisualElement root)
+        {
+            var tabs = new List<InventoryTabElement>();
+            var tabButtons = root.Q<VisualElement>("tabButtonsContainer");
+            if (tabButtons == null) return tabs;
+            foreach (var child in tabButtons.Children()) {
+                if (child is InventoryTabElement tab) tabs.Add(tab);
+            }
+            return tabs;
+        }
+
         private void CacheContainers()
         {
             var root = targetDocument?.rootVisualElement;
@@ -159,7 +301,6 @@ namespace InventorySystem
             }
         }
 
-        // Only build slots, not tabs. TabFilterManager will handle tab UI and filtering.
         private void BuildOrUpdateSlotsOnly()
         {
             if (_tabContentContainer == null || _slotsContainer == null)
@@ -169,7 +310,6 @@ namespace InventorySystem
 
             _slotsContainer.Clear();
             _createdSlots.Clear();
-
             _createdSlots.Capacity = slotCount;
 
             for (int i = 0; i < slotCount; i++) {
@@ -184,6 +324,5 @@ namespace InventorySystem
 
             _tabContentContainer.MarkDirtyRepaint();
         }
-        #endregion
     }
 }

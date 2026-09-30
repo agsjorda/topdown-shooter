@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 namespace InventorySystem
 {
     /// <summary>
-    /// Handles moving or swapping items within inventory slots using the ViewModel.
+    /// Handles moving or swapping items within inventory slots.
     /// </summary>
     public class InventoryToInventoryTransaction : DragDropTransaction
     {
@@ -16,53 +16,49 @@ namespace InventorySystem
             int fromIndex,
             int toIndex,
             SlotView targetSlot,
-            InventoryViewModel inventoryViewModel,
+            IInventory inventory,
             IEquipmentSystem equipmentSystem,
             bool debugMode = false)
-            : base(inventoryViewModel, equipmentSystem, debugMode)
+            : base(inventory, equipmentSystem, debugMode)
         {
             this.fromIndex = fromIndex;
             this.toIndex = toIndex;
             this.targetSlot = targetSlot;
         }
 
-        /// <inheritdoc/>
         public override bool CanExecute()
         {
             if (fromIndex == toIndex) {
                 Log("Source and target are the same slot");
                 return false;
             }
-            if (inventoryViewModel == null) {
-                LogError("InventoryViewModel is null");
+            if (inventory == null) {
+                LogError("Inventory is null");
                 return false;
             }
-            if (!inventoryViewModel.IsValidSlotIndex(fromIndex) || !inventoryViewModel.IsValidSlotIndex(toIndex)) {
+            if (!inventory.IsValidSlotIndex(fromIndex) || !inventory.IsValidSlotIndex(toIndex)) {
                 LogError($"Invalid slot index: from {fromIndex}, to {toIndex}");
                 return false;
             }
             return true;
         }
 
-        /// <inheritdoc/>
         public override IEnumerator Execute()
         {
-            yield return null; // Wait one frame for visual feedback
+            yield return null;
 
-            var fromItem = inventoryViewModel.GetItemAt(fromIndex);
-            var toItem = inventoryViewModel.GetItemAt(toIndex);
+            var fromItem = inventory.GetItemAt(fromIndex);
+            var toItem = inventory.GetItemAt(toIndex);
             if (fromItem != null && toItem != null) {
                 Log($"Inventory swap between slot {fromIndex} and slot {toIndex}");
-                inventoryViewModel.SwapItems(fromIndex, toIndex);
+                inventory.SwapItems(fromIndex, toIndex);
             } else {
                 Log($"Inventory move from slot {fromIndex} to slot {toIndex} (moving to empty)");
-                inventoryViewModel.MoveItem(fromIndex, toIndex);
+                inventory.MoveItem(fromIndex, toIndex);
             }
-            // Only update visuals on the slot
             targetSlot?.RemoveFromClassList("inventorySlots--drop-target");
         }
 
-        /// <inheritdoc/>
-        public override VisualElement GetTargetVisual() => targetSlot as VisualElement;
+        public override VisualElement GetTargetVisual() => targetSlot;
     }
 }

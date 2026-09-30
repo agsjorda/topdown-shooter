@@ -228,7 +228,7 @@ public class PlanarReflectionVolume : MonoBehaviour
     private Camera InitializeReflectionCamera()
     {
         var go = new GameObject("", typeof(Camera));
-        go.name = "Reflection Camera [" + go.GetInstanceID() + "]";
+        go.name = "Reflection Camera [" + go.GetEntityId() + "]";
         var camData = go.AddComponent(typeof(UnityEngine.Rendering.Universal.UniversalAdditionalCameraData)) as UnityEngine.Rendering.Universal.UniversalAdditionalCameraData;
 
         camData.requiresColorOption = CameraOverrideOption.Off;
@@ -317,7 +317,10 @@ public class PlanarReflectionVolume : MonoBehaviour
 
         if (_reflectionCamera.WorldToViewportPoint(reflectionTarget.transform.position).z < 100000)
         {
-            UniversalRenderPipeline.RenderSingleCamera(context, _reflectionCamera);
+            RenderPipeline.SubmitRenderRequest(_reflectionCamera, new UniversalRenderPipeline.SingleCameraRequest
+            {
+                destination = _reflectionCamera.targetTexture
+            });
         }
 
         data.Restore();

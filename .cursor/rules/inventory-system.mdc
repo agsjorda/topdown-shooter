@@ -1,0 +1,170 @@
+---
+description: Architecture, data flow, conventions and known quirks of the self-contained InventorySystem module (Assets/InventorySystem) and how the shooter integrates with it. Read before touching inventory, equipment, item data, or inventory UI/drag-drop code.
+globs: Assets/InventorySystem/**
+alwaysApply: false
+---
+
+# InventorySystem Module — Project Memory
+
+Self-contained inventory + equipment + drag/drop package for **Unity 6000.4.9f1**, **UI Toolkit only** (no uGUI).
+Designed like an Asset Store package: `Assets/InventorySystem/` can be copied into any project; `Demo/` and `Scripts/Extras/` are deletable.
+Last relevant commits: `530ceeb partial InventorySystem refactor`, `725d330 added DemoMat`. Refactor is described as *partial* — expect leftovers (see "Known quirks").
+
+## Assemblies (compiler-enforced boundaries)
+
+| asmdef | Namespace | References | Notes |
+| --- | --- | --- | --- |
+| `Scripts/InventorySystem.asmdef` | `InventorySystem` | none (engine only) | `autoReferenced: true`. Must NEVER reference game code (`Assembly-CSharp`). |
+| `Demo/InventorySystem.Demos.asmdef` | `InventorySystem.Demos` | `InventorySystem`, `Unity.InputSystem` | Demo only. Core must not depend on Input System. |
+
+Game code (`Assembly-CSharp`) consumes the module with `using InventorySystem;`. Dependency direction is one-way: game → module.
+
+## Folder layout
+
+```
+Assets/InventorySystem/
+├── Scripts/
+│   ├── Core/        IInventory, IEquipmentSystem, InventoryItem, InventoryModel, InventoryViewModel,
+│   │                InventoryService, EquipmentController, DragDropController
+│   ├── Data/        Item_DataSO, ItemCategorySO, EquipmentSlotTypeSO, InventoryThemeSO
+│   ├── DragDrop/    DragDropService, DragState, DragVisualHandler, DoubleClickHandler,
+│   │                DragDropTransaction (base), TransactionFactory, Transactions/*.cs (6), README.md (OUTDATED)
+│   ├── UI/          InventoryUIConfig, InventoryThemeApplier, TabFilterManager, InventoryUIController, Inventory_UI,
+│   │                UIBaseComponent, SlotView, EquipmentSlotView, InventoryTabElement, InventoryScrollElement, InventoryContainerComponent
+│   ├── Utilities/   VisualElementExtensions (fluent API), EnumerableExtensions, RectExtensions
+│   └── Extras/      ItemPickup (optional, namespace InventorySystem.Extras)
+├── Resources/InventorySystem/   InventoryContainer.uxml+.uss, InventoryCore.uss  (Resources.Load path is a contract)
+├── Demo/            InventoryDemo.unity, Data/*.asset, UI/InventoryPanel.uxml+.uss, Scripts/Demo*.cs
+└── Documentation/QuickStart.md   (CURRENT, authoritative usage doc)
+```
+
+## Data layer (all authored as assets, no enums)
+
+- `Item_DataSO` (`Create > Inventory System > Item Data`): `itemId` (auto GUID, hidden, lazily generated + `SetDirty` in editor), `itemName`, `icon` (Sprite), `description`, `category` (ItemCategorySO), `compatibleSlots` (List<EquipmentSlotTypeSO>), `stackable` (default true), `maxStack` (99). `CanEquipTo(slot)` = `compatibleSlots.Contains(slot)`.
+  - **The item is the single source of truth for slot fit.** Slots carry no accepted-item lists. Empty `compatibleSlots` = not equippable.
+  - Game subclasses: `Weapon_Data : Item_DataSO` (Assets/Scripts/Data), `Armor_Data : Item_DataSO`. Keep subclassing for stats; never fork the base.
+- `ItemCategorySO`: `id` (doubles as tab id; `"all"` reserved for show-everything tab), `displayName`, `tabIcon` (Texture2D), `tabIconTint`.
+- `EquipmentSlotTypeSO`: `id`, `displayName`, `ussClassSuffix` → `EquipmentSlotView` adds `equipment-slot--{suffix|id}` (lowercased). `ToString()` returns id.
+- Old enums `ItemType`, `EquipmentSlotType`, `ArmorType` were REMOVED (`Assets/Scripts/Enum/ItemEnums.cs` only has game enums now). Do not reintroduce them.
+- `InventoryItem` (plain `[Serializable]` class): `itemData` + `quantity` (min 1). Identity is by reference in lists; stacking compares `itemData.itemId`.
+
+## Core runtime
+
+### `InventoryModel : MonoBehaviour, IInventory`
+- `itemList` is a `List<InventoryItem>` that **may contain nulls = empty slots** and may be **shorter than `maxInventorySize`** (default 24). Indices beyond `Count` are valid empty slots; `EnsureSize(index)` grows the list lazily. Never assume `Count == MaxInventorySize`.
+- `AddItem`: if `stackable`, `TryStackItem` merges into the first same-`itemId` stack that can hold the **whole** quantity (no partial splits), else takes first empty slot. Returns `false` when full — callers must not consume the world object in that case.
+- `MoveItem` == `SmartMoveItem` (moves to empty or swaps if occupied). `SwapItems` requires both indices `< itemList.Count`.
+- Events: `OnSlotChanged(int)` per touched slot, then `OnInventoryChanged()` once per operation. `debugLogging` toggle.
+
+### `InventoryViewModel : IInventory` (plain class, not serializable)
+- Thin validating wrapper over `InventoryModel`; re-broadcasts both events. **All UI/drag-drop code must use the shared instance** from `InventoryService.GetPlayerInventoryViewModel()` — never `new InventoryViewModel(...)` elsewhere.
+
+### `InventoryService` (static registry)
+- `GetPlayerInventory()` / `GetPlayerEquipment()` lazily `FindFirstObjectByType` for `InventoryModel` / `EquipmentController`; `RegisterPlayerInventory/Equipment()` for explicit DI; `Clear()` on scene change.
+- `GetPlayerInventoryViewModel()` caches one ViewModel per registered inventory (only works if inventory is an `InventoryModel`).
+- Statics reset via `[RuntimeInitializeOnLoadMethod(SubsystemRegistration)]` to survive disabled Domain Reload.
+
+### `EquipmentController : MonoBehaviour, IEquipmentSystem`
+- `equippedItems` list of `{ slotType, item }`; one item per `EquipmentSlotTypeSO`.
+- `EquipItem` replaces silently (single `OnEquipmentChanged(slotType, item)`), `UnequipSlot` fires `OnEquipmentChanged(slotType, null)`. This event is **the** hook for game reactions (armor model, stats, SFX).
+- `CanEquip(item, slotType)` is the only slot-fit check (`item.itemData.CanEquipTo`). `EquipItem` returns false and changes nothing when it fails.
+
+## UI layer (UI Toolkit)
+
+### UXML contract (element names, configurable on components)
+```
+inventory-panel                                  ← InventoryUIController toggles class ui-hidden (!important)
+├── <InventorySystem.EquipmentSlotView name="equipSlot..."/>   any count/names; bound via InventoryUIConfig.equipmentSlotBindings
+├── tabButtonsContainer                          ← TabFilterManager generates InventoryTabElement children
+└── tabContentContainer                          ← InventoryUIConfig injects InventoryScrollElement > ScrollView > .inventory-slots-container > SlotView*
+```
+Reference: `Demo/UI/InventoryPanel.uxml`. Shooter: `GameUI.uxml`/`GameUI.uss` (game side).
+
+### Components (typically all on one GameObject with the `UIDocument`)
+| Component | Responsibility | Key fields |
+| --- | --- | --- |
+| `InventoryUIConfig` | Builds the slot grid; owns `Slots`, `EquipmentSlots`, and `SlotsContainer`; initializes equipment slots from bindings; subscribes to `OnEquipmentChanged` and projects it onto `EquipmentSlotView`; loads `InventoryCore.uss`; applies `InventoryThemeSO` | `slotSize`, `slotCount`, `theme`, `panelElementName`, `equipmentController`, `equipmentSlotBindings`, `tabs` |
+| `InventoryThemeApplier` | Writes theme sprites inline (empty sprite clears the inline value so USS shows). Targets: panel, slots container, each `SlotView`, each `equipment-slot-bg`, each tab bg layer | static `Apply` |
+| `TabFilterManager` | Builds tab buttons (per-instance size, not static), tracks `_currentTabId`, subscribes to `ViewModel.OnInventoryChanged`, writes items into `SlotView`s, then `ApplyTheme()` | `uiConfig`, `enableTabFiltering`, `defaultTabId` |
+| `DragDropController` | Orchestrates drag/drop + double-click. Reads slots from `InventoryUIConfig`. Transactions take `IInventory` | `equipmentController`, `uiDocument`, `dragThreshold` (5px), `doubleClickWindow` (0.3s), `debugMode`, `highlightEmptySlots` |
+| `InventoryUIController` | Panel open/close API: `Toggle()/Open()/Close()`, `IsInventoryOpen`, `event OnInventoryToggled(bool)`. Deliberately has NO input/player/camera refs | `document`, `inventoryPanelName`, `startHidden` |
+| `EquipmentController`, `InventoryModel` | data (see above) | |
+
+Slot content refresh is **index-based**: slot `i` shows `Items[i]` (or cleared if filtered out). Filtering hides items, it does not compact them.
+
+### Custom VisualElements (all `[UxmlElement] partial`)
+- `SlotView`: class `inventorySlots`. `has-item` shows `.inventorySlots-icon`; `inventorySlots--stacked` shows `.inventorySlots-qty`. No `CanAcceptItem`.
+- `EquipmentSlotView : SlotView`: adds `equipment-slot` + `equipment-slot--{suffix}` in `Initialize`. Children: `equipment-slot-bg` (theme/empty texture) and `equipment-icon` (item sprite only). `has-item` hides the bg layer and the element's own background-image, and shows the icon. It does **not** store the item; `InventoryUIConfig` calls `SetItem`/`ClearItem` from `OnEquipmentChanged`.
+- `InventoryTabElement`: class `inventoryTab`, `inventoryTab--active`, `inventoryTab--has-label`. Size is per instance. Children: `inventoryTab-bg`, `inventoryTab-bg--active`.
+- `InventoryScrollElement`: `.inventory-scroll-wrapper` > `ScrollView` > `.inventory-slots-container`.
+- `InventoryContainerComponent`: clones `Resources/InventorySystem/InventoryContainer.uxml` (tabButtonsContainer + tabContentContainer) — optional convenience.
+
+### USS contract
+- `Resources/InventorySystem/InventoryCore.uss` = **functional only**, auto-added to root: grid wrap, `ui-hidden` (`display:none !important`), icon/qty/equipment-icon/tab-label visibility, drag states, ghost. Layout and look are not set from C# except dynamic values: ghost position, Inspector px sizes, theme sprites, item icons.
+- `InventoryThemeSO` sprites override USS only when assigned (`InventoryThemeApplier` writes inline; null sprite sets `StyleKeyword.Null`).
+- Do not add cosmetic styles to `InventoryCore.uss`. Host look: demo `InventoryPanel.uss`, shooter `GameUI.uss`. Do not put `display:none` on `.equipment-icon` in the host sheet — core USS shows it via `.equipment-slot.has-item > .equipment-icon`.
+
+## Drag & drop architecture
+
+Flow: `DragDropController` (MonoBehaviour, pointer events) → `DragDropService` (state machine, events) → `TransactionFactory.CreateTransaction(...)` → `DragDropTransaction` subclass (`CanExecute()` then `IEnumerator Execute()`) → `DragDropController.ExecuteTransaction` coroutine → `TabFilterManager.RefreshAndRebuildUI()`.
+
+Transactions (Strategy/Command pattern), in `DragDrop/Transactions/`:
+| Source → Target | Class | Behaviour |
+| --- | --- | --- |
+| Inv → Inv | `InventoryToInventoryTransaction` | swap if both occupied, else `MoveItem` |
+| Inv → Equip | `InventoryToEquipmentTransaction` | equip; previously equipped item returns to source slot |
+| Equip → Inv | `EquipmentToInventoryTransaction` | unequip into slot; swap only if `CanEquip` passes in `CanExecute` |
+| Equip → Equip | `EquipmentToEquipmentTransaction` | move/swap; both directions must `CanEquip` |
+| double-click Inv | `QuickEquipTransaction` | first equipment slot `CanEquip` accepts |
+| double-click Equip | `QuickUnequipTransaction` | first empty inventory index (scans `MaxInventorySize`) |
+
+Transactions mutate `IInventory` and `IEquipmentSystem` only. `InventoryUIConfig` projects `OnEquipmentChanged` onto the equipment views, so `EquipItem` from game code updates the UI.
+
+### Pointer-capture rules (critical — past bugs froze all panel input)
+- Inventory slot Down/Move/Up handlers are registered on **`uiConfig.SlotsContainer`** (event delegation), because `SlotView`s are recreated on every layout rebuild. Pointer is captured on the **container**, never on the `SlotView`.
+- Equipment slots are fixed UXML elements → per-slot handlers, capture on the `EquipmentSlotView` itself.
+- `Cleanup()` (OnDisable) must release any stale capture and unregister everything; `isInitialized` resets so `OnEnable` re-inits.
+- Drop hit-testing uses `worldBound.Padded(20)` for equipment and `Padded(10)` for inventory slots; equipment is checked first.
+- `DragDropController.Initialize()` is a coroutine that waits 2 frames + up to 60 frames for the ViewModel; `InventoryUIController` waits `WaitForEndOfFrame` before querying the UIDocument tree.
+
+## Initialization order (per scene load)
+1. `InventoryModel`/`EquipmentController` exist (`Awake`).
+2. `InventoryUIConfig.Awake` → `InventoryService.GetPlayerInventoryViewModel()`; `OnEnable` → cache containers, add core USS, build `SlotView`s.
+3. `TabFilterManager.Awake` registers itself on `uiConfig.TabFilterManager`; `Start` subscribes to `OnInventoryChanged`, builds tabs, fills slots.
+4. `DragDropController.OnEnable` → coroutine init (reads `uiConfig.Slots` / `EquipmentSlots`, visual handler, service, event registration).
+5. `InventoryUIController.OnEnable` → end-of-frame → wraps `inventory-panel` in `Inventory_UI`, hides if `startHidden`.
+
+## Public API games should use
+```csharp
+using InventorySystem;
+bool added = InventoryService.GetPlayerInventory().AddItem(new InventoryItem(itemData, qty)); // false = full
+InventoryService.GetPlayerEquipment().OnEquipmentChanged += (slotType, item) => { ... };       // item null = unequipped
+model.OnInventoryChanged += RefreshAll;  model.OnSlotChanged += i => RefreshSlot(i);
+inventoryUIController.Toggle(); inventoryUIController.OnInventoryToggled += open => { ... };
+// optional no-code pickup: InventorySystem.Extras.ItemPickup + trigger collider (TryPickup() for custom interaction)
+```
+
+## Shooter-side integration (Assets/Scripts)
+- `UIManager` binds `PlayerControls.Character.InventoryToggle` → `InventoryUIController.Toggle()`, also toggles HUD + character preview camera; exposes `IsInventoryOpen()` for gating weapon fire.
+- `PlayerWeaponController` adds picked-up weapons via `InventoryService.GetPlayerInventory().AddItem(new InventoryItem(weapon.weaponData))`.
+- `Pickup_Item`, `Pickup_Armor` (game's own pickups) use `InventoryService`; `Extras/ItemPickup` is the module's generic alternative.
+- `Assets/Scripts/Documentation/INVENTORY_SYSTEM_COMPLETE_DOCUMENTATION.md` predates modularization — treat as historical.
+
+## Conventions to preserve when editing
+- Keep `InventorySystem` asmdef free of game references and Input System; keep everything in namespace `InventorySystem` (`.Extras`, `.Demos` for those folders).
+- Resolve inventory slots through `uiConfig.Slots` at use-time (they're recreated); never cache `SlotView` lists in long-lived fields.
+- Route all data changes through `InventoryViewModel` / `IEquipmentSystem`; UI reacts via events. Don't rebuild slot views to refresh content — call `TabFilterManager.RefreshAndRebuildUI()`.
+- New transaction = new subclass in `Transactions/` + branch in `TransactionFactory`. Don't grow `DragDropController`.
+- Use the fluent `VisualElementExtensions` (`CreateChild`, `AddClass`, `WithName`, ...) for programmatic UI.
+- Prefer `debugMode`/`debugLogging` toggles over unconditional `Debug.Log`.
+- Everything the host game may style stays out of `InventoryCore.uss`.
+
+## Known quirks / tech debt (observed, not yet fixed)
+- `DragVisualHandler.UpdateAppearance(bool)` (green/red ghost) is never called; `drag-ghost--over-*` classes are effectively unused.
+- No save/load seam. `itemId` exists for it but nothing serializes `InventoryModel` or `EquipmentController`.
+- `InventoryService` is still one static "player" inventory. Chests and multiple characters need an explicit inventory reference on the UI stack.
+- `TabFilterManager._filteredItems` cache is rebuilt on every change but only consumed by `GetFilteredItemsForCurrentTab()`, which nothing calls.
+- `DoubleClickHandler.Reset()` is never invoked on panel open/close.
+- `Inventory_UI` is a trivial pass-through over `UIBaseComponent`.
+- `Assets/Data/Health_Potion_Small.asset` carries `m_EditorClassIdentifier: Assembly-CSharp::Item_DataSO` from before the asmdef move — verify it still resolves to `InventorySystem::Item_DataSO`.
+- `InventorySystem.unitypackage` at repo root is gitignored (`*.unitypackage`); regenerate via right-click `Assets/InventorySystem` → Export Package.

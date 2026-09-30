@@ -8,7 +8,7 @@ namespace InventorySystem
     public class TabFilterManager : MonoBehaviour
     {
         [Header("References")]
-        public InventoryViewModel inventoryViewModel;
+        [System.NonSerialized] public InventoryViewModel inventoryViewModel;
         [SerializeField] private InventoryUIConfig uiConfig;
 
         [Header("Tab Filtering")]
@@ -66,13 +66,13 @@ namespace InventorySystem
 
         private void RebuildTabsWithFiltering(VisualElement tabButtonsContainer)
         {
-            InventoryTabElement.SetGlobalSize(uiConfig.tabWidthPx, uiConfig.tabHeightPx);
-            InventoryTabElement.SetGlobalIconSize(uiConfig.tabIconWidthPx, uiConfig.tabIconHeightPx);
             tabButtonsContainer.Clear();
             for (int i = 0; i < uiConfig.tabs.Count; i++) {
                 var category = uiConfig.tabs[i];
                 if (category == null) continue;
                 var tab = new InventoryTabElement();
+                tab.SetSize(uiConfig.tabWidthPx, uiConfig.tabHeightPx);
+                tab.SetIconSize(uiConfig.tabIconWidthPx, uiConfig.tabIconHeightPx);
                 tab.SetId(category.id);
                 tab.SetIcon(category.tabIcon, category.tabIconTint);
                 tab.SetLabel(category.displayName);
@@ -83,6 +83,7 @@ namespace InventorySystem
                 tab.Clicked += (clickedTab) => OnTabClicked(capturedIndex);
                 tabButtonsContainer.Add(tab);
             }
+            uiConfig.ApplyTheme();
         }
 
         private void OnTabClicked(int tabIndex)

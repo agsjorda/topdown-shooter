@@ -57,6 +57,12 @@ namespace InventorySystem
                 return;
             }
 
+            // The panel toggles via .ui-hidden. That rule lives in InventoryCore and must be
+            // on the document before the first Hide(), which can run before InventoryUIConfig.
+            var coreStyles = Resources.Load<StyleSheet>("InventorySystem/InventoryCore");
+            if (coreStyles != null && !root.styleSheets.Contains(coreStyles))
+                root.styleSheets.Add(coreStyles);
+
             inventoryUI = new Inventory_UI(root.Q<VisualElement>(inventoryPanelName));
             if (!inventoryUI.IsValid) {
                 Debug.LogError($"[InventoryUIController] Inventory panel '{inventoryPanelName}' not found in UIDocument");

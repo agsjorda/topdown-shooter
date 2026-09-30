@@ -112,7 +112,14 @@ public class Pickup_Weapon : Interactable
     {
         // Note: PlayerWeaponController is game-specific and not part of the inventory system
         // Consider creating an IWeaponSystem interface for better modularity
-        PlayerWeaponController weaponController = Object.FindFirstObjectByType<PlayerWeaponController>();
+        PlayerWeaponController weaponController = null;
+        var controllers = Object.FindObjectsByType<PlayerWeaponController>();
+        for (int i = 0; i < controllers.Length; i++) {
+            if (controllers[i].isActiveAndEnabled) {
+                weaponController = controllers[i];
+                break;
+            }
+        }
         if (weaponController == null) {
             Debug.LogWarning($"{name}: No PlayerWeaponController found");
             return;

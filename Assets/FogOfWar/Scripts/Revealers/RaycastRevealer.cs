@@ -318,7 +318,7 @@ namespace FOW
         protected SightIteration FirstIteration;
 
         protected int CommandsPerJob;
-        public NativeArray<bool> FirstIterationConditions;
+        [NonSerialized] public NativeArray<bool> FirstIterationConditions;
         protected JobHandle PreReqJobHandle;
         protected CalculateNextPointsAndAngleConditions FirstIterationPointsAndConditionsJob;
         protected JobHandle FirstIterationPointsAndConditionsJobHandle;

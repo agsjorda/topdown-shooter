@@ -11,16 +11,16 @@ namespace InventorySystem
     /// </summary>
     public abstract class DragDropTransaction
     {
-        protected readonly InventoryViewModel inventoryViewModel;
+        protected readonly IInventory inventory;
         protected readonly IEquipmentSystem equipmentSystem;
         protected readonly bool debugMode;
 
         protected DragDropTransaction(
-            InventoryViewModel inventoryViewModel,
+            IInventory inventory,
             IEquipmentSystem equipmentSystem,
             bool debugMode = false)
         {
-            this.inventoryViewModel = inventoryViewModel;
+            this.inventory = inventory;
             this.equipmentSystem = equipmentSystem;
             this.debugMode = debugMode;
         }

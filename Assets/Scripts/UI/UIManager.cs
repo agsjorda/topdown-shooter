@@ -37,9 +37,16 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        player = Object.FindFirstObjectByType<Player>();
+        // Player_Preview also carries a disabled Player whose controls are never enabled.
+        // Bind to the enabled one so the toggle keys reach a live input map.
+        foreach (var candidate in Object.FindObjectsByType<Player>()) {
+            if (candidate.isActiveAndEnabled) {
+                player = candidate;
+                break;
+            }
+        }
         if (player == null) {
-            Debug.LogError("UIManager: Player not found in scene");
+            Debug.LogError("UIManager: No enabled Player found in scene");
             return;
         }
 

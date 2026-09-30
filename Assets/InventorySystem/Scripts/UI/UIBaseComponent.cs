@@ -19,10 +19,14 @@ namespace InventorySystem
             }
         }
 
+        public const string HiddenClass = "ui-hidden";
+
         public virtual void Show()
         {
             if (!IsValid) return;
             isVisible = true;
+            rootElement.RemoveFromClassList(HiddenClass);
+            // Clearing the inline style leaves the panel at display:none. Set flex explicitly.
             rootElement.style.display = DisplayStyle.Flex;
         }
 
@@ -30,6 +34,7 @@ namespace InventorySystem
         {
             if (!IsValid) return;
             isVisible = false;
+            rootElement.AddToClassList(HiddenClass);
             rootElement.style.display = DisplayStyle.None;
         }
 
@@ -48,9 +53,9 @@ namespace InventorySystem
         // Common helper methods
         protected void SetElementVisibility(VisualElement element, bool visible)
         {
-            if (element != null) {
-                element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
-            }
+            if (element == null) return;
+            element.EnableInClassList(HiddenClass, !visible);
+            element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         protected void SetElementWidthPercent(VisualElement element, float percent)

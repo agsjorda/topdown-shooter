@@ -11,10 +11,10 @@ namespace InventorySystem
         public EquipmentToEquipmentTransaction(
             EquipmentSlotView sourceEquipment,
             EquipmentSlotView targetEquipment,
-            InventoryViewModel inventoryViewModel,
+            IInventory inventory,
             IEquipmentSystem equipmentSystem,
             bool debugMode = false)
-            : base(inventoryViewModel, equipmentSystem, debugMode)
+            : base(inventory, equipmentSystem, debugMode)
         {
             this.sourceEquipment = sourceEquipment;
             this.targetEquipment = targetEquipment;
@@ -26,23 +26,30 @@ namespace InventorySystem
                 LogError("Source or target equipment is null");
                 return false;
             }
-
             if (sourceEquipment == targetEquipment) {
                 Log("Cannot drop on same equipment slot");
                 return false;
             }
+            if (equipmentSystem == null) {
+                LogError("Equipment system is null");
+                return false;
+            }
 
-            var itemToMove = sourceEquipment.GetEquippedItem();
+            var itemToMove = equipmentSystem.GetEquippedItem(sourceEquipment.SlotType);
             if (itemToMove == null) {
                 LogError("No item to move from source equipment");
                 return false;
             }
-
-            if (!targetEquipment.CanAcceptItem(itemToMove.itemData)) {
+            if (!equipmentSystem.CanEquip(itemToMove, targetEquipment.SlotType)) {
                 Log($"Target equipment slot {targetEquipment.SlotType} cannot accept {itemToMove.itemData.itemName}");
                 return false;
             }
 
+            var currentlyEquipped = equipmentSystem.GetEquippedItem(targetEquipment.SlotType);
+            if (currentlyEquipped != null && !equipmentSystem.CanEquip(currentlyEquipped, sourceEquipment.SlotType)) {
+                Log($"Cannot swap: {currentlyEquipped.itemData.itemName} cannot be equipped in {sourceEquipment.SlotType}");
+                return false;
+            }
             return true;
         }
 
@@ -50,45 +57,24 @@ namespace InventorySystem
         {
             yield return null;
 
-            var itemToMove = sourceEquipment.GetEquippedItem();
-            var currentlyEquipped = equipmentSystem?.GetEquippedItem(targetEquipment.SlotType);
+            var itemToMove = equipmentSystem.GetEquippedItem(sourceEquipment.SlotType);
+            var currentlyEquipped = equipmentSystem.GetEquippedItem(targetEquipment.SlotType);
 
             if (currentlyEquipped != null) {
                 Log($"Swapping {itemToMove.itemData.itemName} with {currentlyEquipped.itemData.itemName} between equipment slots");
-
-                sourceEquipment.ClearItem();
-                sourceEquipment.RefreshVisualState();
-                targetEquipment.ClearItem();
-                targetEquipment.RefreshVisualState();
-
-                equipmentSystem?.UnequipSlot(sourceEquipment.SlotType);
-                equipmentSystem?.UnequipSlot(targetEquipment.SlotType);
-
-                equipmentSystem?.EquipItem(itemToMove, targetEquipment.SlotType);
-                targetEquipment.SetItem(itemToMove);
-                targetEquipment.RefreshVisualState();
-
-                equipmentSystem?.EquipItem(currentlyEquipped, sourceEquipment.SlotType);
-                sourceEquipment.SetItem(currentlyEquipped);
-                sourceEquipment.RefreshVisualState();
+                equipmentSystem.UnequipSlot(sourceEquipment.SlotType);
+                equipmentSystem.UnequipSlot(targetEquipment.SlotType);
+                equipmentSystem.EquipItem(itemToMove, targetEquipment.SlotType);
+                equipmentSystem.EquipItem(currentlyEquipped, sourceEquipment.SlotType);
             } else {
                 Log($"Moving {itemToMove.itemData.itemName} from {sourceEquipment.SlotType} to {targetEquipment.SlotType}");
-
-                sourceEquipment.ClearItem();
-                sourceEquipment.RefreshVisualState();
-                equipmentSystem?.UnequipSlot(sourceEquipment.SlotType);
-
-                targetEquipment.ClearItem();
-                targetEquipment.RefreshVisualState();
-
-                equipmentSystem?.EquipItem(itemToMove, targetEquipment.SlotType);
-                targetEquipment.SetItem(itemToMove);
-                targetEquipment.RefreshVisualState();
+                equipmentSystem.UnequipSlot(sourceEquipment.SlotType);
+                equipmentSystem.EquipItem(itemToMove, targetEquipment.SlotType);
             }
 
             targetEquipment?.RemoveFromClassList("inventorySlots--drop-target");
         }
 
-        public override VisualElement GetTargetVisual() => targetEquipment as VisualElement;
+        public override VisualElement GetTargetVisual() => targetEquipment;
     }
 }

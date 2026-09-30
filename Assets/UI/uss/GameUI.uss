@@ -474,18 +474,8 @@
     border-bottom-color: rgba(214, 158, 46, 0.7) !important;
 }
 
-/* Equipment item icon - shown when slot has an item */
-/* NOTE: No rotation needed - parent (.equipSlot-icon) already has rotate: -45deg */
-.equipment-icon {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    -unity-background-scale-mode: scale-to-fit;
-    scale: 0.8 0.8;
-    display: none;
-}
+/* Equipment item icon layout lives in InventoryCore.uss (.equipment-icon).
+   Do not set display:none here — it would hide the equipped icon. */
 
 /* Equipment slot drop target */
 .equipment-slot.inventorySlots--drop-target {

@@ -89,3 +89,16 @@
 .inventoryTab--active {
     background-color: rgba(248, 163, 46, 0.25);
 }
+
+/* Layers the module creates. Display is owned by InventoryCore.uss;
+   style the look here. Theme sprites paint these when assigned. */
+.equipment-slot-bg,
+.inventoryTab-bg,
+.inventoryTab-bg--active {
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.inventoryTab-label {
+    color: rgb(220, 220, 220);
+    -unity-text-align: middle-center;
+}

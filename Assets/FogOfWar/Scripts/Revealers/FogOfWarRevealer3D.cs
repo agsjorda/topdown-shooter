@@ -27,7 +27,7 @@ namespace FOW
 
 		public static PlaneProjection Projection;
 #if UNITY_2022_2_OR_NEWER
-		public QueryParameters RayQueryParameters;
+		[System.NonSerialized] public QueryParameters RayQueryParameters;
 #endif
 
 #if UNITY_EDITOR

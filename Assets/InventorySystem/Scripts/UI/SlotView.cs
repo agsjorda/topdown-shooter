@@ -19,11 +19,10 @@ namespace InventorySystem
                     if (_icon == null) {
                         _icon = new Image {
                             name = "inventorySlots-icon",
-                            scaleMode = ScaleMode.ScaleToFit
+                            scaleMode = ScaleMode.ScaleToFit,
+                            pickingMode = PickingMode.Ignore
                         };
                         _icon.AddToClassList("inventorySlots-icon");
-                        _icon.style.width = Length.Percent(100);
-                        _icon.style.height = Length.Percent(100);
                         Add(_icon);
                     }
                 }
@@ -32,7 +31,7 @@ namespace InventorySystem
         }
 
         // Stack-count label shown when an item's quantity is above 1.
-        // Styleable via the "inventorySlots-qty" USS class.
+        // Visibility is the inventorySlots--stacked class; look is inventorySlots-qty in USS.
         public Label QtyLabel {
             get {
                 if (_qtyLabel == null) {
@@ -43,10 +42,6 @@ namespace InventorySystem
                             pickingMode = PickingMode.Ignore
                         };
                         _qtyLabel.AddToClassList("inventorySlots-qty");
-                        _qtyLabel.style.position = Position.Absolute;
-                        _qtyLabel.style.right = 2;
-                        _qtyLabel.style.bottom = 2;
-                        _qtyLabel.style.display = DisplayStyle.None;
                         Add(_qtyLabel);
                     }
                 }
@@ -62,10 +57,7 @@ namespace InventorySystem
         public bool HasItem => _hasItem;
         public string ItemId => _itemId;
 
-        // NEW: Property to identify if this is an equipment slot
         public virtual bool IsEquipmentSlot => false;
-
-        // NEW: Property for equipment type (null for plain inventory slots)
         public virtual EquipmentSlotTypeSO EquipmentType => null;
 
         protected int slotSize = 100;
@@ -76,12 +68,6 @@ namespace InventorySystem
             AddToClassList("inventorySlots");
             focusable = true;
             pickingMode = PickingMode.Position;
-        }
-
-        // NEW: Method to check if item can be accepted
-        public virtual bool CanAcceptItem(Item_DataSO itemData)
-        {
-            return true; // Default: accept all items
         }
 
         public virtual void SetItem(InventoryItem item)
@@ -99,11 +85,7 @@ namespace InventorySystem
                     Icon.image = item.itemData.icon.texture;
                     Icon.sprite = item.itemData.icon;
                 }
-
-                if (Icon.style.display != DisplayStyle.Flex) {
-                    Icon.style.display = DisplayStyle.Flex;
-                }
-
+                EnableInClassList("has-item", true);
                 UpdateQuantity(item.quantity);
             } else {
                 ClearItem();
@@ -112,12 +94,9 @@ namespace InventorySystem
 
         protected void UpdateQuantity(int quantity)
         {
-            if (quantity > 1) {
-                QtyLabel.text = quantity.ToString();
-                QtyLabel.style.display = DisplayStyle.Flex;
-            } else if (_qtyLabel != null) {
-                _qtyLabel.style.display = DisplayStyle.None;
-            }
+            bool stacked = quantity > 1;
+            EnableInClassList("inventorySlots--stacked", stacked);
+            if (stacked) QtyLabel.text = quantity.ToString();
         }
 
         public virtual void ClearItem()
@@ -125,23 +104,18 @@ namespace InventorySystem
             _hasItem = false;
             _itemId = string.Empty;
 
-            if (Icon.image != null) {
-                Icon.image = null;
-                Icon.sprite = null;
+            if (_icon != null) {
+                _icon.image = null;
+                _icon.sprite = null;
             }
 
-            if (Icon.style.display != DisplayStyle.None) {
-                Icon.style.display = DisplayStyle.None;
-            }
-
-            if (_qtyLabel != null) {
-                _qtyLabel.style.display = DisplayStyle.None;
-            }
+            EnableInClassList("has-item", false);
+            EnableInClassList("inventorySlots--stacked", false);
         }
 
         public virtual void SetSlotIndex(int index) => SlotIndex = index;
 
-        #region UI settings
+        // Pixel sizes come from InventoryUIConfig, so they stay inline.
         public virtual void SetSlotSize(int size)
         {
             if (slotSize != size) {
@@ -159,6 +133,5 @@ namespace InventorySystem
                 style.marginBottom = cellMargin;
             }
         }
-        #endregion
     }
 }

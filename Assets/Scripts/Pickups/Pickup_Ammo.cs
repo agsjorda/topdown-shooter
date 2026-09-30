@@ -46,7 +46,7 @@ public class Pickup_Ammo : Interactable
 
     public override void Interaction()
     {
-        PlayerWeaponController weaponController = Object.FindFirstObjectByType<PlayerWeaponController>();
+        PlayerWeaponController weaponController = Object.FindAnyObjectByType<PlayerWeaponController>();
         if (weaponController == null)
             return;
 

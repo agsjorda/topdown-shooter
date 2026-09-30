@@ -16,7 +16,7 @@ namespace InventorySystem
         /// <param name="targetInventorySlot">Target inventory slot (if dropping to inventory)</param>
         /// <param name="targetEquipmentSlot">Target equipment slot (if dropping to equipment)</param>
         /// <param name="inventorySlots">List of all inventory slots</param>
-        /// <param name="inventoryViewModel">The inventory view model</param>
+        /// <param name="inventory">The inventory</param>
         /// <param name="equipmentSystem">The equipment system interface</param>
         /// <param name="debugMode">Enable debug logging</param>
         /// <returns>The appropriate transaction or null if invalid</returns>
@@ -25,7 +25,7 @@ namespace InventorySystem
             SlotView targetInventorySlot,
             EquipmentSlotView targetEquipmentSlot,
             List<SlotView> inventorySlots,
-            InventoryViewModel inventoryViewModel,
+            IInventory inventory,
             IEquipmentSystem equipmentSystem,
             bool debugMode = false)
         {
@@ -42,22 +42,21 @@ namespace InventorySystem
                     fromIndex,
                     toIndex,
                     targetInventorySlot,
-                    inventoryViewModel,
+                    inventory,
                     equipmentSystem,
                     debugMode
                 );
             }
 
             if (fromInventory && toEquipment) {
-                var item = inventoryViewModel?.GetItemAt(dragState.SourceInventorySlot.SlotIndex);
+                var item = inventory?.GetItemAt(dragState.SourceInventorySlot.SlotIndex);
                 int sourceIndex = dragState.SourceInventorySlot.SlotIndex;
 
                 return new InventoryToEquipmentTransaction(
                     item,
                     sourceIndex,
                     targetEquipmentSlot,
-                    inventorySlots,
-                    inventoryViewModel,
+                    inventory,
                     equipmentSystem,
                     debugMode
                 );
@@ -70,8 +69,7 @@ namespace InventorySystem
                     dragState.SourceEquipmentSlot,
                     targetIndex,
                     targetInventorySlot,
-                    inventorySlots,
-                    inventoryViewModel,
+                    inventory,
                     equipmentSystem,
                     debugMode
                 );
@@ -81,7 +79,7 @@ namespace InventorySystem
                 return new EquipmentToEquipmentTransaction(
                     dragState.SourceEquipmentSlot,
                     targetEquipmentSlot,
-                    inventoryViewModel,
+                    inventory,
                     equipmentSystem,
                     debugMode
                 );

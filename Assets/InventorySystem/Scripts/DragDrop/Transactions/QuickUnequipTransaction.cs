@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 namespace InventorySystem
 {
     /// <summary>
-    /// Handles quick-unequip (double-click) from equipment to inventory. Uses ViewModel/Controller for state changes.
+    /// Double-click unequip into the first empty inventory slot.
     /// </summary>
     public class QuickUnequipTransaction : DragDropTransaction
     {
@@ -19,17 +19,16 @@ namespace InventorySystem
             EquipmentSlotView sourceEquipmentSlot,
             InventoryItem equippedItem,
             List<SlotView> inventorySlots,
-            InventoryViewModel inventoryViewModel,
+            IInventory inventory,
             IEquipmentSystem equipmentSystem,
             bool debugMode = false)
-            : base(inventoryViewModel, equipmentSystem, debugMode)
+            : base(inventory, equipmentSystem, debugMode)
         {
             this.sourceEquipmentSlot = sourceEquipmentSlot;
             this.equippedItem = equippedItem;
             this.inventorySlots = inventorySlots;
         }
 
-        /// <inheritdoc/>
         public override bool CanExecute()
         {
             if (equippedItem == null || equippedItem.itemData == null) {
@@ -40,10 +39,14 @@ namespace InventorySystem
                 LogError("No source equipment slot");
                 return false;
             }
-            // Find first empty slot in ViewModel
+            if (inventory == null) {
+                LogError("Inventory is null");
+                return false;
+            }
+
             targetInventoryIndex = -1;
-            for (int i = 0; i < inventoryViewModel.MaxInventorySize; i++) {
-                if (inventoryViewModel.GetItemAt(i) == null) {
+            for (int i = 0; i < inventory.MaxInventorySize; i++) {
+                if (inventory.GetItemAt(i) == null) {
                     targetInventoryIndex = i;
                     break;
                 }
@@ -52,32 +55,26 @@ namespace InventorySystem
                 Log("No empty inventory slot available for unequipping");
                 return false;
             }
-            if (targetInventoryIndex < inventorySlots.Count)
-                targetInventorySlot = inventorySlots[targetInventoryIndex];
-            else
-                targetInventorySlot = null;
+            targetInventorySlot = targetInventoryIndex < inventorySlots.Count
+                ? inventorySlots[targetInventoryIndex]
+                : null;
             Log($"Quick unequip {equippedItem.itemData.itemName} from {sourceEquipmentSlot.SlotType} to slot {targetInventoryIndex}");
             return true;
         }
 
-        /// <inheritdoc/>
         public override IEnumerator Execute()
         {
             yield return null;
             Log($"Unequipping {equippedItem.itemData.itemName} from {sourceEquipmentSlot.SlotType} to inventory slot {targetInventoryIndex}");
-            sourceEquipmentSlot.ClearItem();
-            sourceEquipmentSlot.RefreshVisualState();
             equipmentSystem?.UnequipSlot(sourceEquipmentSlot.SlotType);
-            inventoryViewModel.SetItemAt(targetInventoryIndex, equippedItem);
+            inventory.SetItemAt(targetInventoryIndex, equippedItem);
             if (targetInventorySlot != null) {
-                targetInventorySlot.SetItem(equippedItem);
                 targetInventorySlot.AddToClassList("inventorySlots--drop-target");
                 yield return null;
                 targetInventorySlot.RemoveFromClassList("inventorySlots--drop-target");
             }
         }
 
-        /// <inheritdoc/>
-        public override VisualElement GetTargetVisual() => targetInventorySlot as VisualElement;
+        public override VisualElement GetTargetVisual() => targetInventorySlot;
     }
 }

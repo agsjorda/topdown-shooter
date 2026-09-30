@@ -40,7 +40,7 @@ public class PlayerWeaponController : MonoBehaviour
     private void Start()
     {
         player = GetComponent<Player>();
-        uiManager = Object.FindFirstObjectByType<UIManager>(); // Cache on Start
+        uiManager = Object.FindAnyObjectByType<UIManager>(); // Cache on Start
         InitializeWeaponSlots();
         AssignInputEvents();
         Invoke(nameof(EquipStartingWeapon), 0.1f);
@@ -107,7 +107,8 @@ public class PlayerWeaponController : MonoBehaviour
             weaponSlots[currentSlotIndex].isEquipped = false;
     }
 
-    private bool IsValidSlot(int index) => index >= 0 && index < maxSlots;
+    private bool IsValidSlot(int index) =>
+        weaponSlots != null && index >= 0 && index < maxSlots && index < weaponSlots.Length;
 
     public void QuickSwitchWeapon()
     {
@@ -150,7 +151,9 @@ public class PlayerWeaponController : MonoBehaviour
 
     private int FindEmptySlot()
     {
-        for (int i = 0; i < maxSlots; i++) {
+        if (weaponSlots == null) return -1;
+        int count = Mathf.Min(maxSlots, weaponSlots.Length);
+        for (int i = 0; i < count; i++) {
             if (weaponSlots[i].IsEmpty)
                 return i;
         }
@@ -183,7 +186,7 @@ public class PlayerWeaponController : MonoBehaviour
 
     public void DropCurrentWeapon()
     {
-        if (weaponSlots[currentSlotIndex].IsEmpty || GetEquippedWeaponCount() <= 1)
+        if (!IsValidSlot(currentSlotIndex) || weaponSlots[currentSlotIndex].IsEmpty || GetEquippedWeaponCount() <= 1)
             return;
 
         DropWeaponFromSlot(currentSlotIndex);
@@ -391,12 +394,12 @@ public class PlayerWeaponController : MonoBehaviour
         controls.Character.Fire.performed += ctx => isShooting = true;
         controls.Character.Fire.canceled += ctx => isShooting = false;
 
-        // Quick slots (only enable if slot has weapon)
-        controls.Character.EquipSlot1.performed += ctx => { if (!weaponSlots[0].IsEmpty) EquipSlot(0); };
-        controls.Character.EquipSlot2.performed += ctx => { if (!weaponSlots[1].IsEmpty) EquipSlot(1); };
-        controls.Character.EquipSlot3.performed += ctx => { if (!weaponSlots[2].IsEmpty) EquipSlot(2); };
-        controls.Character.EquipSlot4.performed += ctx => { if (!weaponSlots[3].IsEmpty) EquipSlot(3); };
-        controls.Character.EquipSlot5.performed += ctx => { if (maxSlots > 4 && !weaponSlots[4].IsEmpty) EquipSlot(4); };
+        // Quick slots. EquipSlot ignores indices beyond maxSlots and empty slots.
+        controls.Character.EquipSlot1.performed += ctx => EquipSlot(0);
+        controls.Character.EquipSlot2.performed += ctx => EquipSlot(1);
+        controls.Character.EquipSlot3.performed += ctx => EquipSlot(2);
+        controls.Character.EquipSlot4.performed += ctx => EquipSlot(3);
+        controls.Character.EquipSlot5.performed += ctx => EquipSlot(4);
 
         // Quick switch
         //controls.Character.QuickSwitchWeapon.performed += ctx => QuickSwitchWeapon();

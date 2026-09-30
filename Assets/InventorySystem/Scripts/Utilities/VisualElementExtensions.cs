@@ -8,8 +8,7 @@ namespace InventorySystem
     /// 
     /// Example usage:
     ///   var element = parent.CreateChild("my-class")
-    ///                       .WithName("myElement")
-    ///                       .WithSize(100, 50);
+    ///                       .WithName("myElement");
     public static class VisualElementExtensions 
     {
         #region Creation & Hierarchy
@@ -139,30 +138,6 @@ namespace InventorySystem
 
         #region Style Setters
 
-        /// Sets both width and height of the element
-        /// Example: element.WithSize(100, 50)
-        /// visualElement: The element to size
-        /// width: Width in pixels
-        /// height: Height in pixels
-        /// Returns: The element for method chaining
-        public static T WithSize<T>(this T visualElement, float width, float height) where T : VisualElement 
-        {
-            visualElement.style.width = width;
-            visualElement.style.height = height;
-            return visualElement;
-        }
-
-        /// Sets the position style to Absolute (for manual positioning)
-        /// Use this before setting left/top/right/bottom positions
-        /// Example: element.WithAbsolutePosition()
-        /// visualElement: The element to make absolutely positioned
-        /// Returns: The element for method chaining
-        public static T WithAbsolutePosition<T>(this T visualElement) where T : VisualElement 
-        {
-            visualElement.style.position = Position.Absolute;
-            return visualElement;
-        }
-
         /// Sets the background image of the element
         /// Example: element.WithBackgroundImage(myTexture)
         /// visualElement: The element to set background on
@@ -184,17 +159,6 @@ namespace InventorySystem
         public static T WithStyle<T>(this T visualElement, Action<IStyle> configureStyle) where T : VisualElement 
         {
             configureStyle?.Invoke(visualElement.style);
-            return visualElement;
-        }
-
-        /// Shows or hides the element by setting display style
-        /// Example: element.SetVisible(false) to hide
-        /// visualElement: The element to show/hide
-        /// visible: True to show (display: flex), false to hide (display: none)
-        /// Returns: The element for method chaining
-        public static T SetVisible<T>(this T visualElement, bool visible) where T : VisualElement 
-        {
-            visualElement.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
             return visualElement;
         }
 

@@ -16,6 +16,106 @@
     flex-wrap: wrap;
 }
 
+/* Panel show/hide. A UXML style attribute outranks this rule, so Show/Hide
+   also write inline display. */
+.ui-hidden {
+    display: none !important;
+}
+
+/* --- Slot contents (icon + stack count) --- */
+.inventorySlots-icon {
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.has-item > .inventorySlots-icon {
+    display: flex;
+}
+
+/* --- Equipment slot layers ---
+   equipment-slot-bg holds the empty-state texture (theme or USS).
+   equipment-icon holds the equipped item icon. Both are layout-only here. */
+.equipment-slot-bg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.equipment-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    -unity-background-scale-mode: scale-to-fit;
+    scale: 0.8 0.8;
+}
+
+.equipment-slot.has-item {
+    background-image: none;
+}
+
+.equipment-slot.has-item > .equipment-slot-bg {
+    display: none;
+}
+
+.equipment-slot.has-item > .equipment-icon {
+    display: flex;
+}
+
+/* --- Tab layers --- */
+.inventoryTab-bg,
+.inventoryTab-bg--active {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.inventoryTab-bg--active {
+    display: none;
+}
+
+.inventoryTab--active > .inventoryTab-bg {
+    display: none;
+}
+
+.inventoryTab--active > .inventoryTab-bg--active {
+    display: flex;
+}
+
+.inventoryTab-label {
+    display: none;
+}
+
+.inventoryTab--has-label > .inventoryTab-label {
+    display: flex;
+}
+
+/* --- Scroll wrapper (generated around the slot grid) --- */
+.inventory-scroll-wrapper {
+    flex-shrink: 0;
+}
+
+.inventory-scroll-wrapper .unity-scroll-view__content-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+}
+
 /* --- Drag & drop slot states --- */
 .inventorySlots--dragging {
     opacity: 0.3;
@@ -60,6 +160,10 @@
 
 /* --- Stack count label --- */
 .inventorySlots-qty {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    display: none;
     color: rgb(255, 255, 255);
     font-size: 14px;
     -unity-font-style: bold;
@@ -70,6 +174,10 @@
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
     border-bottom-left-radius: 3px;
+}
+
+.inventorySlots--stacked > .inventorySlots-qty {
+    display: flex;
 }
 
 /* --- Drag ghost --- */

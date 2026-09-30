@@ -25,9 +25,14 @@ namespace InventorySystem
 
         public event Action<EquipmentSlotTypeSO, InventoryItem> OnEquipmentChanged;
 
-        public void EquipItem(InventoryItem item, EquipmentSlotTypeSO slotType)
+        public bool CanEquip(InventoryItem item, EquipmentSlotTypeSO slotType)
         {
-            if (item == null || item.itemData == null) return;
+            return item != null && item.itemData != null && slotType != null && item.itemData.CanEquipTo(slotType);
+        }
+
+        public bool EquipItem(InventoryItem item, EquipmentSlotTypeSO slotType)
+        {
+            if (!CanEquip(item, slotType)) return false;
 
             // Remove any existing item in this slot (without firing a separate unequip event;
             // listeners get a single change notification with the new item)
@@ -40,6 +45,7 @@ namespace InventorySystem
 
             OnEquipmentChanged?.Invoke(slotType, item);
             Log($"Equipped {item.itemData.itemName} in {slotType} slot");
+            return true;
         }
 
         public void UnequipSlot(EquipmentSlotTypeSO slotType)
